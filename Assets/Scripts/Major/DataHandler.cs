@@ -4,6 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
 using UnityEngine.Events;
+using System;
 
 public class DataHandler : MonoBehaviour
 {
@@ -29,9 +30,9 @@ public class DataHandler : MonoBehaviour
 
     [field: SerializeField] private bool ValidateDataOnStartup = true;
     
-    public const int MaxSaveFiles = 3;
+    private const int MaxSaveFiles = 3;
 
-
+    public int GetMaxSaveFiles() => MaxSaveFiles;
     public string GetFileName(int Index) => GetFilePath() + "/" + SaveFileName + "_" + Index.ToString() + ExtensionName;
     public string GetFilePath() => TargetPath + "/" + FolderName;
 
@@ -78,8 +79,25 @@ public class DataHandler : MonoBehaviour
         BinaryFormatter formatter = new();
         FileStream file = File.Create(filename);
 
-        formatter.Serialize(file, new SaveData());
+        SaveData data = new()
+        {
+            creationData = DateTime.Now.ToString()
+        };
+
+        formatter.Serialize(file, data);
         file.Close();
+    }
+
+    public List<string> GetSaveFileNames()
+    {
+        if (!Directory.Exists(GetFilePath())) return new();
+
+        string[] files = Directory.GetFiles(GetFilePath());
+        List<string> names = new();
+
+        foreach (string file in files) names.Add(file);
+
+        return names;
     }
 
     public List<SaveData> GetSaveFiles()
@@ -89,11 +107,7 @@ public class DataHandler : MonoBehaviour
         string[] files = Directory.GetFiles(GetFilePath());
         List<SaveData> data = new();
 
-        foreach (string file in files)
-        {
-            print(file);
-            data.Add(LoadSaveFile(file));
-        }
+        foreach (string file in files) data.Add(LoadSaveFile(file));
 
         return data;
     }
@@ -101,14 +115,12 @@ public class DataHandler : MonoBehaviour
     public void ValidateData()
     {
         print(GetFilePath());
+        if (!Directory.Exists(GetFilePath())) Directory.CreateDirectory(GetFilePath());
 
-        if (!Directory.Exists(GetFilePath()))
+        for (int i = 0; i < MaxSaveFiles; i++)
         {
-            Directory.CreateDirectory(GetFilePath());
-            for (int i = 0; i < MaxSaveFiles; i++)
-            {
-                CreateSaveFile(GetFileName(i));
-            }
+            print(i);
+            CreateSaveFile(GetFileName(i));
         }
     }
 
