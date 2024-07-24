@@ -30,4 +30,9 @@ public class SaveData
     /// The exact Rottaion values of where the Player was when they reached the latest Checkpoint Instance.
     /// </summary>
     public float[] checkpointRotation;
+
+    /// <summary>
+    /// The exact Time and Date when the data was saved.
+    /// </summary>
+    public string creationData;
 }

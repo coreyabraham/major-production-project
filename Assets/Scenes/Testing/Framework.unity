@@ -296,7 +296,6 @@ GameObject:
   - component: {fileID: 719054583}
   - component: {fileID: 719054582}
   - component: {fileID: 719054585}
-  - component: {fileID: 719054586}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -382,21 +381,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &719054586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 719054580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98ee0e8147b57dd4a95bd7c4c9bce323, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dataHandler: {fileID: 2013053905}
-  testingType: 1
-  SaveFileIndex: 0
 --- !u!1001 &2013053904
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -564,16 +548,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Essentials
       objectReference: {fileID: 0}
+    - target: {fileID: 9141108622811272769, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
+      propertyPath: ValidateDataOnStartup
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
---- !u!114 &2013053905 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9141108622811272769, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
-  m_PrefabInstance: {fileID: 2013053904}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c67742905f73b7e41b35d57c02139885, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
