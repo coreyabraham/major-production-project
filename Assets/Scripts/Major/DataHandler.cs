@@ -70,6 +70,8 @@ public class DataHandler : MonoBehaviour
 
     public void CreateSaveFile(string filename)
     {
+        print(filename);
+
         if (string.IsNullOrWhiteSpace(filename)) return;
         if (File.Exists(filename)) return;
 
@@ -103,7 +105,10 @@ public class DataHandler : MonoBehaviour
         if (!Directory.Exists(GetFilePath()))
         {
             Directory.CreateDirectory(GetFilePath());
-            for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i));
+            for (int i = 0; i < MaxSaveFiles; i++)
+            {
+                CreateSaveFile(GetFileName(i));
+            }
         }
     }
 

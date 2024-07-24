@@ -32,7 +32,7 @@ public class DataTester : MonoBehaviour
 
             case DATA_TestType.CreateSaveFile: 
                 {
-                    //dataHandler.CreateSaveFile(dataHandler.GetFileName(0));
+                    dataHandler.CreateSaveFile(dataHandler.GetFileName(0));
                 } 
                 break;
 

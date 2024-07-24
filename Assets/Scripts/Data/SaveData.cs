@@ -24,10 +24,10 @@ public class SaveData
     /// <summary>
     /// The exact Position values of where the Player was when they reached the latest Checkpoint Instance.
     /// </summary>
-    public System.Numerics.Vector3 checkpointPosition;
+    public float[] checkpointPosition;
 
     /// <summary>
     /// The exact Rottaion values of where the Player was when they reached the latest Checkpoint Instance.
     /// </summary>
-    public System.Numerics.Vector3 checkpointRotation;
+    public float[] checkpointRotation;
 }
