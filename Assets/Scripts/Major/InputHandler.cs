@@ -8,6 +8,7 @@ public class InputHandler : MonoBehaviour
     public class InputEvents
     {
         public UnityEvent<Vector2> Moving;
+        public UnityEvent<bool> Jumping;
     }
 
     [field: Header("Settings")]
@@ -25,16 +26,32 @@ public class InputHandler : MonoBehaviour
         Events.Moving?.Invoke(ctx.ReadValue<Vector2>());
     }
 
+    public void PlayerJumping(InputAction.CallbackContext ctx)
+    {
+        if (!CanUseInputs) return;
+        Events.Jumping?.Invoke(ctx.ReadValueAsButton());
+    }
+
     private void OnEnable()
     {
         Inputs.Player.Move.performed += PlayerMoved;
+        Inputs.Player.Move.started += PlayerMoved;
+        Inputs.Player.Move.canceled += PlayerMoved;
+
+        Inputs.Player.Jump.performed += PlayerJumping;
+        Inputs.Player.Jump.canceled += PlayerJumping;
 
         Inputs.Player.Enable();
     }
 
     private void OnDisable()
     {
-        // Events Go Here!
+        Inputs.Player.Move.performed -= PlayerMoved;
+        Inputs.Player.Move.started -= PlayerMoved;
+        Inputs.Player.Move.canceled -= PlayerMoved;
+
+        Inputs.Player.Jump.performed -= PlayerJumping;
+        Inputs.Player.Jump.canceled -= PlayerJumping;
 
         Inputs.Player.Disable();
     }

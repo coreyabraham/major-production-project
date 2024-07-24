@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8339992002406090265}
+  - component: {fileID: 6561875732722827814}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -32,6 +33,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6561875732722827814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740367087365677538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1f4e7cfbff3302418f5b744056710cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
+  MoveSpeed: 5
+  JumpHeight: 4
+  VelocityYIdle: 0
+  controller: {fileID: 0}
 --- !u!1 &6822224772207293661
 GameObject:
   m_ObjectHideFlags: 0
@@ -44,7 +62,6 @@ GameObject:
   - component: {fileID: 3627319950671314699}
   - component: {fileID: 4701529377699023584}
   - component: {fileID: 5066263474285775699}
-  - component: {fileID: 4102936628317422396}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -135,31 +152,3 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4102936628317422396
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6822224772207293661}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96c6a620b22bb1345a85a059bb7dbbca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Events:
-    Moving:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4102936628317422396}
-          m_TargetAssemblyTypeName: InputSystemTest, Assembly-CSharp
-          m_MethodName: Callback
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
