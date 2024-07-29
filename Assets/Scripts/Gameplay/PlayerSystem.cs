@@ -9,6 +9,8 @@ public class PlayerSystem : MonoBehaviour
 
     [field: SerializeField] private float VelocityYIdle = 0.0f;
 
+    [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
+
     [HideInInspector] public CharacterController Character;
 
     private Vector3 Velocity;
@@ -44,6 +46,14 @@ public class PlayerSystem : MonoBehaviour
     private void Update()
     {
         IsGrounded = Character.isGrounded;
+
+        switch (MoveType)
+        {
+            case MovementType.None: MoveInput = Vector2.zero; break;
+            case MovementType.LockToLeftRight: MoveInput.y = 0.0f; break;
+            case MovementType.LockToForwardBack: MoveInput.x = 0.0f; break;
+        }
+
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
     }
 
