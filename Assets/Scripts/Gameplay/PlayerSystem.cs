@@ -17,6 +17,8 @@ public class PlayerSystem : MonoBehaviour
     Vector2 MoveInput;
     bool IsJumping, IsGrounded, IsMoving;
 
+    private Vector3 WarpPosition;
+
     [Header("External References")]
     [Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
@@ -29,6 +31,7 @@ public class PlayerSystem : MonoBehaviour
     public void HandleMovement(Vector2 moveInput) => MoveInput = moveInput;
     #endregion
 
+    public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
 
     #region Functions - Updates & Awake
     private void FixedUpdate()
@@ -63,6 +66,13 @@ public class PlayerSystem : MonoBehaviour
         Character.Move(Velocity * Time.deltaTime);
     }
 
+    private void LateUpdate()
+    {
+        if (WarpPosition == Vector3.zero) return;
+
+        transform.position = WarpPosition;
+        WarpPosition = Vector3.zero;
+    }
 
     private void Awake() => Character = GetComponentInChildren<CharacterController>();
     #endregion

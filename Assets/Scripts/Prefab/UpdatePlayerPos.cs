@@ -11,6 +11,6 @@ public class UpdatePlayerPos : MonoBehaviour
         if (!player) return;
         if (!transform) return;
 
-        player.Character.transform.SetPositionAndRotation(transform.position, transform.rotation);
+        player.WarpToPosition(transform.position);
     }
 }
