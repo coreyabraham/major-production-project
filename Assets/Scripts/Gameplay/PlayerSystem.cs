@@ -2,45 +2,51 @@ using UnityEngine;
 
 public class PlayerSystem : MonoBehaviour
 {
-    public CameraSystem Camera;
+    #region Variables
+    [Header("Movement & Jumping")]
+    [Tooltip("The speed that the player moves when on the ground.")]
+    [field: SerializeField] float MoveSpeed;    // = 6
+    [Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
+    [field: SerializeField] float JumpForce;    // = 11.5
+    [Tooltip("How much the gravity applied to the player is multiplied.")]
+    [field: SerializeField] float GravityMultiplier;    // = 2.3
+    [field: SerializeField] float VelocityYIdle = 0.0f; // = -4
+    [Tooltip("Locks the player's movement to a specific axis.")]
     public MovementType MoveType = MovementType.FreeRoam;
-    
-    [field: SerializeField] private float MoveSpeed;
-    [field: SerializeField] private float JumpHeight;
+    Vector3 Velocity;
+    Vector2 MoveInput;
+    bool IsJumping, IsGrounded, IsMoving;
 
-    [field: SerializeField] private float VelocityYIdle = 0.0f;
-
+    [Header("External References")]
+    [Tooltip("Reference to the camera that will follow the player.")]
+    public CameraSystem Camera;
     [HideInInspector] public CharacterController Character;
+    #endregion
 
-    private Vector3 Velocity;
-    private Vector2 MoveInput;
 
-    private bool IsJumping;
-    private bool IsGrounded;
-    private bool IsMoving;
-
+    #region Functions - Handlers
     public void HandleJumping(bool JumpBool) => IsJumping = JumpBool;
     public void HandleMovement(Vector2 moveInput) => MoveInput = moveInput;
+    #endregion
 
+
+    #region Functions - Updates & Awake
     private void FixedUpdate()
     {
         Vector3 moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
 
-        if (IsGrounded || IsMoving)
-        {
-            Velocity.x = moveDelta.x;
-            Velocity.z = moveDelta.z;
-        }
+        Velocity.z = moveDelta.z;
+        Velocity.x = moveDelta.x;
 
         if (IsGrounded)
         {
-            if (IsJumping) Velocity.y = JumpHeight;
+            if (IsJumping) Velocity.y = JumpForce;
             else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
         }
 
-        Velocity += Physics.gravity * Time.fixedDeltaTime;
-        Character.Move(Velocity * Time.deltaTime);
+        Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
     }
+
 
     private void Update()
     {
@@ -54,7 +60,10 @@ public class PlayerSystem : MonoBehaviour
         }
 
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
+        Character.Move(Velocity * Time.deltaTime);
     }
 
+
     private void Awake() => Character = GetComponentInChildren<CharacterController>();
+    #endregion
 }
