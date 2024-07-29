@@ -7,7 +7,9 @@ public class UpdatePlayerPos : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         PlayerSystem player = other.gameObject.GetComponentInParent<PlayerSystem>();
+
         if (!player) return;
+        if (!transform) return;
 
         player.Character.transform.SetPositionAndRotation(transform.position, transform.rotation);
     }

@@ -1,15 +1,14 @@
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
 using UnityEngine.Events;
-using System;
-using System.Linq;
 
 public class DataHandler : MonoBehaviour
 {
-    [System.Serializable]
+    [Serializable]
     public class DataEvents
     {
         public UnityEvent DataValidated;
