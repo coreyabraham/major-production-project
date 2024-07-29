@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 
 public class CameraSystem : MonoBehaviour
 {
-    [field: SerializeField] private PlayerSystem Player;
+    public PlayerSystem Player;
+    public CameraAxis CameraAngle = CameraAxis.North;
+
     [field: SerializeField] private bool TargetPlayer = false;
 
     [field: SerializeField] private Vector3 CameraPositionOffset;
@@ -11,11 +14,34 @@ public class CameraSystem : MonoBehaviour
     [field: SerializeField] private bool LerpCamera;
     [field: SerializeField] private float CameraLerpSpeed;
 
-    [field: SerializeField] private CameraAxis CameraAngle = CameraAxis.North;
-
     [HideInInspector] public Camera main;
     
-    private void Start() => main = GetComponentInChildren<Camera>();
+    public void CameraMove(bool Right)
+    {
+        int maxCount = Enum.GetNames(typeof(CameraAxis)).Length;
+        int value = (int)CameraAngle;
+        
+        if (Right)
+        {
+            if (value == maxCount - 1)
+            {
+                CameraAngle = CameraAxis.North;
+                return;
+            }
+
+            value++;
+        }
+
+        else
+        {
+            if (value == 0) value = maxCount - 1;
+            else value--;
+        }
+
+        CameraAngle = (CameraAxis)value;
+    }
+
+    private void Awake() => main = GetComponentInChildren<Camera>();
 
     private float DictateAngle()
     {
@@ -43,6 +69,7 @@ public class CameraSystem : MonoBehaviour
         Transform charTransform = Player.Character.gameObject.transform;
         Vector3 newPos = charTransform.position + CameraPositionOffset;
         
+        // TODO: Make sure that when the Camera rotates, it keeps the Player Character in focus instead of ignoring it's transform!
         float angle = DictateAngle();
         Vector3 vecRot = new(main.transform.rotation.x, angle, main.transform.rotation.z);
 
@@ -54,6 +81,9 @@ public class CameraSystem : MonoBehaviour
             return;
         }
 
-        main.transform.SetPositionAndRotation(Vector3.MoveTowards(main.transform.position, newPos, Time.fixedDeltaTime * CameraLerpSpeed), Quaternion.Lerp(main.transform.rotation, newRot, Time.fixedDeltaTime * CameraLerpSpeed));
+        main.transform.SetPositionAndRotation(
+            Vector3.MoveTowards(main.transform.position, newPos, Time.fixedDeltaTime * CameraLerpSpeed), 
+            Quaternion.Lerp(main.transform.rotation, newRot, Time.fixedDeltaTime * CameraLerpSpeed)
+        );
     }
 }

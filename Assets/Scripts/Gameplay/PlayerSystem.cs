@@ -2,14 +2,13 @@ using UnityEngine;
 
 public class PlayerSystem : MonoBehaviour
 {
-    [field: SerializeField] private CameraSystem mainCamera;
-
+    public CameraSystem Camera;
+    public MovementType MoveType = MovementType.FreeRoam;
+    
     [field: SerializeField] private float MoveSpeed;
     [field: SerializeField] private float JumpHeight;
 
     [field: SerializeField] private float VelocityYIdle = 0.0f;
-
-    [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
 
     [HideInInspector] public CharacterController Character;
 
@@ -25,7 +24,7 @@ public class PlayerSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 moveDelta = (MoveInput.x * mainCamera.main.transform.right + MoveInput.y * mainCamera.main.transform.forward) * MoveSpeed;
+        Vector3 moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
 
         if (IsGrounded || IsMoving)
         {
@@ -57,5 +56,5 @@ public class PlayerSystem : MonoBehaviour
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
     }
 
-    private void Start() => Character = GetComponentInChildren<CharacterController>();
+    private void Awake() => Character = GetComponentInChildren<CharacterController>();
 }

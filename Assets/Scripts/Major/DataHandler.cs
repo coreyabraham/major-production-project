@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+using System.Linq;
 
 public class DataHandler : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class DataHandler : MonoBehaviour
     [field: Space(0.5f)]
 
     [field: SerializeField] private bool ValidateDataOnStartup = true;
-    
+
     private const int MaxSaveFiles = 3;
 
     public int GetMaxSaveFiles() => MaxSaveFiles;
@@ -114,14 +115,8 @@ public class DataHandler : MonoBehaviour
 
     public void ValidateData()
     {
-        print(GetFilePath());
         if (!Directory.Exists(GetFilePath())) Directory.CreateDirectory(GetFilePath());
-
-        for (int i = 0; i < MaxSaveFiles; i++)
-        {
-            print(i);
-            CreateSaveFile(GetFileName(i));
-        }
+        for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i));
     }
 
     private void Awake()

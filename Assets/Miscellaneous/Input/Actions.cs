@@ -44,6 +44,24 @@ public partial class @Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MoveCamLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""f92d8d6b-20a5-4820-b2b3-e81d733ea09d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MoveCamRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""32ae3d3f-d9ad-4ddc-8949-77c38add2264"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -112,6 +130,28 @@ public partial class @Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""baeb7a47-5c64-44d5-b44b-bba0510d74e6"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c3201e47-1fa7-4005-9673-ffdfc40910bb"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveCamRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -122,6 +162,8 @@ public partial class @Actions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_MoveCamLeft = m_Player.FindAction("MoveCamLeft", throwIfNotFound: true);
+        m_Player_MoveCamRight = m_Player.FindAction("MoveCamRight", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -185,12 +227,16 @@ public partial class @Actions: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_MoveCamLeft;
+    private readonly InputAction m_Player_MoveCamRight;
     public struct PlayerActions
     {
         private @Actions m_Wrapper;
         public PlayerActions(@Actions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @MoveCamLeft => m_Wrapper.m_Player_MoveCamLeft;
+        public InputAction @MoveCamRight => m_Wrapper.m_Player_MoveCamRight;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -206,6 +252,12 @@ public partial class @Actions: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @MoveCamLeft.started += instance.OnMoveCamLeft;
+            @MoveCamLeft.performed += instance.OnMoveCamLeft;
+            @MoveCamLeft.canceled += instance.OnMoveCamLeft;
+            @MoveCamRight.started += instance.OnMoveCamRight;
+            @MoveCamRight.performed += instance.OnMoveCamRight;
+            @MoveCamRight.canceled += instance.OnMoveCamRight;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -216,6 +268,12 @@ public partial class @Actions: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @MoveCamLeft.started -= instance.OnMoveCamLeft;
+            @MoveCamLeft.performed -= instance.OnMoveCamLeft;
+            @MoveCamLeft.canceled -= instance.OnMoveCamLeft;
+            @MoveCamRight.started -= instance.OnMoveCamRight;
+            @MoveCamRight.performed -= instance.OnMoveCamRight;
+            @MoveCamRight.canceled -= instance.OnMoveCamRight;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -237,5 +295,7 @@ public partial class @Actions: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnMoveCamLeft(InputAction.CallbackContext context);
+        void OnMoveCamRight(InputAction.CallbackContext context);
     }
 }

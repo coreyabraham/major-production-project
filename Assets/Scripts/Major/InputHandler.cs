@@ -9,6 +9,9 @@ public class InputHandler : MonoBehaviour
     {
         public UnityEvent<Vector2> Moving;
         public UnityEvent<bool> Jumping;
+
+        public UnityEvent MoveCamLeft;
+        public UnityEvent MoveCamRight;
     }
 
     [field: Header("Settings")]
@@ -32,6 +35,18 @@ public class InputHandler : MonoBehaviour
         Events.Jumping?.Invoke(ctx.ReadValueAsButton());
     }
 
+    public void CameraMoveLeft(InputAction.CallbackContext ctx)
+    {
+        if (!CanUseInputs) return;
+        Events.MoveCamLeft?.Invoke();
+    }
+
+    public void CameraMoveRight(InputAction.CallbackContext ctx)
+    {
+        if (!CanUseInputs) return;
+        Events.MoveCamRight?.Invoke();
+    }
+
     private void OnEnable()
     {
         Inputs.Player.Move.performed += PlayerMoved;
@@ -40,6 +55,9 @@ public class InputHandler : MonoBehaviour
 
         Inputs.Player.Jump.performed += PlayerJumping;
         Inputs.Player.Jump.canceled += PlayerJumping;
+
+        Inputs.Player.MoveCamLeft.performed += CameraMoveLeft;
+        Inputs.Player.MoveCamRight.performed += CameraMoveRight;
 
         Inputs.Player.Enable();
     }
@@ -52,6 +70,9 @@ public class InputHandler : MonoBehaviour
 
         Inputs.Player.Jump.performed -= PlayerJumping;
         Inputs.Player.Jump.canceled -= PlayerJumping;
+
+        Inputs.Player.MoveCamLeft.performed -= CameraMoveLeft;
+        Inputs.Player.MoveCamRight.performed -= CameraMoveRight;
 
         Inputs.Player.Disable();
     }
