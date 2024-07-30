@@ -27,6 +27,9 @@ public struct PlayerSettings
     /// </summary>
     public int resolution;
     
+    /// <summary>
+    /// The Quality Setting that the game's visuals will run under, is adjustable via "Project Settings"!
+    /// </summary>
     public int quality;
 
     /// <summary>

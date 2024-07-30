@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DataTester : MonoBehaviour
@@ -14,7 +13,6 @@ public class DataTester : MonoBehaviour
         SaveFileData
     }
 
-    [field: SerializeField] private DataHandler dataHandler;
     [field: SerializeField] private DATA_TestType testingType = DATA_TestType.CreateSaveFile;
 
     [field: SerializeField] private int SaveFileIndex = 0;
@@ -26,10 +24,10 @@ public class DataTester : MonoBehaviour
         {
             case DATA_TestType.GetSaveFiles:
                 {
-                    List<SaveData> data = dataHandler.GetSaveFiles();
+                    SaveData[] data = DataHandler.Instance.GetSaveFiles();
                     foreach (SaveData file in data)
                     {
-                        print(file.creationData);
+                        print(file.modificationData);
                     }
                 }
                 break;
@@ -38,16 +36,16 @@ public class DataTester : MonoBehaviour
                 {
                     if (TestAllSaveFiles)
                     {
-                        List<string> data = dataHandler.GetSaveFileNames();
+                        string[] data = DataHandler.Instance.GetSaveFileNames();
                         foreach (string file in data)
                         {
-                            dataHandler.CreateSaveFile(file);
+                            DataHandler.Instance.CreateSaveFile(file);
                         }
 
                         return;
                     }
 
-                    dataHandler.CreateSaveFile(dataHandler.GetFileName(SaveFileIndex));
+                    DataHandler.Instance.CreateSaveFile(DataHandler.Instance.GetFileName(SaveFileIndex));
                 } 
                 break;
 
@@ -55,16 +53,16 @@ public class DataTester : MonoBehaviour
                 {
                     if (TestAllSaveFiles)
                     {
-                        List<string> data = dataHandler.GetSaveFileNames();
+                        string[] data = DataHandler.Instance.GetSaveFileNames();
                         foreach (string file in data)
                         {
-                            dataHandler.LoadSaveFile(file);
+                            DataHandler.Instance.LoadSaveFile(file);
                         }
 
                         return;
                     }
 
-                    print(dataHandler.LoadSaveFile(dataHandler.GetFileName(SaveFileIndex)));
+                    print(DataHandler.Instance.LoadSaveFile(DataHandler.Instance.GetFileName(SaveFileIndex)));
                 }
                 break;
 
@@ -74,22 +72,22 @@ public class DataTester : MonoBehaviour
 
                     SaveData SD = new()
                     {
-                        creationData = DateTime.Now.ToString()
+                        modificationData = DateTime.Now.ToString()
                     };
 
                     if (TestAllSaveFiles)
                     {
-                        List<string> data = dataHandler.GetSaveFileNames();
+                        string[] data = DataHandler.Instance.GetSaveFileNames();
                         foreach (string file in data)
                         {
-                            dataHandler.SaveFileData(file, SD);
+                            DataHandler.Instance.SaveFileData(file, SD);
                         }
 
                         return;
                     }
 
-                    filename = dataHandler.GetFileName(SaveFileIndex);
-                    dataHandler.SaveFileData(filename, SD);
+                    filename = DataHandler.Instance.GetFileName(SaveFileIndex);
+                    DataHandler.Instance.SaveFileData(filename, SD);
                 }
                 break;
 

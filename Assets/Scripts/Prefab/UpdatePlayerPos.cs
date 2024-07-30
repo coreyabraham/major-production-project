@@ -11,6 +11,6 @@ public class UpdatePlayerPos : MonoBehaviour
         if (!player) return;
         if (!transform) return;
 
-        player.WarpToPosition(transform.position);
+        player.WarpToPosition(TargetTransform.position);
     }
 }

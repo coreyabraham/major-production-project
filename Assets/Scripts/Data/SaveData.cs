@@ -34,5 +34,5 @@ public class SaveData
     /// <summary>
     /// The exact Time and Date when the data was saved.
     /// </summary>
-    public string creationData;
+    public string modificationData;
 }

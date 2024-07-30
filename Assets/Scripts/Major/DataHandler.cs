@@ -1,22 +1,21 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
-using UnityEngine.Events;
+//using UnityEngine.Events;
 
-public class DataHandler : MonoBehaviour
+public class DataHandler : Singleton<DataHandler>
 {
-    [Serializable]
-    public class DataEvents
-    {
-        public UnityEvent DataValidated;
-        public UnityEvent CreatedFile;
-        public UnityEvent SavedToFile;
-        public UnityEvent LoadedFromFile;
-        public UnityEvent DeletedFile;
-    }
+    //[Serializable]
+    //public class DataEvents
+    //{
+    //    public UnityEvent DataValidated;
+    //    public UnityEvent CreatedFile;
+    //    public UnityEvent SavedToFile;
+    //    public UnityEvent LoadedFromFile;
+    //    public UnityEvent DeletedFile;
+    //}
 
     [field: SerializeField] private string FolderName = "SaveData";
     [field: SerializeField] private string TargetPath = string.Empty;
@@ -81,33 +80,30 @@ public class DataHandler : MonoBehaviour
 
         SaveData data = new()
         {
-            creationData = DateTime.Now.ToString()
+            modificationData = DateTime.Now.ToString()
         };
 
         formatter.Serialize(file, data);
         file.Close();
     }
 
-    public List<string> GetSaveFileNames()
+    public string[] GetSaveFileNames()
     {
-        if (!Directory.Exists(GetFilePath())) return new();
-
-        string[] files = Directory.GetFiles(GetFilePath());
-        List<string> names = new();
-
-        foreach (string file in files) names.Add(file);
-
-        return names;
+        if (!Directory.Exists(GetFilePath())) return new string[0];
+        return Directory.GetFiles(GetFilePath());
     }
 
-    public List<SaveData> GetSaveFiles()
+    public SaveData[] GetSaveFiles()
     {
-        if (!Directory.Exists(GetFilePath())) return new();
+        if (!Directory.Exists(GetFilePath())) return new SaveData[0];
 
         string[] files = Directory.GetFiles(GetFilePath());
-        List<SaveData> data = new();
+        SaveData[] data = new SaveData[files.Length];
 
-        foreach (string file in files) data.Add(LoadSaveFile(file));
+        for (int i = 0; i < files.Length; i++)
+        {
+            data[i] = LoadSaveFile(files[i]);
+        }
 
         return data;
     }
@@ -118,7 +114,7 @@ public class DataHandler : MonoBehaviour
         for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i));
     }
 
-    private void Awake()
+    protected override void Initialize()
     {
         if (string.IsNullOrWhiteSpace(TargetPath)) TargetPath = Application.persistentDataPath;
         if (!ValidateDataOnStartup) return;
