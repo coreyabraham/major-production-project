@@ -48,7 +48,7 @@ public struct PlayerSettings
     /// The target amount of Frames Per Second the game will try to reach during gameplay. <br/>
     /// THIS WILL NOT BE READ IF VSYNC IS ENABLED!
     /// </summary>
-    public float framesPerSecond;
+    public int framesPerSecond;
 
     /// <summary>
     /// Cap the Framerate to your Monitor's "Refresh Rate" and yield GPU rendering per frame to prevent screen-tearing <br/>

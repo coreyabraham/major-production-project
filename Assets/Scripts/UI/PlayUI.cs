@@ -17,6 +17,10 @@ public class PlayUI : MonoBehaviour
     [field: SerializeField] private TMP_Text DeathLabel;
     [field: SerializeField] private TMP_Text ProgressLabel;
 
+    [field: Space(5.0f)]
+
+    [field: SerializeField] private string NonSelectedText = "Selected File: N / A";
+
     private SaveFileUI[] CachedFiles;
     private int SaveFileUI_Index = -1;
 
@@ -49,7 +53,7 @@ public class PlayUI : MonoBehaviour
         if (SaveFileUI_Index != -1 && file == CachedFiles[SaveFileUI_Index])
         {
             SaveFileUI_Index = -1;
-            SelectLabel.text = "Selected File: null";
+            SelectLabel.text = NonSelectedText;
 
             ChosenParent.SetActive(false);
 
@@ -109,6 +113,6 @@ public class PlayUI : MonoBehaviour
         ProgressLabel.text = "Progress: 0%";
 
         SaveFileUI_Index = -1;
-        SelectLabel.text = "Selected File: null";
+        SelectLabel.text = NonSelectedText;
     }
 }
