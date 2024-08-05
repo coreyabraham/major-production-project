@@ -48,8 +48,10 @@ public class PlayerSystem : MonoBehaviour
         }
 
         Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
+        
+        Character.Move(Velocity * Time.deltaTime);
+        // ROTATE CHARACTER HERE!
     }
-
 
     private void Update()
     {
@@ -63,7 +65,6 @@ public class PlayerSystem : MonoBehaviour
         }
 
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
-        Character.Move(Velocity * Time.deltaTime);
     }
 
     private void LateUpdate()

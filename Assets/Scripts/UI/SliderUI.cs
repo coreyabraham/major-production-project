@@ -8,8 +8,8 @@ using UnityEngine.Events;
 
 public class SliderUI : MonoBehaviour
 {
-    [field: SerializeField] private Slider Slider;
-    [field: SerializeField] private TMP_Text Text;
+    public Slider Slider;
+    public TMP_Text Text;
 
     [field: Space(5.0f)]
 

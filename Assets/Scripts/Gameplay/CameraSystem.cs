@@ -1,89 +1,118 @@
-using System;
 using UnityEngine;
 
 public class CameraSystem : MonoBehaviour
 {
-    public PlayerSystem Player;
-    public CameraAxis CameraAngle = CameraAxis.North;
+    [field: Header("Toggleables")]
+    public bool TargetPlayer = false;
 
-    [field: SerializeField] private bool TargetPlayer = false;
-
+    [field: Header("Angles and Offsets")]
     [field: SerializeField] private Vector3 CameraPositionOffset;
     [field: SerializeField] private Vector3 CameraRotationOffset;
 
+    [field: Space(5.0f)]
+
+    [field: SerializeField] private float CameraAngle;
+    [field: SerializeField] private float FieldOfView = 80.0f;
+    [field: SerializeField] private float DepthOfField;
+
+    [field: Header("Lerping")]
     [field: SerializeField] private bool LerpCamera;
+    [field: SerializeField] private bool LerpSettings;
+
+    [field: Space(5.0f)]
+
     [field: SerializeField] private float CameraLerpSpeed;
+    [field: SerializeField] private float SettingsLerpSpeed;
+
+    [field: Space(5.0f)]
+    
+    [field: SerializeField] private EasingStyle EasingStyle;
+    [field: SerializeField] private EasingDirection EasingDirection;
+
+    [field: Header("External References")]
+    public PlayerSystem Player;
 
     [HideInInspector] public Camera main;
-    
-    public void CameraMove(bool Right)
+
+    private bool SkipAutoTargetSetting = false;
+    private bool YieldMovementDuringSet = false;
+
+    System.Action FinishedAction;
+    MovementType PreviousMoveType;
+
+    private Vector3 TargetPosition;
+    private Quaternion TargetRotation;
+
+    public Transform GetCameraTransform() => main.transform;
+
+    public void SetCameraTransform(Transform Transform, bool YieldMovement, System.Action Finished)
     {
-        int maxCount = Enum.GetNames(typeof(CameraAxis)).Length;
-        int value = (int)CameraAngle;
-        
-        if (Right)
-        {
-            if (value == maxCount - 1)
-            {
-                CameraAngle = CameraAxis.North;
-                return;
-            }
+        PreviousMoveType = Player.MoveType;
+        SkipAutoTargetSetting = true;
+        YieldMovementDuringSet = YieldMovement;
 
-            value++;
-        }
+        if (YieldMovement) Player.MoveType = MovementType.None;
 
-        else
-        {
-            if (value == 0) value = maxCount - 1;
-            else value--;
-        }
+        TargetPosition = Transform.position;
+        TargetRotation = Transform.rotation;
 
-        CameraAngle = (CameraAxis)value;
+        FinishedAction = Finished;
     }
 
-    private void Awake() => main = GetComponentInChildren<Camera>();
-
-    private float DictateAngle()
+    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation)
     {
-        float angle = 0.0f;
-
-        switch (CameraAngle)
-        {
-            case CameraAxis.North: angle = 0.0f; break;
-            case CameraAxis.NorthEast: angle = 45.0f; break;
-            case CameraAxis.East: angle = 90.0f; break;
-            case CameraAxis.SouthEast: angle = 135.0f; break;
-            case CameraAxis.South: angle = 180.0f; break;
-            case CameraAxis.SouthWest: angle = 225.0f; break;
-            case CameraAxis.West: angle = 270.0f; break;
-            case CameraAxis.NorthWest: angle = 315.0f; break;
-        }
-
-        return angle;
-    }
-
-    private void FixedUpdate()
-    {
-        if (!TargetPlayer) return;
-
-        Transform charTransform = Player.Character.gameObject.transform;
-        Vector3 newPos = charTransform.position + CameraPositionOffset;
-        
-        // TODO: Make sure that when the Camera rotates, it keeps the Player Character in focus instead of ignoring it's transform!
-        float angle = DictateAngle();
-        Vector3 vecRot = new(main.transform.rotation.x, angle, main.transform.rotation.z);
-
-        Quaternion newRot = Quaternion.Euler(vecRot + CameraRotationOffset);
-
         if (!LerpCamera)
         {
-            main.transform.SetPositionAndRotation(newPos, newRot);
+            main.transform.SetPositionAndRotation(Position, Rotation);
             return;
         }
 
         main.transform.SetPositionAndRotation(
-            Vector3.MoveTowards(main.transform.position, newPos, Time.fixedDeltaTime * CameraLerpSpeed), 
-            Quaternion.Lerp(main.transform.rotation, newRot, Time.fixedDeltaTime * CameraLerpSpeed)
+            Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * CameraLerpSpeed),
+            Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * CameraLerpSpeed)
         );
+
+        if (!SkipAutoTargetSetting) return;
+        if (main.transform.position != Position || main.transform.rotation != Rotation) return;
+
+        if (YieldMovementDuringSet) Player.MoveType = PreviousMoveType;
+
+        YieldMovementDuringSet = false;
+        SkipAutoTargetSetting = false;
+
+        FinishedAction?.Invoke();
+        FinishedAction = null;
     }
+
+    private void LerpCameraTransform(Transform Transform) => LerpCameraTransform(Transform.position, Transform.rotation);
+
+    private void FixedUpdate()
+    {
+        if (LerpSettings)
+        {
+            main.fieldOfView = Mathf.Lerp(main.fieldOfView, Mathf.Clamp(FieldOfView, 0, 180), Time.fixedDeltaTime * SettingsLerpSpeed);
+            //main.depthOfField = Mathf.Lerp(main.depthOfField, DepthOfField, Time.fixedDeltaTime * SettingsLerpSpeed);
+        }
+        else
+        {
+            main.fieldOfView = Mathf.Clamp(FieldOfView, 0, 180);
+            //main.depthOfField = DepthOfField;
+        }
+
+        if (!SkipAutoTargetSetting && TargetPlayer)
+        {
+            Transform charTransform = Player.Character.gameObject.transform;
+            Vector3 newPos = charTransform.position + CameraPositionOffset;
+
+            Vector3 vecRot = new(main.transform.rotation.x, CameraAngle, main.transform.rotation.z);
+            Quaternion newRot = Quaternion.Euler(vecRot + CameraRotationOffset);
+
+            TargetPosition = newPos;
+            TargetRotation = newRot;
+        }
+
+        LerpCameraTransform(TargetPosition, TargetRotation);
+    }
+    
+    private void Awake() => main = GetComponentInChildren<Camera>();
 }

@@ -23,7 +23,7 @@ public class PromptUI : Singleton<PromptUI>
 
     private PromptDataUI cachedData;
 
-    public void PromptCalled(PromptDataUI data)
+    public void Begin(PromptDataUI data)
     {
         Prompt.SetActive(true);
         SetupPrompt(data);
