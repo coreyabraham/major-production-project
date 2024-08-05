@@ -22,7 +22,7 @@ public class PlayerSystem : MonoBehaviour
     [Header("External References")]
     [Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
-    [HideInInspector] public CharacterController Character;
+   [HideInInspector] public CharacterController Character;
     #endregion
 
 
