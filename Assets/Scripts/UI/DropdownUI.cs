@@ -7,8 +7,8 @@ using UnityEngine.Events;
 
 public class DropdownUI : MonoBehaviour
 {
-    [field: SerializeField] private TMP_Dropdown Dropdown;
-    [field: SerializeField] private TMP_Text TextLabel;
+    public TMP_Dropdown Dropdown;
+    public TMP_Text TextLabel;
 
     [field: SerializeField] private int DropdownStartIndex = -1;
     [field: SerializeField] private DropdownTypeUI DropdownFillType;

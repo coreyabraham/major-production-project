@@ -6,8 +6,8 @@ using UnityEngine.Events;
 
 public class CheckboxUI : MonoBehaviour
 {
-    [field: SerializeField] private Toggle Checkbox;
-    [field: SerializeField] private TMP_Text TextLabel;
+    public Toggle Checkbox;
+    public TMP_Text TextLabel;
 
     [field: SerializeField] private UnityEvent<bool> CheckboxToggled;
 
