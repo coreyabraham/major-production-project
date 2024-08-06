@@ -19,6 +19,7 @@ public class SliderUI : MonoBehaviour
 
     [field: Space(5.0f)]
 
+    [field: SerializeField] private int RoundToDecimals = -1;
     [field: SerializeField] private SliderTypeUI SliderDisplayType;
 
     [field: Space(5.0f)]
@@ -34,6 +35,7 @@ public class SliderUI : MonoBehaviour
             case SliderTypeUI.Percentage:
                 {
                     displayValue *= 100;
+                    if (RoundToDecimals > 0) displayValue = (float)Math.Round(displayValue, RoundToDecimals);
                 }
                 break;
 
@@ -47,12 +49,13 @@ public class SliderUI : MonoBehaviour
 
         if (UpdateLabel) Text.text = BaseText + ": " + displayValue.ToString() + TextExtension;
 
+        if (!invokeEvent) return;
         ValueChanged?.Invoke(value);
     }
 
     private void Awake()
     {
-        ValueModified(Slider.value);
+        ValueModified(Slider.value, false);
         Slider.onValueChanged.AddListener((float value) => ValueModified(value, true));
     }
 }

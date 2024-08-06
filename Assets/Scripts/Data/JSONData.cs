@@ -1,5 +1,7 @@
 using System.IO;
+
 using UnityEngine;
+using UnityEngine.Events;
 
 public class JSONData : MonoBehaviour
 {
@@ -8,6 +10,8 @@ public class JSONData : MonoBehaviour
     [field: SerializeField] private bool DefaultOnStartup = false;
 
     [field: SerializeField] private PlayerSettings DefaultSettings;
+
+    public UnityEvent<PlayerSettings> Initialized;
 
     private PlayerSettings lastSavedSettings;
 
@@ -21,13 +25,15 @@ public class JSONData : MonoBehaviour
         return JsonUtility.FromJson<PlayerSettings>(fileContents);
     }
 
-    public void ApplyData(PlayerSettings NewSettings)
+    public void ApplyData(PlayerSettings NewSettings, bool SetDefault = false)
     {
         if (NewSettings == lastSavedSettings)
         {
             Debug.Log(name + " | Newer PlayerSettings Instance is exactly the same as the Last Saved Data, skipping...");
             return;
         }
+
+        if (string.IsNullOrWhiteSpace(NewSettings.Resolution)) NewSettings.Resolution = Screen.currentResolution.width.ToString() + "x" + Screen.currentResolution.height;
 
         string data = JsonUtility.ToJson(NewSettings);
         File.WriteAllText(FilePath, data);
@@ -47,15 +53,12 @@ public class JSONData : MonoBehaviour
         if (!File.Exists(FilePath))
         {
             fileDidntExistPrior = true;
-
-            File.Create(FilePath);
-            ApplyData(DefaultSettings);
-
+            ApplyData(DefaultSettings, true);
             lastSavedSettings = DefaultSettings;
         }
 
-        if (!DefaultOnStartup || fileDidntExistPrior) return;
+        if (DefaultOnStartup && fileDidntExistPrior) ApplyData(DefaultSettings, true);
 
-        ApplyData(DefaultSettings);
+        Initialized?.Invoke(GetCurrentData());
     }
 }
