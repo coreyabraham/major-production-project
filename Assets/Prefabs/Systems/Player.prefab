@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8339992002406090265}
   - component: {fileID: 6561875732722827814}
+  - component: {fileID: 1534051186}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 740367087365677538}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5872828256086086563}
@@ -45,15 +46,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1f4e7cfbff3302418f5b744056710cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 5
-  JumpForce: 4
-  GravityMultiplier: 0.9
-  VelocityYIdle: 0
-  MoveType: 1
+  MoveSpeed: 2.8
+  ScurrySpeed: 5.7
+  MoveEasing: 24
+  MoveType: 3
+  JumpForce: 4.5
+  GravityMultiplier: 1.05
+  VelocityYIdle: -3.2
   LerpRotation: 1
-  LerpSpeed: 4
+  LerpSpeed: 20
   Camera: {fileID: 0}
   Character: {fileID: 0}
+--- !u!143 &1534051186
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740367087365677538}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 0.05
+  m_Radius: 0.05
+  m_SlopeLimit: 45
+  m_StepOffset: 0.005
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1001 &6199982600700703816
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -125,6 +146,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rat_Blockout_01
       objectReference: {fileID: 0}
+    - target: {fileID: 1050135703514554785, guid: 61d9ae8ddff5c66408e0d88965e083da, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9993c7a8f8d484547b80a36ce5c2b73a, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 61d9ae8ddff5c66408e0d88965e083da, type: 3}
 --- !u!4 &5872828256086086563 stripped
@@ -132,26 +157,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 61d9ae8ddff5c66408e0d88965e083da, type: 3}
   m_PrefabInstance: {fileID: 6199982600700703816}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6542510360959846681 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 61d9ae8ddff5c66408e0d88965e083da, type: 3}
-  m_PrefabInstance: {fileID: 6199982600700703816}
-  m_PrefabAsset: {fileID: 0}
---- !u!143 &7514013264716679392
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6542510360959846681}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 0.05
-  m_Radius: 0.05
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.05, z: 0}
