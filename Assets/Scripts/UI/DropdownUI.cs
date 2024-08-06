@@ -15,7 +15,8 @@ public class DropdownUI : MonoBehaviour
 
     [field: Space(10.0f)]
 
-    [field: SerializeField] private UnityEvent<int> ValueChanged;
+    public UnityEvent<int> ValueChanged;
+    public UnityEvent DropdownInitalized;
 
     [field: Space(10.0f)]
 
@@ -108,5 +109,6 @@ public class DropdownUI : MonoBehaviour
         }
 
         Dropdown.onValueChanged.AddListener(ValueModified);
+        DropdownInitalized?.Invoke();
     }
 }
