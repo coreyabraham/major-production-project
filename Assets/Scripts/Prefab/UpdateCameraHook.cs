@@ -6,9 +6,9 @@ public class UpdateCameraHook : MonoBehaviour
     [field: SerializeField] private bool YieldMovement = true;
     [field: SerializeField] private Transform TargetCameraTransform;
 
-    public UnityEvent TriggerFinished;
+    public UnityEvent<CameraSystem> TriggerFinished;
 
-    private void FinishedTransform() => TriggerFinished?.Invoke();
+    private void FinishedTransform(CameraSystem Camera) => TriggerFinished?.Invoke(Camera);
 
     private void OnTriggerEnter(Collider other)
     {
@@ -17,6 +17,8 @@ public class UpdateCameraHook : MonoBehaviour
 
         CameraSystem camera = player.Camera;
         if (!camera) return;
+
+        if (camera.IsLerpingToPoint()) return;
 
         if (!TargetCameraTransform)
         {

@@ -37,15 +37,29 @@ public class CameraSystem : MonoBehaviour
     private bool SkipAutoTargetSetting = false;
     private bool YieldMovementDuringSet = false;
 
-    System.Action FinishedAction;
+    System.Action<CameraSystem> FinishedAction;
     MovementType PreviousMoveType;
 
     private Vector3 TargetPosition;
     private Quaternion TargetRotation;
 
+    public void HookCameraToPlayer()
+    {
+        if (!SkipAutoTargetSetting) return;
+
+        if (YieldMovementDuringSet) Player.MoveType = PreviousMoveType;
+
+        YieldMovementDuringSet = false;
+        SkipAutoTargetSetting = false;
+
+        TargetPlayer = true;
+    }
+
+    public bool IsLerpingToPoint() => SkipAutoTargetSetting;
+
     public Transform GetCameraTransform() => main.transform;
 
-    public void SetCameraTransform(Transform Transform, bool YieldMovement, System.Action Finished)
+    public void SetCameraTransform(Transform Transform, bool YieldMovement, System.Action<CameraSystem> Finished)
     {
         PreviousMoveType = Player.MoveType;
         SkipAutoTargetSetting = true;
@@ -75,12 +89,7 @@ public class CameraSystem : MonoBehaviour
         if (!SkipAutoTargetSetting) return;
         if (main.transform.position != Position || main.transform.rotation != Rotation) return;
 
-        if (YieldMovementDuringSet) Player.MoveType = PreviousMoveType;
-
-        YieldMovementDuringSet = false;
-        SkipAutoTargetSetting = false;
-
-        FinishedAction?.Invoke();
+        FinishedAction?.Invoke(this);
         FinishedAction = null;
     }
 

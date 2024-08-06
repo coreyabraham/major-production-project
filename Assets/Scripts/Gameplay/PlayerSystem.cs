@@ -2,33 +2,49 @@ using UnityEngine;
 
 public class PlayerSystem : MonoBehaviour
 {
-    #region Variables
-    [Header("Movement & Jumping")]
-    [Tooltip("The speed that the player moves when on the ground.")]
+    #region Public Variables
+    [field: Header("Movement & Jumping")]
+
+    [field: Tooltip("The speed that the player moves when on the ground.")]
     [field: SerializeField] float MoveSpeed;    // = 6
-    [Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
+    
+    [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] float JumpForce;    // = 11.5
-    [Tooltip("How much the gravity applied to the player is multiplied.")]
+    
+    [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] float GravityMultiplier;    // = 2.3
     [field: SerializeField] float VelocityYIdle = 0.0f; // = -4
-    [Tooltip("Locks the player's movement to a specific axis.")]
+    
+    [field: Tooltip("Locks the player's movement to a specific axis.")]
     public MovementType MoveType = MovementType.FreeRoam;
-    Vector3 Velocity;
-    Vector2 MoveInput;
-    bool IsJumping, IsGrounded, IsMoving;
 
-    private Vector3 WarpPosition;
+    [field: Header("Lerping")]
+    [field: SerializeField] private bool LerpRotation;
+    [field: SerializeField] private float LerpSpeed;
 
-    [Header("External References")]
-    [Tooltip("Reference to the camera that will follow the player.")]
+    [field: Header("External References")]
+    [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
-   [HideInInspector] public CharacterController Character;
+    [HideInInspector] public CharacterController Character;
     #endregion
 
+    #region Private Variables
+    private Vector3 WarpPosition;
+    private Quaternion CharacterRotation;
+
+    private Vector3 Velocity;
+    private Vector2 MoveInput;
+    private bool IsJumping, IsGrounded, IsMoving;
+    #endregion
 
     #region Functions - Handlers
-    public void HandleJumping(bool JumpBool) => IsJumping = JumpBool;
     public void HandleMovement(Vector2 moveInput) => MoveInput = moveInput;
+
+    public void HandleJumping(bool JumpBool)
+    {
+        if (MoveType == MovementType.None) return;
+        IsJumping = JumpBool;
+    }
     #endregion
 
     public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
@@ -48,9 +64,22 @@ public class PlayerSystem : MonoBehaviour
         }
 
         Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
-        
         Character.Move(Velocity * Time.deltaTime);
-        // ROTATE CHARACTER HERE!
+
+        if (!IsMoving) return;
+
+        float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
+        float degree = 180.0f * radian / Mathf.PI;
+        float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
+
+        CharacterRotation = Quaternion.Euler(0.0f, IsMoving ? rotation + 90.0f : 90.0f, 0.0f);
+
+        if (LerpRotation)
+        {
+            CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
+        }
+
+        Character.transform.rotation = CharacterRotation;
     }
 
     private void Update()
