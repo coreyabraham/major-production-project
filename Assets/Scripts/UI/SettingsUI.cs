@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Audio;
 using System;
 
@@ -27,13 +26,25 @@ public class SettingsUI : MonoBehaviour
     [field: SerializeField] private SliderUI MasterSlider;
     [field: SerializeField] private SliderUI MusicSlider;
     [field: SerializeField] private SliderUI SoundSlider;
+
+    [field: Space(2.5f)]
+
     [field: SerializeField] private SliderUI FPSSlider;
+
+    [field: Space(2.5f)]
+
+    [field: SerializeField] private SliderUI ContrastSlider;
+    [field: SerializeField] private SliderUI BrightnessSlider;
 
     [field: Header("Dropdowns")]
     [field: SerializeField] private DropdownUI ResolutionDD;
     [field: SerializeField] private DropdownUI QualityDD;
     [field: SerializeField] private DropdownUI WindowDD;
     [field: SerializeField] private DropdownUI HudScaleDD;
+
+    [field: Space(2.5f)]
+
+    [field: SerializeField] private DropdownUI ColourAccDD;
 
     [field: Header("Checkboxes")]
     [field: SerializeField] private CheckboxUI VsyncCB;
@@ -62,7 +73,7 @@ public class SettingsUI : MonoBehaviour
     public void ResetButtonClicked() => PromptHandler.Begin(ResetPromptData);
     #endregion
 
-    #region SliderUI References
+    #region Public References
     public void MasterVolumeChanged(float value)
     {
         MixerReference reference = GetMixerReference(AudioType.Master);
@@ -83,6 +94,21 @@ public class SettingsUI : MonoBehaviour
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();
     }
+
+    public void ContrastChanged(float value)
+    {
+        print(value);
+    }
+
+    public void BrightnessChanged(float value)
+    {
+        print(value);
+    }
+
+    public void ColourAccessibilityChanged(int value)
+    {
+        print(value);
+    }
     #endregion
 
     #region PromptMethods
@@ -102,7 +128,11 @@ public class SettingsUI : MonoBehaviour
             HudScale = HudScaleDD.Dropdown.options[HudScaleDD.Dropdown.value].text,
 
             FramesPerSecond = (int)FPSSlider.Slider.value,
-            UseVsync = VsyncCB.Checkbox.isOn
+            UseVsync = VsyncCB.Checkbox.isOn,
+
+            Contrast = ContrastSlider.Slider.value,
+            Brightness = BrightnessSlider.Slider.value,
+            ColourAccessibility = ColourAccDD.Dropdown.options[ColourAccDD.Dropdown.value].text
         };
 
         JsonHandler.ApplyData(newSettings);
@@ -168,12 +198,22 @@ public class SettingsUI : MonoBehaviour
 
         FPSSlider.Slider.value = Settings.FramesPerSecond;
         VsyncCB.Checkbox.isOn = Settings.UseVsync;
+
+        ContrastSlider.Slider.value = Settings.Contrast;
+        BrightnessSlider.Slider.value = Settings.Brightness;
+        ColourAccDD.Dropdown.value = GetDropdownOptionIndex(ColourAccDD.Dropdown.options, Settings.ColourAccessibility);
     }
 
     private void UpdateGraphics()
     {
         PlayerSettings settings = JsonHandler.GetCurrentData();
         string[] strings = settings.Resolution.Split('x');
+
+        if (strings.Length != 2)
+        {
+            string currentResolution = ResolutionDD.Dropdown.options[ResolutionDD.Dropdown.value].text;
+            strings = currentResolution.Split('x');
+        }
 
         int.TryParse(strings[0], out int width);
         int.TryParse(strings[1], out int height);
