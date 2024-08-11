@@ -1,5 +1,8 @@
 public enum ClimbPointType
 {
-    TopPoint = 0,
-    BottomPoint
+    PipeNorth = 0,
+    PipeEast,
+    PipeSouth,
+    PipeWest,
+    Ground
 }

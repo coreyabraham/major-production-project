@@ -1,9 +1,5 @@
 using UnityEngine;
 
-// When the rat is within a climable surface's trigger and hits interact, he latches onto the surface to climb. When he reaches the peak or base of the wall,
-// he automatically lets go. When he latches on, his MoveType changes to "climbing", which changes his controls slightly for climbing.
-// The rat cannot let go of a climable surface when he's in the middle of it.
-
 
 public class PlayerSystem : MonoBehaviour
 {
@@ -19,14 +15,15 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] float MoveEasing;
 
     public MovementType MoveType = MovementType.FreeRoam;
+    [HideInInspector] public bool isClimbing = false;
 
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
-    [field: SerializeField] float JumpForce;    // = 11.5
+    [field: SerializeField] float JumpForce;
     
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
-    [field: SerializeField] float GravityMultiplier;    // = 2.3
-    [field: SerializeField] float VelocityYIdle = 0.0f; // = -4
+    [field: SerializeField] float GravityMultiplier;
+    [field: SerializeField] float VelocityYIdle = 0.0f;
     
     [field: Tooltip("Locks the player's movement to a specific axis.")]
 
@@ -38,9 +35,6 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
     [HideInInspector] public CharacterController Character;
-
-
-    [field: SerializeField] bool isClimbing = false;
 
     #endregion
 
@@ -113,8 +107,8 @@ public class PlayerSystem : MonoBehaviour
             }
 
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
-            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.deltaTime);
-            Character.Move(actualVelocity * Time.deltaTime);
+            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            Character.Move(actualVelocity * Time.fixedDeltaTime);
 
             lastFrameVelocity = new(actualVelocity.x, Velocity.y, actualVelocity.z);
         }
@@ -122,9 +116,9 @@ public class PlayerSystem : MonoBehaviour
         {
             Velocity.y = moveDelta.z;
 
-            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.deltaTime);
+            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             actualVelocity.z = 0;
-            Character.Move(actualVelocity * Time.deltaTime);
+            Character.Move(actualVelocity * Time.fixedDeltaTime);
 
             lastFrameVelocity = new(actualVelocity.x, actualVelocity.y, Velocity.z);
         }

@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[CreateAssetMenu(fileName = "LevelPrefab", menuName = "Scriptables/Level Prefab", order = 1)]
+[System.Serializable, CreateAssetMenu(fileName = "Level Prefab", menuName = "Scriptables/Management/Level Prefab", order = 1)]
 public class LevelPrefab : ScriptableObject
 {
-    [field: SerializeField] public string FriendlyName { get; set; }
-    
+    public string FriendlyName { get; set; }
+    public Scene UnityScene { get; set; }
+
     // ADD SCENE OPTIONS FOR 'SceneHandler.cs' HERE!
-    
-    //[field: SerializeField] public Scene UnityScene { get; set; }
 }
