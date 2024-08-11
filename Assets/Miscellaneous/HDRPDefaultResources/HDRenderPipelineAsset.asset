@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RenderPipelineSettings:
     supportShadowMask: 1
-    supportSSR: 0
-    supportSSRTransparent: 0
+    supportSSR: 1
+    supportSSRTransparent: 1
     supportSSAO: 1
     supportSSGI: 0
     supportSubsurfaceScattering: 1
@@ -35,7 +35,7 @@ MonoBehaviour:
     customBufferFormat: 8
     supportedLitShaderMode: 2
     planarReflectionResolution:
-      m_Values: 000100000004000000080000
+      m_Values: 000100000002000000020000
       m_SchemaId:
         m_Id: With3Levels
     supportDecals: 1
@@ -59,7 +59,7 @@ MonoBehaviour:
       cookieTexArraySize: 1
       planarReflectionAtlasSize: 1024
       reflectionProbeCacheSize: 64
-      reflectionCubemapSize: 256
+      reflectionCubemapSize: 512
       reflectionCacheCompressed: 0
       reflectionProbeFormat: 74
       skyReflectionSize: 256
@@ -77,9 +77,9 @@ MonoBehaviour:
       maxLocalVolumetricFogSize: 32
       maxLocalVolumetricFogOnScreen: 64
     hdShadowInitParams:
-      maxShadowRequests: 128
+      maxShadowRequests: 512
       directionalShadowsDepthBits: 32
-      shadowFilteringQuality: 1
+      shadowFilteringQuality: 2
       punctualLightShadowAtlas:
         shadowAtlasResolution: 4096
         shadowAtlasDepthBits: 32
