@@ -9,9 +9,8 @@ public class InputHandler : MonoBehaviour
     {
         public UnityEvent<Vector2> Moving;
         public UnityEvent<bool> Jumping;
-
-        public UnityEvent MoveCamLeft;
-        public UnityEvent MoveCamRight;
+        public UnityEvent<bool> Climbing;
+        public UnityEvent<bool> Scurrying;
     }
 
     [field: Header("Settings")]
@@ -22,6 +21,13 @@ public class InputHandler : MonoBehaviour
     [field: SerializeField] private InputEvents Events;
 
     private Actions Inputs;
+
+    //public void InputCalled<TValue>(InputAction.CallbackContext ctx, EventData target, bool readAsButton = false)
+    //{
+    //    if (!CanUseInputs) return;
+    //    target.Value = readAsButton ? ctx.ReadValueAsButton() : ctx.ReadValue<TValue>();
+    //    target.Event?.Invoke(target.Value);
+    //}
 
     public void PlayerMoved(InputAction.CallbackContext ctx)
     {
@@ -35,16 +41,16 @@ public class InputHandler : MonoBehaviour
         Events.Jumping?.Invoke(ctx.ReadValueAsButton());
     }
 
-    public void CameraMoveLeft(InputAction.CallbackContext ctx)
+    public void PlayerClimbing(InputAction.CallbackContext ctx)
     {
         if (!CanUseInputs) return;
-        Events.MoveCamLeft?.Invoke();
+        Events.Climbing?.Invoke(ctx.ReadValueAsButton());
     }
 
-    public void CameraMoveRight(InputAction.CallbackContext ctx)
+    public void PlayerScurrying(InputAction.CallbackContext ctx)
     {
         if (!CanUseInputs) return;
-        Events.MoveCamRight?.Invoke();
+        Events.Scurrying?.Invoke(ctx.ReadValueAsButton());
     }
 
     private void OnEnable()
@@ -56,8 +62,11 @@ public class InputHandler : MonoBehaviour
         Inputs.Player.Jump.performed += PlayerJumping;
         Inputs.Player.Jump.canceled += PlayerJumping;
 
-        Inputs.Player.MoveCamLeft.performed += CameraMoveLeft;
-        Inputs.Player.MoveCamRight.performed += CameraMoveRight;
+        Inputs.Player.Climb.performed += PlayerClimbing;
+        Inputs.Player.Climb.canceled += PlayerClimbing;
+
+        Inputs.Player.Scurry.performed += PlayerScurrying;
+        Inputs.Player.Scurry.canceled += PlayerScurrying;
 
         Inputs.Player.Enable();
     }
@@ -71,8 +80,11 @@ public class InputHandler : MonoBehaviour
         Inputs.Player.Jump.performed -= PlayerJumping;
         Inputs.Player.Jump.canceled -= PlayerJumping;
 
-        Inputs.Player.MoveCamLeft.performed -= CameraMoveLeft;
-        Inputs.Player.MoveCamRight.performed -= CameraMoveRight;
+        Inputs.Player.Climb.performed -= PlayerClimbing;
+        Inputs.Player.Climb.canceled-= PlayerClimbing;
+
+        Inputs.Player.Scurry.performed -= PlayerScurrying;
+        Inputs.Player.Scurry.canceled-= PlayerScurrying;
 
         Inputs.Player.Disable();
     }

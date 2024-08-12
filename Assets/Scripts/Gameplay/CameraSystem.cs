@@ -47,7 +47,7 @@ public class CameraSystem : MonoBehaviour
     {
         if (!SkipAutoTargetSetting) return;
 
-        if (YieldMovementDuringSet) Player.MoveType = PreviousMoveType;
+        if (YieldMovementDuringSet) Player.SetMovementType(PreviousMoveType);
 
         YieldMovementDuringSet = false;
         SkipAutoTargetSetting = false;
@@ -61,16 +61,28 @@ public class CameraSystem : MonoBehaviour
 
     public void SetCameraTransform(Transform Transform, bool YieldMovement, System.Action<CameraSystem> Finished)
     {
-        PreviousMoveType = Player.MoveType;
+        PreviousMoveType = Player.GetMoveType();
         SkipAutoTargetSetting = true;
         YieldMovementDuringSet = YieldMovement;
 
-        if (YieldMovement) Player.MoveType = MovementType.None;
+        if (YieldMovement) Player.SetMovementType(MovementType.None, true);
 
         TargetPosition = Transform.position;
         TargetRotation = Transform.rotation;
 
         FinishedAction = Finished;
+    }
+
+    public void ForceCameraBackToPlayer()
+    {
+        SkipAutoTargetSetting = true;
+
+        Vector3 vecRot = new(main.transform.rotation.x, CameraAngle, main.transform.rotation.z);
+        TargetRotation = Quaternion.Euler(vecRot + CameraRotationOffset);
+
+        TargetPosition = Player.Character.gameObject.transform.position + CameraPositionOffset;
+
+        HookCameraToPlayer();
     }
 
     private void LerpCameraTransform(Vector3 Position, Quaternion Rotation)
@@ -93,7 +105,7 @@ public class CameraSystem : MonoBehaviour
         FinishedAction = null;
     }
 
-    private void LerpCameraTransform(Transform Transform) => LerpCameraTransform(Transform.position, Transform.rotation);
+    //private void LerpCameraTransform(Transform Transform) => LerpCameraTransform(Transform.position, Transform.rotation);
 
     private void FixedUpdate()
     {

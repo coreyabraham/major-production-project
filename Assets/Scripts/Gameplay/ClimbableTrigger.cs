@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ClimbableTrigger : MonoBehaviour
@@ -9,65 +8,53 @@ public class ClimbableTrigger : MonoBehaviour
     private PlayerSystem playerSystem;
     private ClimbPointType PipePointType;
 
-
-    private void Start()
+    private void DetermineClimbHook()
     {
-        PipePointType = PipePoint.GetComponent<ClimbPoint>().climbPointType;
+        if (!playerSystem.ClimbingRequested) return;
+
+        playerSystem.IsClimbing = !playerSystem.IsClimbing;
+
+        if (playerSystem.IsClimbing) playerSystem.SetVelocity(Vector3.zero);
+
+        playerSystem.WarpToPosition(playerSystem.IsClimbing ? PipePoint.transform.position : GroundPoint.transform.position);
+        playerSystem.ClimbingRequested = false;
     }
 
     private void Update()
     {
-        if (playerSystem != null)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                playerSystem.ToggleClimbingMode();
+        if (playerSystem == null) return;
 
-                if (playerSystem.isClimbing)
-                {
-                    playerSystem.WarpToPosition(PipePoint.transform.position);
-                }
-                else
-                {
-                    playerSystem.WarpToPosition(GroundPoint.transform.position);
-                }
-            }
+        DetermineClimbHook();
 
+        bool isOutsideBounds = false;
 
-            /* Buggy - Auto-Detach from Pipe if you pass beyond it's PipePoint transform.
-             * 
-             * 
-             * if (playerSystem.isClimbing && toggleCooldownTimer <= 0)
-            {
-                if (PipePointType == ClimbPointType.PipeNorth &&        // Exit via Northern Pipe
-                    playerSystem.transform.position.y > PipePoint.transform.position.y)
-                {
-                    TogglePlayerState();
-                }
-                else if (PipePointType == ClimbPointType.PipeEast &&    // Exit via Eastern Pipe
-                    playerSystem.transform.position.x > PipePoint.transform.position.x)
-                {
-                    TogglePlayerState();
-                }
-                else if (PipePointType == ClimbPointType.PipeSouth &&   // Exit via Southern Pipe
-                    playerSystem.transform.position.y < PipePoint.transform.position.y)
-                {
-                    TogglePlayerState();
-                }
-                else if (PipePointType == ClimbPointType.PipeWest &&    // Exit via Western Pipe
-                    playerSystem.transform.position.x < PipePoint.transform.position.x)
-                {
-                    TogglePlayerState();
-                }
-            }*/
-        }
-    }
+        //Buggy - Auto - Detach from Pipe if you pass beyond it's PipePoint transform.
+        //if (playerSystem.IsClimbing /*&& toggleCooldownTimer <= 0*/)
+        //{
+        //    if (PipePointType == ClimbPointType.PipeNorth &&        // Exit via Northern Pipe
+        //        playerSystem.transform.position.y > PipePoint.transform.position.y)
+        //    {
+        //        isOutsideBounds = true;
+        //    }
+        //    else if (PipePointType == ClimbPointType.PipeEast &&    // Exit via Eastern Pipe
+        //        playerSystem.transform.position.x > PipePoint.transform.position.x)
+        //    {
+        //        isOutsideBounds = true;
+        //    }
+        //    else if (PipePointType == ClimbPointType.PipeSouth &&   // Exit via Southern Pipe
+        //        playerSystem.transform.position.y < PipePoint.transform.position.y)
+        //    {
+        //        isOutsideBounds = true;
+        //    }
+        //    else if (PipePointType == ClimbPointType.PipeWest &&    // Exit via Western Pipe
+        //        playerSystem.transform.position.x < PipePoint.transform.position.x)
+        //    {
+        //        isOutsideBounds = true;
+        //    }
+        //}
 
-
-    private void TogglePlayerState()
-    {
-        playerSystem.ToggleClimbingMode();
-        playerSystem.WarpToPosition(GroundPoint.transform.position);
+        if (!isOutsideBounds) return;
+        playerSystem.IsClimbing = false;
     }
 
 
@@ -87,5 +74,7 @@ public class ClimbableTrigger : MonoBehaviour
             playerSystem = null;
         }
     }
+
+    private void Awake() => PipePointType = PipePoint.GetComponent<ClimbPoint>().climbPointType;
     #endregion
 }
