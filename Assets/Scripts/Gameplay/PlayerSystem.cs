@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.Events;
 
 public class PlayerSystem : MonoBehaviour
 {
@@ -14,16 +14,18 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The acceleration that will be applied to the player when they begin moving. Likewise, the time it takes for them to stop moving.")]
     [field: SerializeField] float MoveEasing;
 
-    public MovementType MoveType = MovementType.FreeRoam;
-    [HideInInspector] public bool isClimbing = false;
+    [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
+    [HideInInspector] public bool ClimbingRequested;
+    [HideInInspector] public bool IsClimbing;
 
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] float JumpForce;
     
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
-    [field: SerializeField] float GravityMultiplier;
-    [field: SerializeField] float VelocityYIdle = 0.0f;
+    [field: SerializeField] private float GravityMultiplier;
+    [field: SerializeField] private float VelocityYIdle = 0.0f;
+    [field: SerializeField] private float CharacterMass;
     
     [field: Tooltip("Locks the player's movement to a specific axis.")]
 
@@ -35,67 +37,60 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
     [HideInInspector] public CharacterController Character;
-
     #endregion
 
     #region Private Variables
     private Vector3 WarpPosition;
     private Quaternion CharacterRotation;
 
-    private Vector3 lastFrameVelocity = new(0, 0, 0);
     private Vector3 Velocity;
     private Vector2 MoveInput;
-    private bool IsJumping, IsGrounded, IsMoving;
+    private Vector3 HitDirection;
+
+    private Vector3 lastFrameVelocity = Vector3.zero;
+
+    private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
     #endregion
 
     #region Functions - Handlers
     public void HandleMovement(Vector2 moveInput) => MoveInput = moveInput;
-
-    public void HandleJumping(bool JumpBool)
+    public void HandleScurry(bool scurry) => IsScurrying = scurry;
+    public void HandleClimbing(bool climbing) => ClimbingRequested = climbing;
+    public void HandleJumping(bool jumping)
     {
         if (MoveType == MovementType.None) return;
-        IsJumping = JumpBool;
+        IsJumping = jumping;
     }
     #endregion
 
+    #region Functions - Public
     public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
-
-
-    public void ToggleClimbingMode()
+    public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
+    public MovementType GetMoveType() => MoveType;
+    public void SetMovementType(MovementType Type, bool ResetVelocity = false)
     {
-        Velocity = new(0, 0, 0);
+        MoveType = Type;
+        if (!ResetVelocity) return;
+        SetVelocity(Vector3.zero);
+    }
+    public void DeathTriggered() => print("There's currently nothing here, please add something after the prototyping phase ends!");
+    #endregion
 
-        if (!isClimbing)
-        {
-            // Enable Climbing
+    #region Functions - Private
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        HitDirection = hit.point - transform.position;
+        if (!hit.rigidbody) return;
 
-            isClimbing = true;
-        }
-        else
-        {
-            // Disable Climbing
-
-            isClimbing = false;
-        }
+        hit.rigidbody.AddForceAtPosition(Velocity * CharacterMass, hit.point);
     }
 
-
-    #region Functions - Updates & Awake
     private void FixedUpdate()
     {
-        Vector3 moveDelta;
-        
-        if (Input.GetKey(KeyCode.LeftControl))
-        {
-            moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed;
-        }
-        else
-        {
-            moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
-        }
+        Vector3 moveDelta = IsScurrying ? (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed : 
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
 
-
-        if (!isClimbing)
+        if (!IsClimbing)
         {
             Velocity.z = moveDelta.z;
             Velocity.x = moveDelta.x;
@@ -123,21 +118,28 @@ public class PlayerSystem : MonoBehaviour
             lastFrameVelocity = new(actualVelocity.x, actualVelocity.y, Velocity.z);
         }
 
-        
-        if (!IsMoving) return;
+        if (!IsGrounded) HitDirection = Vector3.zero;
+
+        if (!IsMoving)
+        {
+            Vector3 horizonalHitDirection = HitDirection;
+            horizonalHitDirection.y = 0;
+
+            float displacement = horizonalHitDirection.magnitude;
+            if (displacement <= 0) return;
+
+            Velocity -= 0.2f * horizonalHitDirection / displacement;
+
+            return;
+        }
 
         float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
-
         CharacterRotation = Quaternion.Euler(0.0f, IsMoving ? rotation + 90.0f : 90.0f, 0.0f);
 
-
-        if (LerpRotation)
-        {
-            CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
-        }
+        if (LerpRotation) CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
 
         Character.transform.rotation = CharacterRotation;
     }

@@ -46,22 +46,22 @@ public partial class @Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""MoveCamLeft"",
+                    ""name"": ""Scurry"",
                     ""type"": ""Button"",
-                    ""id"": ""f92d8d6b-20a5-4820-b2b3-e81d733ea09d"",
+                    ""id"": ""9ffe50b8-4554-4b84-b9d0-a46298b6056e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": true
+                    ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""MoveCamRight"",
+                    ""name"": ""Climb"",
                     ""type"": ""Button"",
-                    ""id"": ""32ae3d3f-d9ad-4ddc-8949-77c38add2264"",
+                    ""id"": ""5a9cda02-3beb-4749-ad5f-90bc1a35f41c"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": true
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -133,23 +133,23 @@ public partial class @Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""baeb7a47-5c64-44d5-b44b-bba0510d74e6"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""id"": ""4f0f33e6-9da9-4f94-90f3-81724b78dae6"",
+                    ""path"": ""<Keyboard>/leftShift"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveCamLeft"",
+                    ""action"": ""Scurry"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""c3201e47-1fa7-4005-9673-ffdfc40910bb"",
-                    ""path"": ""<Keyboard>/r"",
+                    ""id"": ""e68f45fa-6bb3-421d-95fc-2e80527f35d6"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveCamRight"",
+                    ""action"": ""Climb"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -162,8 +162,8 @@ public partial class @Actions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_MoveCamLeft = m_Player.FindAction("MoveCamLeft", throwIfNotFound: true);
-        m_Player_MoveCamRight = m_Player.FindAction("MoveCamRight", throwIfNotFound: true);
+        m_Player_Scurry = m_Player.FindAction("Scurry", throwIfNotFound: true);
+        m_Player_Climb = m_Player.FindAction("Climb", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,16 +227,16 @@ public partial class @Actions: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_MoveCamLeft;
-    private readonly InputAction m_Player_MoveCamRight;
+    private readonly InputAction m_Player_Scurry;
+    private readonly InputAction m_Player_Climb;
     public struct PlayerActions
     {
         private @Actions m_Wrapper;
         public PlayerActions(@Actions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
-        public InputAction @MoveCamLeft => m_Wrapper.m_Player_MoveCamLeft;
-        public InputAction @MoveCamRight => m_Wrapper.m_Player_MoveCamRight;
+        public InputAction @Scurry => m_Wrapper.m_Player_Scurry;
+        public InputAction @Climb => m_Wrapper.m_Player_Climb;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -252,12 +252,12 @@ public partial class @Actions: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @MoveCamLeft.started += instance.OnMoveCamLeft;
-            @MoveCamLeft.performed += instance.OnMoveCamLeft;
-            @MoveCamLeft.canceled += instance.OnMoveCamLeft;
-            @MoveCamRight.started += instance.OnMoveCamRight;
-            @MoveCamRight.performed += instance.OnMoveCamRight;
-            @MoveCamRight.canceled += instance.OnMoveCamRight;
+            @Scurry.started += instance.OnScurry;
+            @Scurry.performed += instance.OnScurry;
+            @Scurry.canceled += instance.OnScurry;
+            @Climb.started += instance.OnClimb;
+            @Climb.performed += instance.OnClimb;
+            @Climb.canceled += instance.OnClimb;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -268,12 +268,12 @@ public partial class @Actions: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @MoveCamLeft.started -= instance.OnMoveCamLeft;
-            @MoveCamLeft.performed -= instance.OnMoveCamLeft;
-            @MoveCamLeft.canceled -= instance.OnMoveCamLeft;
-            @MoveCamRight.started -= instance.OnMoveCamRight;
-            @MoveCamRight.performed -= instance.OnMoveCamRight;
-            @MoveCamRight.canceled -= instance.OnMoveCamRight;
+            @Scurry.started -= instance.OnScurry;
+            @Scurry.performed -= instance.OnScurry;
+            @Scurry.canceled -= instance.OnScurry;
+            @Climb.started -= instance.OnClimb;
+            @Climb.performed -= instance.OnClimb;
+            @Climb.canceled -= instance.OnClimb;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -295,7 +295,7 @@ public partial class @Actions: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
-        void OnMoveCamLeft(InputAction.CallbackContext context);
-        void OnMoveCamRight(InputAction.CallbackContext context);
+        void OnScurry(InputAction.CallbackContext context);
+        void OnClimb(InputAction.CallbackContext context);
     }
 }
