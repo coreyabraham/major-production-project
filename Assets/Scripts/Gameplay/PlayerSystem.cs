@@ -6,7 +6,7 @@ public class PlayerSystem : MonoBehaviour
     #region Public Variables
     [field: Header("Movement")]
     [field: Tooltip("The speed that the player moves when on the ground.")]
-    [field: SerializeField] float MoveSpeed;    // = 6
+    [field: SerializeField] float MoveSpeed;
 
     [field: Tooltip("The speed that the player moves when scurrying on the ground.")]
     [field: SerializeField] float ScurrySpeed;
@@ -14,6 +14,7 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The acceleration that will be applied to the player when they begin moving. Likewise, the time it takes for them to stop moving.")]
     [field: SerializeField] float MoveEasing;
 
+    [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
@@ -27,16 +28,19 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private float VelocityYIdle = 0.0f;
     [field: SerializeField] private float CharacterMass;
     
-    [field: Tooltip("Locks the player's movement to a specific axis.")]
 
     [field: Header("Lerping")]
     [field: SerializeField] private bool LerpRotation;
     [field: SerializeField] private float LerpSpeed;
 
+    [field: Tooltip("The force that the player will push objects.")]
+    [field: SerializeField] float PushForce;
+
     [field: Header("External References")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
     [HideInInspector] public CharacterController Character;
+    [HideInInspector] public bool IsHidden = false;
     #endregion
 
     #region Private Variables
@@ -79,10 +83,20 @@ public class PlayerSystem : MonoBehaviour
     #region Functions - Private
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        HitDirection = hit.point - transform.position;
+        /*HitDirection = hit.point - transform.position;
         if (!hit.rigidbody) return;
 
-        hit.rigidbody.AddForceAtPosition(Velocity * CharacterMass, hit.point);
+        hit.rigidbody.AddForceAtPosition(Velocity * CharacterMass, hit.point);*/
+
+        Rigidbody body = hit.collider.attachedRigidbody;
+
+        if (body == null || body.isKinematic) { return; }
+
+        if (hit.moveDirection.y < -0.3f) { return; }
+
+        Vector3 pushDir = new(hit.moveDirection.x, 0, hit.moveDirection.z);
+        Vector3 collisionPoint = hit.point;
+        body.AddForceAtPosition(pushDir * PushForce, collisionPoint, ForceMode.Impulse);
     }
 
     private void FixedUpdate()

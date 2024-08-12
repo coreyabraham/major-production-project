@@ -12,18 +12,15 @@ public class StealthTrigger : MonoBehaviour
         {
             playerSystem = other.GetComponent<PlayerSystem>();
 
-          /* if (!playerSystem.isHidden)
-             {
-                 // Kill player.
-             }
-             else
-             {
-                 // playerSystem = null;
-             }
-           */
 
-
-            // can't do this because I need to edit the player script.
+            if (!playerSystem.IsHidden)
+            {
+                playerSystem.DeathTriggered();
+            }
+            else
+            {
+                playerSystem = null;
+            }
         }
     }
 

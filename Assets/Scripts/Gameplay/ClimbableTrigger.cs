@@ -28,8 +28,8 @@ public class ClimbableTrigger : MonoBehaviour
 
         bool isOutsideBounds = false;
 
-        //Buggy - Auto - Detach from Pipe if you pass beyond it's PipePoint transform.
-        //if (playerSystem.IsClimbing /*&& toggleCooldownTimer <= 0*/)
+        /*Buggy - Auto - Detach from Pipe if you pass beyond it's PipePoint transform.
+        //if (playerSystem.IsClimbing && toggleCooldownTimer <= 0)
         //{
         //    if (PipePointType == ClimbPointType.PipeNorth &&        // Exit via Northern Pipe
         //        playerSystem.transform.position.y > PipePoint.transform.position.y)
@@ -52,6 +52,7 @@ public class ClimbableTrigger : MonoBehaviour
         //        isOutsideBounds = true;
         //    }
         //}
+        */
 
         if (!isOutsideBounds) return;
         playerSystem.IsClimbing = false;
