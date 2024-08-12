@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7768850616224398124}
-  - component: {fileID: 832517397650722490}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -33,24 +32,6 @@ Transform:
   m_Father: {fileID: 6765966995821839399}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &832517397650722490
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661404308647368980}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 0
-  m_Radius: 0.7
-  m_SlopeLimit: 45
-  m_StepOffset: 0.002
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &663177930638499458
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,9 +208,10 @@ GameObject:
   m_Component:
   - component: {fileID: 6765966995821839399}
   - component: {fileID: 590231323864142498}
+  - component: {fileID: 1886212965}
   m_Layer: 0
   m_Name: Player_V3
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -262,13 +244,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1f4e7cfbff3302418f5b744056710cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 5
-  JumpForce: 4
-  GravityMultiplier: 1
-  VelocityYIdle: -1.41
-  MoveType: 1
+  MoveSpeed: 1.8
+  ScurrySpeed: 3.7
+  MoveEasing: 24
+  MoveType: 3
+  isClimbing: 0
+  JumpForce: 3.8
+  GravityMultiplier: 1.15
+  VelocityYIdle: -3.2
+  LerpRotation: 1
+  LerpSpeed: 20
   Camera: {fileID: 0}
   Character: {fileID: 0}
+--- !u!143 &1886212965
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246030398808792733}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 0
+  m_Radius: 0.1
+  m_SlopeLimit: 45
+  m_StepOffset: 0.001
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.17, z: 0}
 --- !u!1 &7109679004641858255
 GameObject:
   m_ObjectHideFlags: 0
