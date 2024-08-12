@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class UpdateCameraHook : MonoBehaviour
+public class UpdateCameraHooks : MonoBehaviour
 {
     [field: SerializeField] private bool YieldMovement = true;
-    [field: SerializeField] private Transform TargetCameraTransform;
+    [field: SerializeField] private CameraTarget[] TargetTransforms;
 
     public UnityEvent<CameraSystem> TriggerFinished;
 
@@ -20,12 +20,6 @@ public class UpdateCameraHook : MonoBehaviour
 
         if (camera.IsLerpingToPoint()) return;
 
-        if (!TargetCameraTransform)
-        {
-            camera.TargetPlayer = true;
-            return;
-        }
-
-        camera.SetCameraTarget(TargetCameraTransform, YieldMovement, FinishedTransform);
+        camera.SetMultipleCameraTargets(TargetTransforms, YieldMovement, 1.0f, 0.0f, FinishedTransform);
     }
 }
