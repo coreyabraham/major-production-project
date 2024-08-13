@@ -20,8 +20,6 @@ public class TitleUI : MonoBehaviour
 
     [field: SerializeField] private FrameGroup[] Groups;
 
-    public void TestGame() => SceneManager.LoadScene("Framework");
-
     private void GetButtons()
     {
         GameObject[] objs = GameObject.FindGameObjectsWithTag(ButtonTag);

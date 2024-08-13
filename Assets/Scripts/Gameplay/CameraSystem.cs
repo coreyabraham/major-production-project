@@ -1,6 +1,4 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -26,7 +24,7 @@ public class CameraSystem : MonoBehaviour
 
     [field: Space(5.0f)]
     
-    [field: SerializeField, Tooltip("Not Implemented Yet!")] private EasingStyle EasingStyle;
+    [field: SerializeField] private EasingStyle EasingStyle;
     [field: SerializeField, Tooltip("Not Implemented Yet!")] private EasingDirection EasingDirection;
 
     [field: Header("External References")]
@@ -108,38 +106,6 @@ public class CameraSystem : MonoBehaviour
         Offsets.Rotation = Target.rotation;
     }
 
-    public void MathAgainstOffsets(MathType MathType, (bool Position, bool Rotation) Targets, Vector3 Value)
-    {
-        switch (MathType)
-        {
-            case MathType.Addition:
-                {
-                    if (Targets.Position) Offsets.Position += Value;
-                    if (Targets.Rotation) Offsets.Rotation.eulerAngles += Value;
-                }
-                break;
-            
-            case MathType.Subtraction:
-                {
-                    if (Targets.Position) Offsets.Position -= Value;
-                    if (Targets.Rotation) Offsets.Rotation.eulerAngles -= Value;
-                }
-                break;
-            
-            //case MathType.Multiplication:
-            //    {
-
-            //    }
-            //    break;
-            
-            //case MathType.Division:
-            //    { 
-                
-            //    }
-            //    break;
-        }
-    }
-
     public void SetMultipleCameraTargets(CameraTarget[] Targets, bool YieldMovement, float MaxIntervalBetweenEach, float IntervalModifier, System.Action<CameraSystem> Finished)
     {
         if (MovingBetweenPoints) return;
@@ -202,10 +168,24 @@ public class CameraSystem : MonoBehaviour
         }
         else
         {
-            main.transform.SetPositionAndRotation(
-                Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * CameraLerpSpeed),
-                Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * CameraLerpSpeed)
-            );
+            switch (EasingStyle)
+            {
+                case EasingStyle.Linear:
+                    {
+                        Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * CameraLerpSpeed);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * CameraLerpSpeed);
+                    }
+                    break;
+                
+                case EasingStyle.Sine:
+                    {
+                        Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * CameraLerpSpeed);
+                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * CameraLerpSpeed);
+                    }
+                    break;
+            }
+
+            main.transform.SetPositionAndRotation(Position, Rotation);
         }
 
         if (!SkipAutoTargetSetting) return;

@@ -96,10 +96,10 @@ MonoBehaviour:
     Jumping:
       m_PersistentCalls:
         m_Calls: []
-    MoveCamLeft:
+    Climbing:
       m_PersistentCalls:
         m_Calls: []
-    MoveCamRight:
+    Scurrying:
       m_PersistentCalls:
         m_Calls: []
 --- !u!1 &7331677958958138894
@@ -112,6 +112,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2389180204614053018}
   - component: {fileID: 9141108622811272769}
+  - component: {fileID: 8337814683459291855}
   m_Layer: 0
   m_Name: Data Handler
   m_TagString: Untagged
@@ -151,6 +152,37 @@ MonoBehaviour:
   ExtensionName: .dat
   SaveFileName: SaveFile
   ValidateDataOnStartup: 1
+--- !u!114 &8337814683459291855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7331677958958138894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fdd3d7850cdb9744abf2fa96f34382c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FileName: SettingsData.json
+  DirectoryName: MiscellaneousData
+  DefaultOnStartup: 0
+  DefaultSettings:
+    MasterVolume: 1
+    MusicVolume: 0.5
+    SoundVolume: 0.75
+    Resolution: 
+    Quality: Very Low
+    WindowMode: FullscreenWindow
+    HudScale: x1
+    FramesPerSecond: 60
+    UseVsync: 1
+    Contrast: 0.5
+    Brightness: 0.5
+    ColourAccessibility: Default
+  Initialized:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8081438214460888954
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,6 +192,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6975320980592092749}
+  - component: {fileID: 8505438615512106963}
   m_Layer: 0
   m_Name: Essentials
   m_TagString: Untagged
@@ -185,3 +218,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8505438615512106963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8081438214460888954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2edf3002c47245b0feb60c464e7ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

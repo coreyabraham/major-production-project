@@ -12,6 +12,6 @@ public class PlrDeathState : MonoBehaviour
 
         // Here temporarily until `DeathTriggered()` is finished!
         player.WarpToPosition(RespawnTransform.position);
-        player.Camera.ForceCameraBackToPlayer();
+        //player.Camera.ForceCameraBackToPlayer();
     }
 }

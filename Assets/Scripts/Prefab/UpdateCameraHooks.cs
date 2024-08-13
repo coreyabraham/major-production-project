@@ -20,6 +20,6 @@ public class UpdateCameraHooks : MonoBehaviour
 
         if (camera.IsLerpingToPoint()) return;
 
-        camera.SetMultipleCameraTargets(TargetTransforms, YieldMovement, 1.0f, 0.0f, FinishedTransform);
+        //camera.SetMultipleCameraTargets(TargetTransforms, YieldMovement, 1.0f, 0.0f, FinishedTransform);
     }
 }

@@ -26,8 +26,6 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
     [field: SerializeField] private float VelocityYIdle = 0.0f;
-    [field: SerializeField] private float CharacterMass;
-    
 
     [field: Header("Lerping")]
     [field: SerializeField] private bool LerpRotation;
@@ -83,19 +81,14 @@ public class PlayerSystem : MonoBehaviour
     #region Functions - Private
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        /*HitDirection = hit.point - transform.position;
-        if (!hit.rigidbody) return;
-
-        hit.rigidbody.AddForceAtPosition(Velocity * CharacterMass, hit.point);*/
-
         Rigidbody body = hit.collider.attachedRigidbody;
 
-        if (body == null || body.isKinematic) { return; }
-
-        if (hit.moveDirection.y < -0.3f) { return; }
+        if (body == null || body.isKinematic) return;
+        if (hit.moveDirection.y < -0.3f) return;
 
         Vector3 pushDir = new(hit.moveDirection.x, 0, hit.moveDirection.z);
         Vector3 collisionPoint = hit.point;
+
         body.AddForceAtPosition(pushDir * PushForce, collisionPoint, ForceMode.Impulse);
     }
 
@@ -116,7 +109,7 @@ public class PlayerSystem : MonoBehaviour
             }
 
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
-            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            Vector3 actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             Character.Move(actualVelocity * Time.fixedDeltaTime);
 
             lastFrameVelocity = new(actualVelocity.x, Velocity.y, actualVelocity.z);
@@ -125,7 +118,7 @@ public class PlayerSystem : MonoBehaviour
         {
             Velocity.y = moveDelta.z;
 
-            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            Vector3 actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             actualVelocity.z = 0;
             Character.Move(actualVelocity * Time.fixedDeltaTime);
 
