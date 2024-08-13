@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,6 +17,7 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
+    [field: SerializeField] private bool AssignInputsOnAwake = true;
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
 
@@ -55,13 +57,13 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Handlers
-    public void HandleMovement(Vector2 moveInput) => MoveInput = moveInput;
-    public void HandleScurry(bool scurry) => IsScurrying = scurry;
-    public void HandleClimbing(bool climbing) => ClimbingRequested = climbing;
-    public void HandleJumping(bool jumping)
+    public void HandleMovement(object moveInput) => MoveInput = (Vector2)moveInput;
+    public void HandleScurry(object scurry) => IsScurrying = (bool)scurry;
+    public void HandleClimbing(object climbing) => ClimbingRequested = (bool)climbing;
+    public void HandleJumping(object jumping)
     {
         if (MoveType == MovementType.None) return;
-        IsJumping = jumping;
+        IsJumping = (bool)jumping;
     }
     #endregion
 
@@ -176,6 +178,12 @@ public class PlayerSystem : MonoBehaviour
         WarpPosition = Vector3.zero;
     }
 
-    private void Awake() => Character = GetComponent<CharacterController>();
+    private void Awake()
+    {
+        Character = GetComponent<CharacterController>();
+        if (!AssignInputsOnAwake) return;
+
+        InputHandler.Instance.GetInputMethod("Move")?.Event?.AddListener(HandleMovement);
+    }
     #endregion
 }

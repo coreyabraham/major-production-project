@@ -1,93 +1,148 @@
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public class InputHandler : MonoBehaviour
+public class InputHandler : Singleton<InputHandler>
 {
     [System.Serializable]
-    public class InputEvents
+    public class InputMethod
     {
-        public UnityEvent<Vector2> Moving;
-        public UnityEvent<bool> Jumping;
-        public UnityEvent<bool> Climbing;
-        public UnityEvent<bool> Scurrying;
+        public string Name;
+        public bool IgnoreInputUsability;
+
+        [field: Space(5.0f)]
+
+        public InputValueType ValueType;
+        public UnityEvent<object> Event;
     }
 
     [field: Header("Settings")]
-    public bool CanUseInputs = true;
+    [field: SerializeField] private InputActionAsset Actions;
+    [field: SerializeField] private string ActionMap = "Player";
 
-    [field: Space(2.5f)]
+    [field: Header("Generic")]
+    public bool InputUsability = true;
 
-    [field: SerializeField] private InputEvents Events;
+    [field: Space(5.0f)]
 
-    private Actions Inputs;
+    [field: SerializeField] private InputMethod[] Inputs;
+    public Dictionary<string, InputMethod> InputMethods = new();
 
-    //public void InputCalled<TValue>(InputAction.CallbackContext ctx, EventData target, bool readAsButton = false)
-    //{
-    //    if (!CanUseInputs) return;
-    //    target.Value = readAsButton ? ctx.ReadValueAsButton() : ctx.ReadValue<TValue>();
-    //    target.Event?.Invoke(target.Value);
-    //}
+    private InputActionMap InputActionMap;
 
-    public void PlayerMoved(InputAction.CallbackContext ctx)
+    public void EnableControls() => InputActionMap.Enable();
+    public void DisableControls() => InputActionMap.Disable();
+
+    public InputMethod GetInputMethod(string Name)
     {
-        if (!CanUseInputs) return;
-        Events.Moving?.Invoke(ctx.ReadValue<Vector2>());
-    }
-
-    public void PlayerJumping(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.Jumping?.Invoke(ctx.ReadValueAsButton());
-    }
-
-    public void PlayerClimbing(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.Climbing?.Invoke(ctx.ReadValueAsButton());
-    }
-
-    public void PlayerScurrying(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.Scurrying?.Invoke(ctx.ReadValueAsButton());
+        InputMethods.TryGetValue(Name, out InputMethod value);
+        return value;
     }
 
     private void OnEnable()
     {
-        Inputs.Player.Move.performed += PlayerMoved;
-        Inputs.Player.Move.started += PlayerMoved;
-        Inputs.Player.Move.canceled += PlayerMoved;
+        EnableControls();
 
-        Inputs.Player.Jump.performed += PlayerJumping;
-        Inputs.Player.Jump.canceled += PlayerJumping;
+        foreach (InputAction action in InputActionMap.actions)
+        {
+            InputMethod Method = GetInputMethod(action.name);
 
-        Inputs.Player.Climb.performed += PlayerClimbing;
-        Inputs.Player.Climb.canceled += PlayerClimbing;
+            switch (action.type)
+            {
+                case InputActionType.Button:
+                    {
+                        action.performed += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.canceled += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                    }
+                    break;
 
-        Inputs.Player.Scurry.performed += PlayerScurrying;
-        Inputs.Player.Scurry.canceled += PlayerScurrying;
+                case InputActionType.PassThrough:
+                    {
+                        action.started += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.canceled += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                    }
+                    break;
 
-        Inputs.Player.Enable();
+                case InputActionType.Value:
+                    {
+                        action.performed += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.started += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.canceled += (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                    }
+                    break;
+            }
+        }
     }
 
     private void OnDisable()
     {
-        Inputs.Player.Move.performed -= PlayerMoved;
-        Inputs.Player.Move.started -= PlayerMoved;
-        Inputs.Player.Move.canceled -= PlayerMoved;
+        DisableControls();
 
-        Inputs.Player.Jump.performed -= PlayerJumping;
-        Inputs.Player.Jump.canceled -= PlayerJumping;
+        foreach (InputAction action in InputActionMap.actions)
+        {
+            InputMethod Method = GetInputMethod(action.name);
+            if (Method == null) continue;
 
-        Inputs.Player.Climb.performed -= PlayerClimbing;
-        Inputs.Player.Climb.canceled-= PlayerClimbing;
+            switch (action.type)
+            {
+                case InputActionType.Button:
+                    {
+                        action.performed -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.canceled -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                    }
+                    break;
 
-        Inputs.Player.Scurry.performed -= PlayerScurrying;
-        Inputs.Player.Scurry.canceled-= PlayerScurrying;
+                case InputActionType.PassThrough:
+                    {
+                        action.started -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.canceled -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                    }
+                    break;
 
-        Inputs.Player.Disable();
+                case InputActionType.Value:
+                    {
+                        action.performed -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.started -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                        action.canceled -= (InputAction.CallbackContext ctx) => InputCallback(ctx, Method);
+                    }
+                    break;
+            }
+        }
     }
 
-    private void Awake() => Inputs = new();
+    private void InputCallback(InputAction.CallbackContext ctx, InputMethod method)
+    {
+        if (!InputUsability) return;
+
+        switch (ctx.action.type)
+        {
+            case InputActionType.Button: method?.Event?.Invoke(ctx.ReadValueAsButton()); return;
+            
+            case InputActionType.PassThrough: method?.Event?.Invoke(ctx.ReadValueAsObject()); return;
+            
+            case InputActionType.Value:
+                {
+                    switch (method.ValueType)
+                    {
+                        case InputValueType.Int: method?.Event?.Invoke(ctx.ReadValue<int>()); break;
+                        case InputValueType.Float: method?.Event?.Invoke(ctx.ReadValue<float>()); break;
+                        case InputValueType.Double: method?.Event?.Invoke(ctx.ReadValue<double>()); break;
+                        case InputValueType.Char: method?.Event?.Invoke(ctx.ReadValue<char>()); break;
+                        case InputValueType.Byte: method?.Event?.Invoke(ctx.ReadValue<byte>()); break;
+                        case InputValueType.Vector2: method?.Event?.Invoke(ctx.ReadValue<Vector2>()); break;
+                        case InputValueType.Vector3: method?.Event?.Invoke(ctx.ReadValue<Vector3>()); break;
+                        case InputValueType.Bool: method?.Event?.Invoke(ctx.ReadValue<bool>()); break;
+                    }
+                }
+                return;
+        }
+    }
+
+    override protected void Initialize()
+    {
+        foreach (InputMethod input in Inputs) InputMethods.Add(input.Name, input);
+        InputActionMap = Actions.FindActionMap("Player", true);
+    }
 }
