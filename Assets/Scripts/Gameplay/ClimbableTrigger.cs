@@ -6,7 +6,6 @@ public class ClimbableTrigger : MonoBehaviour
     public GameObject GroundPoint;
 
     private PlayerSystem playerSystem;
-    private ClimbPointType PipePointType;
 
     private void DetermineClimbHook()
     {
@@ -75,7 +74,5 @@ public class ClimbableTrigger : MonoBehaviour
             playerSystem = null;
         }
     }
-
-    private void Awake() => PipePointType = PipePoint.GetComponent<ClimbPoint>().climbPointType;
     #endregion
 }

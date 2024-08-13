@@ -1,14 +1,20 @@
 using UnityEngine;
 
-public class NoodleBoxTrigger : MonoBehaviour
+public class ChineseBoxTrigger : MonoBehaviour
 {
-    [field: SerializeField] GameObject NoodleBox;
-    private PlayerSystem playerSystem;
+    #region Public Variables
+    [field: SerializeField] GameObject ChineseBox;
+    #endregion
 
+    #region Private Variables
+    private PlayerSystem playerSystem;
+    #endregion
+
+    #region Functions - Private
     private void MakePlayerHidden()
     {
-        NoodleBox.transform.parent = playerSystem.gameObject.transform;
-        NoodleBox.transform.localPosition = new(0, 0.14f, -0.01f);
+        ChineseBox.transform.parent = playerSystem.gameObject.transform;
+        ChineseBox.transform.SetLocalPositionAndRotation(new(0, 0.09f, -0.04f), new(0, 0, 180, 0));
         playerSystem.IsHidden = true;
     }
 
@@ -40,4 +46,5 @@ public class NoodleBoxTrigger : MonoBehaviour
             playerSystem = null;
         }
     }
+    #endregion
 }

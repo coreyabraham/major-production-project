@@ -40,7 +40,7 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
     [HideInInspector] public CharacterController Character;
-    [HideInInspector] public bool IsHidden = false;
+    [HideInInspector] public bool IsHidden = false, IsOnWetCement = false;
     #endregion
 
     #region Private Variables
@@ -96,8 +96,10 @@ public class PlayerSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 moveDelta = IsScurrying ? (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed : 
-            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
+        Vector3 moveDelta = IsOnWetCement ?
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * (MoveSpeed / 1.85f): (IsScurrying ?
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed :
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed);
 
         if (!IsClimbing)
         {
@@ -106,7 +108,7 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsGrounded)
             {
-                if (IsJumping) Velocity.y = JumpForce;
+                if (IsJumping && !IsOnWetCement) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
