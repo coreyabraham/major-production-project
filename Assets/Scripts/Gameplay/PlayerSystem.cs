@@ -1,6 +1,6 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
 {
@@ -57,13 +57,13 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Handlers
-    public void HandleMovement(object moveInput) => MoveInput = (Vector2)moveInput;
-    public void HandleScurry(object scurry) => IsScurrying = (bool)scurry;
-    public void HandleClimbing(object climbing) => ClimbingRequested = (bool)climbing;
-    public void HandleJumping(object jumping)
+    public void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
+    public void OnScurry(InputAction.CallbackContext ctx) => IsScurrying = ctx.ReadValueAsButton();
+    public void OnClimbing(InputAction.CallbackContext ctx) => ClimbingRequested = ctx.ReadValueAsButton();
+    public void OnJumping(InputAction.CallbackContext ctx)
     {
         if (MoveType == MovementType.None) return;
-        IsJumping = (bool)jumping;
+        IsJumping = ctx.ReadValueAsButton();
     }
     #endregion
 
@@ -180,12 +180,6 @@ public class PlayerSystem : MonoBehaviour
         WarpPosition = Vector3.zero;
     }
 
-    private void Awake()
-    {
-        Character = GetComponent<CharacterController>();
-        if (!AssignInputsOnAwake) return;
-
-        InputHandler.Instance.GetInputMethod("Move")?.Event?.AddListener(HandleMovement);
-    }
+    private void Awake() => Character = GetComponent<CharacterController>();
     #endregion
 }
