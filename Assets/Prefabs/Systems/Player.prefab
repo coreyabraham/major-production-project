@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8339992002406090265}
   - component: {fileID: 6561875732722827814}
   - component: {fileID: 1534051186}
+  - component: {fileID: 410204144542357463}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -50,13 +51,19 @@ MonoBehaviour:
   ScurrySpeed: 5.7
   MoveEasing: 24
   MoveType: 3
+  AssignInputsOnAwake: 1
+  ClimbingRequested: 0
+  IsClimbing: 0
   JumpForce: 4.5
   GravityMultiplier: 1.05
   VelocityYIdle: -3.2
   LerpRotation: 1
   LerpSpeed: 20
+  PushForce: 1
   Camera: {fileID: 0}
   Character: {fileID: 0}
+  IsHidden: 0
+  IsOnWetCement: 0
 --- !u!143 &1534051186
 CharacterController:
   m_ObjectHideFlags: 0
@@ -75,6 +82,104 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.05, z: 0}
+--- !u!114 &410204144542357463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740367087365677538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 37717043224923d4c96574aabac3b2bf, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6561875732722827814}
+        m_TargetAssemblyTypeName: PlayerSystem, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 20893e36-5730-4bb4-9b45-9c529890f779
+    m_ActionName: Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6561875732722827814}
+        m_TargetAssemblyTypeName: PlayerSystem, Assembly-CSharp
+        m_MethodName: OnJumping
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 1bfd9048-58e6-4d38-b508-ac8faa1504dd
+    m_ActionName: Player/Jump[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6561875732722827814}
+        m_TargetAssemblyTypeName: PlayerSystem, Assembly-CSharp
+        m_MethodName: OnScurry
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 9ffe50b8-4554-4b84-b9d0-a46298b6056e
+    m_ActionName: Player/Scurry[/Keyboard/leftShift]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6561875732722827814}
+        m_TargetAssemblyTypeName: PlayerSystem, Assembly-CSharp
+        m_MethodName: OnClimbing
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 5a9cda02-3beb-4749-ad5f-90bc1a35f41c
+    m_ActionName: Player/Climb[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: def9cd2f-9fc4-4cfe-8133-1e3b8b614bef
+    m_ActionName: Generic/Pause[/Keyboard/escape]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: 
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1001 &6199982600700703816
 PrefabInstance:
   m_ObjectHideFlags: 0

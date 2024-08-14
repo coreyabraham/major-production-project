@@ -1,81 +1,26 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public class InputHandler : MonoBehaviour
+public class InputHandler : Singleton<InputHandler>
 {
-    [System.Serializable]
-    public class InputEvents
-    {
-        public UnityEvent<Vector2> Moving;
-        public UnityEvent<bool> Jumping;
-
-        public UnityEvent MoveCamLeft;
-        public UnityEvent MoveCamRight;
-    }
+    // Heavily reduced in size due to `PlayerInput` Instances being used instead,
+    // this is used for global input settings now!
 
     [field: Header("Settings")]
-    public bool CanUseInputs = true;
+    [field: SerializeField] private InputActionAsset Actions;
+    [field: SerializeField] private string ActionMap = "Player";
 
-    [field: Space(2.5f)]
+    [field: Header("Generic")]
+    public bool InputUsability = true;
 
-    [field: SerializeField] private InputEvents Events;
+    private InputActionMap InputActionMap;
 
-    private Actions Inputs;
+    public void EnableControls() => InputActionMap.Enable();
+    public void DisableControls() => InputActionMap.Disable();
 
-    public void PlayerMoved(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.Moving?.Invoke(ctx.ReadValue<Vector2>());
-    }
+    private void OnEnable() => EnableControls();
 
-    public void PlayerJumping(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.Jumping?.Invoke(ctx.ReadValueAsButton());
-    }
+    private void OnDisable() => DisableControls();
 
-    public void CameraMoveLeft(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.MoveCamLeft?.Invoke();
-    }
-
-    public void CameraMoveRight(InputAction.CallbackContext ctx)
-    {
-        if (!CanUseInputs) return;
-        Events.MoveCamRight?.Invoke();
-    }
-
-    private void OnEnable()
-    {
-        Inputs.Player.Move.performed += PlayerMoved;
-        Inputs.Player.Move.started += PlayerMoved;
-        Inputs.Player.Move.canceled += PlayerMoved;
-
-        Inputs.Player.Jump.performed += PlayerJumping;
-        Inputs.Player.Jump.canceled += PlayerJumping;
-
-        Inputs.Player.MoveCamLeft.performed += CameraMoveLeft;
-        Inputs.Player.MoveCamRight.performed += CameraMoveRight;
-
-        Inputs.Player.Enable();
-    }
-
-    private void OnDisable()
-    {
-        Inputs.Player.Move.performed -= PlayerMoved;
-        Inputs.Player.Move.started -= PlayerMoved;
-        Inputs.Player.Move.canceled -= PlayerMoved;
-
-        Inputs.Player.Jump.performed -= PlayerJumping;
-        Inputs.Player.Jump.canceled -= PlayerJumping;
-
-        Inputs.Player.MoveCamLeft.performed -= CameraMoveLeft;
-        Inputs.Player.MoveCamRight.performed -= CameraMoveRight;
-
-        Inputs.Player.Disable();
-    }
-
-    private void Awake() => Inputs = new();
+    override protected void Initialize() => InputActionMap = Actions.FindActionMap(ActionMap, true);
 }
