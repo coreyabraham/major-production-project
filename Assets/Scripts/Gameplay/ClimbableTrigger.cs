@@ -12,8 +12,7 @@ public class ClimbableTrigger : MonoBehaviour
         if (!playerSystem.ClimbingRequested) return;
 
         playerSystem.IsClimbing = !playerSystem.IsClimbing;
-
-        if (playerSystem.IsClimbing) playerSystem.SetVelocity(Vector3.zero);
+        playerSystem.SetVelocity(Vector3.zero);
 
         playerSystem.WarpToPosition(playerSystem.IsClimbing ? PipePoint.transform.position : GroundPoint.transform.position);
         playerSystem.ClimbingRequested = false;
