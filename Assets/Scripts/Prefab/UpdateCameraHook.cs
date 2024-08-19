@@ -26,6 +26,6 @@ public class UpdateCameraHook : MonoBehaviour
             return;
         }
 
-        camera.SetCameraTransform(TargetCameraTransform, YieldMovement, FinishedTransform);
+        camera.SetCameraTarget(TargetCameraTransform, YieldMovement, FinishedTransform);
     }
 }

@@ -2,14 +2,14 @@
 public class SaveData
 {
     /// <summary>
+    /// The Filename given when saving the data, used to dictate information easier when caching data in `DataHandler.cs`!
+    /// </summary>
+    public string filename;
+
+    /// <summary>
     /// The Name of the Scene / Level that's currently being used (DO NOT INCLUDE NON-LEVEL SCENES!)
     /// </summary>
     public string levelName;
-    
-    /// <summary>
-    /// The Health the Player is currently on before saving, this is used to protect against relogging.
-    /// </summary>
-    public int health;
     
     /// <summary>
     /// The amount of times the Player has died, recorded for the end sequence display.
@@ -27,7 +27,7 @@ public class SaveData
     public float[] checkpointPosition;
 
     /// <summary>
-    /// The exact Rottaion values of where the Player was when they reached the latest Checkpoint Instance.
+    /// The exact Rotation values of where the Player was when they reached the latest Checkpoint Instance.
     /// </summary>
     public float[] checkpointRotation;
 

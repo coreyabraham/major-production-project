@@ -30,6 +30,11 @@ public class DataHandler : Singleton<DataHandler>
     [field: SerializeField] private bool ValidateDataOnStartup = true;
 
     private const int MaxSaveFiles = 3;
+    private SaveData CachedData;
+
+    public SaveData GetCachedData() => CachedData;
+    public void SetCachedData(SaveData Data) => CachedData = Data;
+    public void SaveCachedDataToFile(string Filename) => SaveFileData(Filename, CachedData);
 
     public int GetMaxSaveFiles() => MaxSaveFiles;
     public string GetFileName(int Index) => GetFilePath() + "/" + SaveFileName + "_" + Index.ToString() + ExtensionName;
@@ -70,8 +75,6 @@ public class DataHandler : Singleton<DataHandler>
 
     public void CreateSaveFile(string filename)
     {
-        print(filename);
-
         if (string.IsNullOrWhiteSpace(filename)) return;
         if (File.Exists(filename)) return;
 
@@ -80,6 +83,11 @@ public class DataHandler : Singleton<DataHandler>
 
         SaveData data = new()
         {
+            filename = Path.GetFileNameWithoutExtension(filename),
+
+            checkpointPosition = new float[3],
+            checkpointRotation = new float[3],
+            
             modificationData = DateTime.Now.ToString()
         };
 

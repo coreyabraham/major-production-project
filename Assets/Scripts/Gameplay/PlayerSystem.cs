@@ -1,12 +1,13 @@
 using UnityEngine;
-
+using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
 {
     #region Public Variables
     [field: Header("Movement")]
     [field: Tooltip("The speed that the player moves when on the ground.")]
-    [field: SerializeField] float MoveSpeed;    // = 6
+    [field: SerializeField] float MoveSpeed;
 
     [field: Tooltip("The speed that the player moves when scurrying on the ground.")]
     [field: SerializeField] float ScurrySpeed;
@@ -14,100 +15,105 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The acceleration that will be applied to the player when they begin moving. Likewise, the time it takes for them to stop moving.")]
     [field: SerializeField] float MoveEasing;
 
-    public MovementType MoveType = MovementType.FreeRoam;
-    [HideInInspector] public bool isClimbing = false;
+    [field: Tooltip("Locks the player's movement to a specific axis.")]
+    [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
+    [field: SerializeField] private bool AssignInputsOnAwake = true;
+    [HideInInspector] public bool ClimbingRequested;
+    [HideInInspector] public bool IsClimbing;
 
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] float JumpForce;
     
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
-    [field: SerializeField] float GravityMultiplier;
-    [field: SerializeField] float VelocityYIdle = 0.0f;
-    
-    [field: Tooltip("Locks the player's movement to a specific axis.")]
+    [field: SerializeField] private float GravityMultiplier;
+    [field: SerializeField] private float VelocityYIdle = 0.0f;
 
     [field: Header("Lerping")]
     [field: SerializeField] private bool LerpRotation;
     [field: SerializeField] private float LerpSpeed;
 
+    [field: Tooltip("The force that the player will push objects.")]
+    [field: SerializeField] float PushForce;
+
     [field: Header("External References")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
     [HideInInspector] public CharacterController Character;
-
+    [HideInInspector] public bool IsHidden = false, IsOnWetCement = false;
     #endregion
 
     #region Private Variables
     private Vector3 WarpPosition;
     private Quaternion CharacterRotation;
 
-    private Vector3 lastFrameVelocity = new(0, 0, 0);
     private Vector3 Velocity;
     private Vector2 MoveInput;
-    private bool IsJumping, IsGrounded, IsMoving;
+    private Vector3 HitDirection;
+
+    private Vector3 lastFrameVelocity = Vector3.zero;
+
+    private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
     #endregion
 
     #region Functions - Handlers
-    public void HandleMovement(Vector2 moveInput) => MoveInput = moveInput;
-
-    public void HandleJumping(bool JumpBool)
+    public void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
+    public void OnScurry(InputAction.CallbackContext ctx) => IsScurrying = ctx.ReadValueAsButton();
+    public void OnClimbing(InputAction.CallbackContext ctx) => ClimbingRequested = ctx.ReadValueAsButton();
+    public void OnJumping(InputAction.CallbackContext ctx)
     {
         if (MoveType == MovementType.None) return;
-        IsJumping = JumpBool;
+        IsJumping = ctx.ReadValueAsButton();
     }
     #endregion
 
+    #region Functions - Public
     public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
-
-
-    public void ToggleClimbingMode()
+    public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
+    public MovementType GetMoveType() => MoveType;
+    public void SetMovementType(MovementType Type, bool ResetVelocity = false)
     {
-        Velocity = new(0, 0, 0);
+        MoveType = Type;
+        if (!ResetVelocity) return;
+        SetVelocity(Vector3.zero);
+    }
+    public void DeathTriggered() => print("There's currently nothing here, please add something after the prototyping phase ends!");
+    #endregion
 
-        if (!isClimbing)
-        {
-            // Enable Climbing
+    #region Functions - Private
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Rigidbody body = hit.collider.attachedRigidbody;
 
-            isClimbing = true;
-        }
-        else
-        {
-            // Disable Climbing
+        if (body == null || body.isKinematic) return;
+        if (hit.moveDirection.y < -0.3f) return;
 
-            isClimbing = false;
-        }
+        Vector3 pushDir = new(hit.moveDirection.x, 0, hit.moveDirection.z);
+        Vector3 collisionPoint = hit.point;
+
+        body.AddForceAtPosition(pushDir * PushForce, collisionPoint, ForceMode.Impulse);
     }
 
-
-    #region Functions - Updates & Awake
     private void FixedUpdate()
     {
-        Vector3 moveDelta;
-        
-        if (Input.GetKey(KeyCode.LeftControl))
-        {
-            moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed;
-        }
-        else
-        {
-            moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
-        }
+        Vector3 moveDelta = IsOnWetCement ?
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * (MoveSpeed / 1.85f): (IsScurrying ?
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed :
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed);
 
-
-        if (!isClimbing)
+        if (!IsClimbing)
         {
             Velocity.z = moveDelta.z;
             Velocity.x = moveDelta.x;
 
             if (IsGrounded)
             {
-                if (IsJumping) Velocity.y = JumpForce;
+                if (IsJumping && !IsOnWetCement) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
-            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            Vector3 actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             Character.Move(actualVelocity * Time.fixedDeltaTime);
 
             lastFrameVelocity = new(actualVelocity.x, Velocity.y, actualVelocity.z);
@@ -116,28 +122,35 @@ public class PlayerSystem : MonoBehaviour
         {
             Velocity.y = moveDelta.z;
 
-            Vector3 actualVelocity = Vector3.MoveTowards(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            Vector3 actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             actualVelocity.z = 0;
             Character.Move(actualVelocity * Time.fixedDeltaTime);
 
             lastFrameVelocity = new(actualVelocity.x, actualVelocity.y, Velocity.z);
         }
 
-        
-        if (!IsMoving) return;
+        if (!IsGrounded) HitDirection = Vector3.zero;
+
+        if (!IsMoving)
+        {
+            Vector3 horizonalHitDirection = HitDirection;
+            horizonalHitDirection.y = 0;
+
+            float displacement = horizonalHitDirection.magnitude;
+            if (displacement <= 0) return;
+
+            Velocity -= 0.2f * horizonalHitDirection / displacement;
+
+            return;
+        }
 
         float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
-
         CharacterRotation = Quaternion.Euler(0.0f, IsMoving ? rotation + 90.0f : 90.0f, 0.0f);
 
-
-        if (LerpRotation)
-        {
-            CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
-        }
+        if (LerpRotation) CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
 
         Character.transform.rotation = CharacterRotation;
     }

@@ -1,18 +1,29 @@
 using TMPro;
+
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayUI : MonoBehaviour
 {
+    [field: Header("Miscellaneous")]
+    [field: SerializeField] private string[] LevelEntries;
+
+    [field: Header("Parents")]
     [field: SerializeField] private GameObject SavesParent;
     [field: SerializeField] private GameObject ChosenParent;
+    [field: SerializeField] private GameObject ButtonsParent;
 
     [field: Space(5.0f)]
 
-    [field: SerializeField] private SaveFileUI Template;
+    [field: SerializeField] private GameObject SceneSelector;
+    [field: SerializeField] private GameObject ScenesParent;
+
+    [field: Header("Templates")]
+    [field: SerializeField] private SaveFileUI SaveTemplate;
+    [field: SerializeField] private NavigatorButton SceneTemplate;
+
+    [field: Header("Labels")]
     [field: SerializeField] private TMP_Text SelectLabel;
-
-    [field: Space(5.0f)]
-
     [field: SerializeField] private TMP_Text LevelLabel;
     [field: SerializeField] private TMP_Text DeathLabel;
     [field: SerializeField] private TMP_Text ProgressLabel;
@@ -24,17 +35,54 @@ public class PlayUI : MonoBehaviour
     private SaveFileUI[] CachedFiles;
     private int SaveFileUI_Index = -1;
 
+    private string[] SceneNames;
+
     private bool Initialized = false;
+
+    public void TestBtnClicked()
+    {
+        if (SceneSelector.activeSelf)
+        {
+            SavesParent.SetActive(true);
+            ButtonsParent.SetActive(true);
+            SelectLabel.enabled = true;
+
+            SceneSelector.SetActive(false);
+
+            return;
+        }
+
+        SavesParent.SetActive(false);
+        ChosenParent.SetActive(false);
+        ButtonsParent.SetActive(false);
+        SelectLabel.enabled = false;
+
+        SceneSelector.SetActive(true);
+    }
 
     public void PlayButtonPressed()
     {
-        print("Play with File: " + CachedFiles[SaveFileUI_Index].name);
+        SaveData targetData = CachedFiles[SaveFileUI_Index].GetData();
+
+       if (string.IsNullOrWhiteSpace(targetData.levelName))
+       {
+            targetData.levelName = LevelEntries[0];
+            DataHandler.Instance.SetCachedData(targetData);
+            SceneManager.LoadScene(targetData.levelName);
+            
+            return;
+       }
+        
+        DataHandler.Instance.SetCachedData(targetData);
+        SceneManager.LoadScene(targetData.levelName);
     }
 
     public void ClearButtonPressed()
     {
         print("Clear Data from File: " + CachedFiles[SaveFileUI_Index].name);
     }
+
+    private void SceneButtonClicked(int SceneIndex) => SceneManager.LoadScene(SceneIndex, LoadSceneMode.Single);
 
     private void UpdateSaveFileIndex(SaveFileUI file)
     {
@@ -76,7 +124,7 @@ public class PlayUI : MonoBehaviour
 
     private void OnEnable()
     {
-        Template.gameObject.SetActive(false);
+        SaveTemplate.gameObject.SetActive(false);
         ChosenParent.SetActive(false);
 
         if (Initialized) return;
@@ -86,7 +134,7 @@ public class PlayUI : MonoBehaviour
 
         for (int i = 0; i < files.Length; i++)
         {
-            SaveFileUI clone = Instantiate(Template);
+            SaveFileUI clone = Instantiate(SaveTemplate);
 
             clone.name = "SaveFile_" + (i + 1).ToString();
             clone.transform.SetParent(SavesParent.transform, false);
@@ -99,6 +147,25 @@ public class PlayUI : MonoBehaviour
             clone.Button.onClick.AddListener(() => SaveFileSelected(clone));
 
             CachedFiles[i] = clone;
+        }
+
+        int sceneCount = SceneManager.sceneCountInBuildSettings;
+        SceneNames = new string[sceneCount];
+
+        for (int i = 0; i < sceneCount; i++)
+        {
+            int index = i;
+
+            SceneNames[index] = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(index));
+
+            NavigatorButton clone = Instantiate(SceneTemplate);
+            clone.transform.SetParent(ScenesParent.transform, false);
+
+            clone.name = SceneNames[index];
+            clone.Text.text = "Scene " + (i + 1).ToString() + ": " + clone.name;
+
+            clone.gameObject.SetActive(true);
+            clone.Button.onClick.AddListener(() => SceneButtonClicked(index));
         }
 
         Initialized = true;

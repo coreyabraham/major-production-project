@@ -46,16 +46,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetPlayer: 1
-  CameraPositionOffset: {x: 0, y: 1, z: -5}
-  CameraRotationOffset: {x: 5, y: 0, z: 0}
-  CameraAngle: 0
-  FieldOfView: 80
+  Offsets:
+    Position: {x: 0, y: 1, z: -4}
+    Rotation: {x: 0.05233596, y: 0, z: 0, w: 0.9986295}
+  FieldOfView: 85
   DepthOfField: 0
   LerpCamera: 1
   LerpSettings: 1
-  CameraLerpSpeed: 4
+  CameraLerpSpeed: 5
   SettingsLerpSpeed: 4
-  EasingStyle: 0
+  EasingStyle: 1
   EasingDirection: 0
   Player: {fileID: 0}
   main: {fileID: 0}
@@ -116,7 +116,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.05
   far clip plane: 1000
   field of view: 80
   orthographic: 0
