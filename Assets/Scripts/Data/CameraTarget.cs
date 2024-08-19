@@ -3,6 +3,6 @@ using UnityEngine;
 [System.Serializable]
 public struct CameraTarget
 {
-    public Vector3 Position;
-    public Quaternion Rotation;
+    public Vector3 position;
+    public Quaternion rotation;
 }

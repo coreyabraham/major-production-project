@@ -1,32 +1,32 @@
 using UnityEngine;
 
-public class CutsceneTester : MonoBehaviour
+public class CutsceneTester : MonoBehaviour, ITouchEvent
 {
-    private bool Started = false;
+    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
+    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
 
-    private float Current = 0.0f;
-    private readonly float Max = 1.0f;
+    [field: SerializeField] private GameObject[] CutscenePoints;
+    [field: SerializeField] private float TimeInterval;
+    [field: SerializeField] private float CameraSpeed;
 
-    private CameraSystem Camera;
+    [field: SerializeField] private bool UseDefaultSpeed;
 
-    public void StartEvent(CameraSystem CamSys)
+    public void CutsceneEnded()
     {
-        Started = true;
-        Camera = CamSys;
+        print("Cutscene has concluded");
     }
 
-    private void Update()
+    public void Triggered(Collider Other)
     {
-        if (!Started) return;
-        
-        if (Current < Max)
-        {
-            Current += Time.deltaTime;
-            return;
-        }
+        if (!PlayerExclusive) return;
 
-        Current = 0.0f;
-        Started = false;
-        Camera.HookCameraToPlayer();
+        PlayerSystem Player = Other.GetComponent<PlayerSystem>();
+
+        if (!Player) return;
+        if (!Player.Camera) return;
+
+        Player.Camera.BeginCutscene(CutscenePoints, TimeInterval, !UseDefaultSpeed ? CameraSpeed : -1.0f);
     }
+
+    private void OnTriggerEnter(Collider other) => Triggered(other);
 }

@@ -1,12 +1,17 @@
 using UnityEngine;
 
-public class PlrDeathState : MonoBehaviour
+public class PlrDeathState : MonoBehaviour, ITouchEvent
 {
+    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
+    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
+
     [field: SerializeField] private Transform RespawnTransform;
 
-    private void OnTriggerEnter(Collider other)
+    public void Triggered(Collider Other)
     {
-        if (!other.TryGetComponent<PlayerSystem>(out PlayerSystem player)) return;
+        if (!PlayerExclusive) return;
+
+        if (!Other.TryGetComponent<PlayerSystem>(out PlayerSystem player)) return;
 
         player.DeathTriggered();
 
@@ -14,4 +19,6 @@ public class PlrDeathState : MonoBehaviour
         player.WarpToPosition(RespawnTransform.position);
         //player.Camera.ForceCameraBackToPlayer();
     }
+
+    private void OnTriggerEnter(Collider other) => Triggered(other);
 }

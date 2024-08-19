@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UpdateCamOffset : MonoBehaviour
+public class UpdateCamOffset : MonoBehaviour, ITouchEvent
 {
     public enum UpdateCamOffsetType
     {
@@ -8,23 +8,19 @@ public class UpdateCamOffset : MonoBehaviour
         Default,
         Previous
     }
+    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
+    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
 
     [field: SerializeField] private CameraTarget Target;
     [field: SerializeField] private UpdateCamOffsetType Type;
 
     [field: SerializeField] private bool HideOnStartup = true;
 
-    private void Awake()
+    public void Triggered(Collider Other)
     {
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
-        if (!renderer) return;
+        if (!PlayerExclusive) return;
 
-        renderer.enabled = false;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        PlayerSystem player = other.gameObject.GetComponentInParent<PlayerSystem>();
+        PlayerSystem player = Other.gameObject.GetComponentInParent<PlayerSystem>();
         if (!player) return;
 
         CameraSystem camera = player.Camera;
@@ -37,4 +33,16 @@ public class UpdateCamOffset : MonoBehaviour
             case UpdateCamOffsetType.Previous: camera.RevertCameraOffsets(); return;
         }
     }
+
+    private void Awake()
+    {
+        if (!HideOnStartup) return;
+
+        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        if (!renderer) return;
+
+        renderer.enabled = false;
+    }
+
+    private void OnTriggerEnter(Collider other) => Triggered(other);
 }

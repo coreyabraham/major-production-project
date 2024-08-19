@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
@@ -17,7 +16,6 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
-    [field: SerializeField] private bool AssignInputsOnAwake = true;
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
 
@@ -70,7 +68,7 @@ public class PlayerSystem : MonoBehaviour
     #region Functions - Public
     public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
-    public MovementType GetMoveType() => MoveType;
+    public MovementType GetMovementType() => MoveType;
     public void SetMovementType(MovementType Type, bool ResetVelocity = false)
     {
         MoveType = Type;

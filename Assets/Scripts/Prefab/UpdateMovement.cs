@@ -1,15 +1,22 @@
 using UnityEngine;
 
-public class UpdateMovement : MonoBehaviour
+public class UpdateMovement : MonoBehaviour, ITouchEvent
 {
+    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
+    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
+
     [field: SerializeField] private MovementType TargetMoveType;
     [field: SerializeField] private bool ResetVelocity;
 
-    private void OnTriggerEnter(Collider other)
+    public void Triggered(Collider Other)
     {
-        PlayerSystem player = other.gameObject.GetComponentInParent<PlayerSystem>();
+        if (!PlayerExclusive) return;
+
+        PlayerSystem player = Other.gameObject.GetComponentInParent<PlayerSystem>();
         if (!player) return;
 
         player.SetMovementType(TargetMoveType, ResetVelocity);
     }
+
+    private void OnTriggerEnter(Collider other) => Triggered(other);
 }
