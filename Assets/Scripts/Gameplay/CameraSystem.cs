@@ -7,6 +7,8 @@ public class CameraSystem : MonoBehaviour
 
     [field: Header("Angles and Offsets")]
     [field: SerializeField] private CameraTarget Offsets;
+    private CameraTarget PreviousOffsets;
+    private CameraTarget DefaultOffsets;
 
     [field: Space(5.0f)]
 
@@ -94,16 +96,21 @@ public class CameraSystem : MonoBehaviour
     }
 
     public CameraTarget GetCameraOffset() => Offsets;
-    public void SetCameraOffsets(CameraTarget Target) => Offsets = Target;
+    public void RevertCameraOffsets() => Offsets = PreviousOffsets;
+    public void SetToDefaultOffsets() => Offsets = DefaultOffsets;
+
+    public void SetCameraOffsets(CameraTarget Target) => SetCameraOffsets(Target.Position, Target.Rotation);
+    public void SetCameraOffsets(Transform Target) => SetCameraOffsets(Target.position, Target.rotation);
     public void SetCameraOffsets(Vector3 Position, Quaternion Rotation)
     {
+        PreviousOffsets = new()
+        {
+            Position = Position,
+            Rotation = Rotation
+        };
+
         Offsets.Position = Position;
         Offsets.Rotation = Rotation;
-    }
-    public void SetCameraOffsets(Transform Target)
-    {
-        Offsets.Position = Target.position;
-        Offsets.Rotation = Target.rotation;
     }
 
     public void SetMultipleCameraTargets(CameraTarget[] Targets, bool YieldMovement, float MaxIntervalBetweenEach, float IntervalModifier, System.Action<CameraSystem> Finished)
@@ -241,5 +248,6 @@ public class CameraSystem : MonoBehaviour
     {
         main = GetComponentInChildren<Camera>();
         DefaultMoveType = Player.GetMoveType();
+        DefaultOffsets = Offsets;
     }
 }
