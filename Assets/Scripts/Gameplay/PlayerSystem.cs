@@ -43,6 +43,7 @@ public class PlayerSystem : MonoBehaviour
 
     #region Private Variables
     private Vector3 WarpPosition;
+    private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
 
     private Vector3 Velocity;
@@ -50,6 +51,8 @@ public class PlayerSystem : MonoBehaviour
     private Vector3 HitDirection;
 
     private Vector3 lastFrameVelocity = Vector3.zero;
+
+    private CameraTarget OriginalSpawn;
 
     private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
     #endregion
@@ -66,7 +69,12 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Public
-    public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
+    public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
+    public void Warp(Vector3 NewPosition, Quaternion NewRotation)
+    {
+        WarpPosition = NewPosition;
+        WarpRotation = NewRotation;
+    }
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
     public MovementType GetMovementType() => MoveType;
     public void SetMovementType(MovementType Type, bool ResetVelocity = false)
@@ -75,10 +83,51 @@ public class PlayerSystem : MonoBehaviour
         if (!ResetVelocity) return;
         SetVelocity(Vector3.zero);
     }
-    public void DeathTriggered() => print("There's currently nothing here, please add something after the prototyping phase ends!");
+    public void DeathTriggered()
+    {
+        /*
+         * TODO:
+         * 1. Trigger cut to black
+         * 2. Hold screen for a few seconds
+         * 3. Fade from black with the player reloaded at the previous checkpoint
+         * 4. Add to the current save file's "Deaths" data
+         * 5. Save to disk!
+         */
+
+        SaveData data = DataHandler.Instance.GetCachedData();
+        data.deaths++;
+
+        DataHandler.Instance.SetCachedData(data);
+        bool result = DataHandler.Instance.SaveCachedDataToFile();
+
+        if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
+        else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
+
+        SpawnAtCheckpoint();
+    }
     #endregion
 
     #region Functions - Private
+    private void SpawnAtCheckpoint()
+    {
+        SaveData data = DataHandler.Instance.RefreshCachedData();
+        
+        if (string.IsNullOrWhiteSpace(data.checkpointName))
+        {
+            Warp(OriginalSpawn.position, OriginalSpawn.rotation);
+            return;
+        }
+
+        Vector3 Position = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointPosition);
+        Vector3 Eular = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointRotation);
+        Quaternion Rotation = Quaternion.Euler(Eular);
+
+        print(Position.ToString());
+        print(Rotation.ToString());
+
+        Warp(Position, Rotation);
+    }
+
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Rigidbody body = hit.collider.attachedRigidbody;
@@ -172,10 +221,30 @@ public class PlayerSystem : MonoBehaviour
         if (WarpPosition == Vector3.zero) return;
 
         Character.enabled = false;
+        
         transform.position = WarpPosition;
+        
+        if (WarpRotation.eulerAngles != Vector3.zero)
+        {
+            transform.rotation = WarpRotation;
+            CharacterRotation = WarpRotation;
+        }
+
         Character.enabled = true;
 
+        WarpRotation.eulerAngles = Vector3.zero;
         WarpPosition = Vector3.zero;
+    }
+
+    private void Start()
+    {
+        OriginalSpawn = new()
+        {
+            position = transform.position,
+            rotation = transform.rotation
+        };
+
+        SpawnAtCheckpoint();
     }
 
     private void Awake() => Character = GetComponent<CharacterController>();

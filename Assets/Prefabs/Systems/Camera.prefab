@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetPlayer: 1
   Offset:
-    position: {x: 0, y: 0.6, z: -4}
+    position: {x: 0, y: 1, z: -4}
     rotation: {x: 0.034899496, y: 0, z: 0, w: 0.99939084}
   PreviousOffset:
     position: {x: 0, y: 0, z: 0}
@@ -63,7 +63,13 @@ MonoBehaviour:
   EasingDirection: 0
   Player: {fileID: 0}
   main: {fileID: 0}
-  _TEMPORARY: 0
+  Events:
+    CutsceneStarted:
+      m_PersistentCalls:
+        m_Calls: []
+    CutsceneFinished:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &9170917592866041194
 GameObject:
   m_ObjectHideFlags: 0

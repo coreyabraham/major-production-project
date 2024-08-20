@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CutsceneTester : MonoBehaviour, ITouchEvent
+public class CutsceneTrigger : MonoBehaviour, ITouchEvent
 {
     [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
     [field: SerializeField] public bool PlayerExclusive { get; set; } = true;

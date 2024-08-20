@@ -9,7 +9,7 @@ public class DontDestroyOnLoad : MonoBehaviour
     {
         if (Instantiated.ContainsKey(this.gameObject.name))
         {
-            Destroy(this.gameObject);
+            Destroy(this.gameObject); // "Object reference not set to an instance of an object"
             return;
         }
 

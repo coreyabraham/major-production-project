@@ -16,7 +16,7 @@ public class UpdatePlayerPos : MonoBehaviour, ITouchEvent
         if (!player) return;
         if (!transform) return;
 
-        player.WarpToPosition(TargetTransform.position);
+        player.Warp(TargetTransform.position);
     }
 
     private void OnTriggerEnter(Collider other) => Triggered(other);
