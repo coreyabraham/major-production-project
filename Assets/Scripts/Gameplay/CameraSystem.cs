@@ -1,26 +1,40 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CameraSystem : MonoBehaviour
 {
+    [System.Serializable]
+    public class CameraEvents
+    {
+        public UnityEvent CutsceneStarted;
+        public UnityEvent CutsceneFinished;
+    }
+
     [field: Header("Toggleables")]
     public bool TargetPlayer = false;
 
     [field: Header("Angles and Offsets")]
-    [field: SerializeField] private CameraTarget Offsets;
+    [field: SerializeField] private CameraTarget Offset;
+
+    [field: SerializeField]
+
+    [HideInInspector] private CameraTarget PreviousOffset;
+    [HideInInspector] private CameraTarget DefaultOffset;
 
     [field: Space(5.0f)]
 
+    [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
     [field: SerializeField] private float DepthOfField;
 
     [field: Header("Lerping")]
     [field: SerializeField] private bool LerpCamera;
-    [field: SerializeField] private bool LerpSettings;
+    [field: SerializeField] private bool LerpVFX;
 
     [field: Space(5.0f)]
 
     [field: SerializeField] private float CameraLerpSpeed;
-    [field: SerializeField] private float SettingsLerpSpeed;
+    [field: SerializeField] private float VFXLerpSpeed;
 
     [field: Space(5.0f)]
     
@@ -29,217 +43,214 @@ public class CameraSystem : MonoBehaviour
 
     [field: Header("External References")]
     public PlayerSystem Player;
-
     [HideInInspector] public Camera main;
 
-    private bool SkipAutoTargetSetting = false;
-    private bool YieldMovementDuringSet = false;
+    [field: Space(2.5f)]
+    [field: SerializeField] private CameraEvents Events;
 
-    MovementType PreviousMoveType;
-    MovementType DefaultMoveType;
+    private bool CutsceneRunning = false;
+    private bool TrackCutsceneInterval = false;
 
-    private CameraTarget CurrentTarget;
+    private float CurrentInterval = 0.0f;
+    private float MaxInterval = 0.0f;
+    private float CutsceneSpeed = 0.0f;
 
-    private bool MovingBetweenPoints = false;
-    private int CamPointsMovedTo = 0;
-    private int MaxCamPoints = 0;
+    private int CutsceneIndex = 0;
+    private CameraTarget[] CutscenePoints;
 
-    private float CurrentTime = 0.0f;
-    private float MaxTime = 0.0f;
-    private float ModifierTime = 0.0f;
+    private MovementType PreviousMoveType;
 
-    private System.Action<CameraSystem> FinishedAction;
-    private System.Action TimeIntervalReached;
+    public bool IsCutsceneActive() => CutsceneRunning;
 
-    public bool IsLerpingToPoint() => SkipAutoTargetSetting;
     public Transform GetCameraTransform() => main.transform;
+    public CameraTarget GetCameraOffset() => Offset;
 
-    public void HookCameraToPlayer()
+    public void RevertCameraOffsets() => Offset = PreviousOffset;
+    public void SetToDefaultOffsets() => Offset = DefaultOffset;
+
+    public void SetCameraOffsets(Vector3 Position, Quaternion Rotation)
     {
-        if (!SkipAutoTargetSetting) return;
-        if (YieldMovementDuringSet) Player.SetMovementType(PreviousMoveType);
-
-        YieldMovementDuringSet = false;
-        SkipAutoTargetSetting = false;
-
-        TargetPlayer = true;
-        PreviousMoveType = MovementType.None;
-    }
-
-    public void ForceCameraBackToPlayer()
-    {
-        SkipAutoTargetSetting = true;
-        CurrentTarget = GetPlayerCamPositionAndRotation();
-    }
-
-    private void FinishedMovementToTarget(CameraTarget Target)
-    {
-        print(Target.Position);
-        print(Target.Rotation);
-
-        if (MovingBetweenPoints && CamPointsMovedTo < MaxCamPoints)
+        PreviousOffset = Offset;
+        Offset = new()
         {
-            CamPointsMovedTo++;
+            position = Position,
+            rotation = Rotation
+        };
+    }
+    public void SetCameraOffsets(CameraTarget Target) => SetCameraOffsets(Target.position, Target.rotation);
+    public void SetCameraOffsets(Transform Target) => SetCameraOffsets(Target.position, Target.rotation);
+
+    public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
+    {
+        if (CutsceneRunning)
+        {
+            Debug.LogWarning(name + " | A Cutscene is already running! Please wait for it to end or cancel it via `CancelCutscene()`!");
             return;
         }
 
-        MovingBetweenPoints = false;
-        CamPointsMovedTo = 0;
-        MaxCamPoints = 0;
+        PreviousMoveType = Player.GetMovementType();
+        Player.SetMovementType(MovementType.None, true);
 
-        FinishedAction?.Invoke(this);
+        TargetPlayer = false;
 
-        FinishedAction = null;
-        TimeIntervalReached = null;
+        CurrentInterval = 0.0f;
+        MaxInterval = TimeInterval;
+        CutsceneSpeed = CameraSpeed;
+
+        CutscenePoints = Points;
+        CutsceneRunning = true;
+
+        Events.CutsceneStarted?.Invoke();
     }
 
-    public CameraTarget GetCameraOffset() => Offsets;
-    public void SetCameraOffsets(CameraTarget Target) => Offsets = Target;
-    public void SetCameraOffsets(Vector3 Position, Quaternion Rotation)
+    public void BeginCutscene(GameObject[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
-        Offsets.Position = Position;
-        Offsets.Rotation = Rotation;
-    }
-    public void SetCameraOffsets(Transform Target)
-    {
-        Offsets.Position = Target.position;
-        Offsets.Rotation = Target.rotation;
-    }
+        CameraTarget[] POIs = new CameraTarget[Points.Length];
 
-    public void SetMultipleCameraTargets(CameraTarget[] Targets, bool YieldMovement, float MaxIntervalBetweenEach, float IntervalModifier, System.Action<CameraSystem> Finished)
-    {
-        if (MovingBetweenPoints) return;
-
-        void TimeIntervalMet() => SetCameraTarget(Targets[CamPointsMovedTo], YieldMovement, Finished);
-
-        MovingBetweenPoints = true;
-        MaxCamPoints = Targets.Length;
-        CamPointsMovedTo = 0;
-
-        MaxTime = MaxIntervalBetweenEach;
-        ModifierTime = IntervalModifier;
-
-        TimeIntervalReached = TimeIntervalMet;
-    }
-
-    public void SetCameraTarget(CameraTarget Target, bool YieldMovement, System.Action<CameraSystem> Finished)
-    {
-        PreviousMoveType = Player.GetMoveType();
-        SkipAutoTargetSetting = true;
-        YieldMovementDuringSet = YieldMovement;
-
-        if (YieldMovement) Player.SetMovementType(MovementType.None, true);
-
-        CurrentTarget = Target;
-        FinishedAction = Finished;
-    }
-
-    public void SetCameraTarget(Transform Transform, bool YieldMovement, System.Action<CameraSystem> Finished)
-    {
-        CameraTarget target = new()
+        for (int i = 0; i < Points.Length; i++)
         {
-            Position = Transform.position,
-            Rotation = Transform.rotation
-        };
+            POIs[i] = new()
+            {
+                position = Points[i].transform.position,
+                rotation = Points[i].transform.rotation,
+            };
+        }
 
-        SetCameraTarget(target, YieldMovement, Finished);
+        BeginCutscene(POIs, TimeInterval, CameraSpeed);
+    }
+
+    public void BeginCutscene(Transform[] Points, float TimeInterval, float CameraSpeed = -1.0f)
+    {
+        CameraTarget[] POIs = new CameraTarget[Points.Length];
+
+        for (int i = 0; i < Points.Length; i++)
+        {
+            POIs[i] = new()
+            {
+                position = Points[i].position,
+                rotation = Points[i].rotation,
+            };
+        }
+
+        BeginCutscene(POIs, TimeInterval, CameraSpeed);
+    }
+
+    private void UpdateCutsceneIndex()
+    {
+        CutsceneIndex++;
+
+        if (CutsceneIndex >= CutscenePoints.Length)
+        {
+            CutsceneFinished();
+            return;
+        }
+    }
+
+    private void CutsceneFinished()
+    {
+        CutsceneRunning = false;
+        TargetPlayer = true;
+
+        CurrentInterval = 0.0f;
+        MaxInterval = 0.0f;
+        CutsceneSpeed = 0.0f;
+
+        CutsceneIndex = 0;
+        CutscenePoints = null;
+
+        Player.SetMovementType(PreviousMoveType, true);
+        Events.CutsceneFinished?.Invoke();
     }
 
     private CameraTarget GetPlayerCamPositionAndRotation()
     {
         Transform charTransform = Player.Character.gameObject.transform;
-        Vector3 newPos = charTransform.position + Offsets.Position;
+        Vector3 newPos = charTransform.position + Offset.position;
 
         Vector3 vecRot = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
-        Quaternion newRot = Quaternion.Euler(vecRot + Offsets.Rotation.eulerAngles);
+        Quaternion newRot = Quaternion.Euler(vecRot + Offset.rotation.eulerAngles);
 
-        return new()
+        CameraTarget target = new()
         {
-            Position = newPos,
-            Rotation = newRot
+            position = newPos,
+            rotation = newRot
         };
+
+        return target;
     }
 
-    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation)
+    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = -1.0f)
     {
-        if (!LerpCamera)
-        {
-            main.transform.SetPositionAndRotation(Position, Rotation);
-        }
-        else
+        float LerpSpeed = (CustomLerpSpeed > 0) ? CustomLerpSpeed : CameraLerpSpeed;
+
+        if (LerpCamera)
         {
             switch (EasingStyle)
             {
                 case EasingStyle.Linear:
                     {
-                        Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * CameraLerpSpeed);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * CameraLerpSpeed);
+                        Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
                     }
                     break;
                 
                 case EasingStyle.Sine:
                     {
-                        Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * CameraLerpSpeed);
-                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * CameraLerpSpeed);
+                        Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
+                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
                     }
                     break;
             }
-
-            main.transform.SetPositionAndRotation(Position, Rotation);
         }
 
-        if (!SkipAutoTargetSetting) return;
-        if (main.transform.position != Position || main.transform.rotation != Rotation) return;
+        main.transform.SetPositionAndRotation(Position, Rotation);
 
-        CameraTarget target = new()
-        {
-            Position = main.transform.position,
-            Rotation = main.transform.rotation
-        };
+        if (!CutsceneRunning || TrackCutsceneInterval) return;
+        if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
 
-        FinishedMovementToTarget(target);
+        TrackCutsceneInterval = true;
     }
 
-    private void LerpCameraTransform(CameraTarget target) => LerpCameraTransform(target.Position, target.Rotation);
+    private void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
 
     private void Update()
     {
-        if (!MovingBetweenPoints) return;
+        if (!CutsceneRunning || !TrackCutsceneInterval) return;
 
-        if (CurrentTime < MaxTime)
+        if (CurrentInterval < MaxInterval)
         {
-            CurrentTime += Time.deltaTime + ModifierTime;
+            CurrentInterval += Time.deltaTime;
             return;
         }
 
-        CurrentTime = 0.0f;
-        MaxTime = 0.0f;
-        ModifierTime = 0.0f;
+        CurrentInterval = 0.0f;
+        TrackCutsceneInterval = false;
 
-        TimeIntervalReached?.Invoke();
+        UpdateCutsceneIndex();
     }
 
     private void FixedUpdate()
     {
-        if (LerpSettings)
+        float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
+
+        if (LerpVFX)
         {
-            main.fieldOfView = Mathf.Lerp(main.fieldOfView, Mathf.Clamp(FieldOfView, 0, 180), Time.fixedDeltaTime * SettingsLerpSpeed);
+            main.fieldOfView = Mathf.Lerp(main.fieldOfView, CameraFOV, Time.fixedDeltaTime * VFXLerpSpeed);
             //main.depthOfField = Mathf.Lerp(main.depthOfField, DepthOfField, Time.fixedDeltaTime * SettingsLerpSpeed);
         }
         else
         {
-            main.fieldOfView = Mathf.Clamp(FieldOfView, 0, 180);
+            main.fieldOfView = CameraFOV;
             //main.depthOfField = DepthOfField;
         }
 
-        if (!SkipAutoTargetSetting && TargetPlayer) CurrentTarget = GetPlayerCamPositionAndRotation();
-
-        LerpCameraTransform(CurrentTarget);
+        CameraTarget Target = (!CutsceneRunning) ? GetPlayerCamPositionAndRotation() : CutscenePoints[CutsceneIndex];
+        LerpCameraTransform(Target, CutsceneSpeed);
     }
     
     private void Awake()
     {
         main = GetComponentInChildren<Camera>();
-        DefaultMoveType = Player.GetMoveType();
+        DefaultOffset = Offset;
     }
 }

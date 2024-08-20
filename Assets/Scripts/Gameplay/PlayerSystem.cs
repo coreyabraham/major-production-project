@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
@@ -7,23 +6,22 @@ public class PlayerSystem : MonoBehaviour
     #region Public Variables
     [field: Header("Movement")]
     [field: Tooltip("The speed that the player moves when on the ground.")]
-    [field: SerializeField] float MoveSpeed;
+    [field: SerializeField] private float MoveSpeed;
 
     [field: Tooltip("The speed that the player moves when scurrying on the ground.")]
-    [field: SerializeField] float ScurrySpeed;
+    [field: SerializeField] private float ScurrySpeed;
 
     [field: Tooltip("The acceleration that will be applied to the player when they begin moving. Likewise, the time it takes for them to stop moving.")]
-    [field: SerializeField] float MoveEasing;
+    [field: SerializeField] private float MoveEasing;
 
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
-    [field: SerializeField] private bool AssignInputsOnAwake = true;
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
 
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
-    [field: SerializeField] float JumpForce;
+    [field: SerializeField] private float JumpForce;
     
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
@@ -34,17 +32,23 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private float LerpSpeed;
 
     [field: Tooltip("The force that the player will push objects.")]
-    [field: SerializeField] float PushForce;
+    [field: SerializeField] private float PushForce;
 
     [field: Header("External References")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
+
     [HideInInspector] public CharacterController Character;
-    [HideInInspector] public bool IsHidden = false, IsOnWetCement = false;
+    [HideInInspector] public bool IsHidden = false;
+
+    [field: Header("Miscellaneous")]
+    [field: Tooltip("All the Surface Types that the Player can interact with, this needs to be ported elsewhere for safe-keeping!")]
+    [field: SerializeField] private SurfaceMaterial[] Materials; // This should also be converted into a Dictionary when possible!
     #endregion
 
     #region Private Variables
     private Vector3 WarpPosition;
+    private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
 
     private Vector3 Velocity;
@@ -52,6 +56,9 @@ public class PlayerSystem : MonoBehaviour
     private Vector3 HitDirection;
 
     private Vector3 lastFrameVelocity = Vector3.zero;
+
+    private CameraTarget OriginalSpawn;
+    private SurfaceMaterial FloorMaterial;
 
     private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
     #endregion
@@ -68,19 +75,62 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Public
-    public void WarpToPosition(Vector3 NewPosition) => WarpPosition = NewPosition;
+    public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
+    public void Warp(Vector3 NewPosition, Quaternion NewRotation)
+    {
+        WarpPosition = NewPosition;
+        WarpRotation = NewRotation;
+    }
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
-    public MovementType GetMoveType() => MoveType;
+    public MovementType GetMovementType() => MoveType;
     public void SetMovementType(MovementType Type, bool ResetVelocity = false)
     {
         MoveType = Type;
         if (!ResetVelocity) return;
         SetVelocity(Vector3.zero);
     }
-    public void DeathTriggered() => print("There's currently nothing here, please add something after the prototyping phase ends!");
+    public void DeathTriggered()
+    {
+        /*
+         * TODO:
+         * 1. Trigger cut to black
+         * 2. Hold screen for a few seconds
+         * 3. Fade from black with the player reloaded at the previous checkpoint
+         * 4. Add to the current save file's "Deaths" data
+         * 5. Save to disk!
+         */
+
+        SaveData data = DataHandler.Instance.GetCachedData();
+        data.deaths++;
+
+        DataHandler.Instance.SetCachedData(data);
+        bool result = DataHandler.Instance.SaveCachedDataToFile();
+
+        if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
+        else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
+
+        SpawnAtCheckpoint();
+    }
     #endregion
 
     #region Functions - Private
+    private void SpawnAtCheckpoint()
+    {
+        SaveData data = DataHandler.Instance.RefreshCachedData();
+        
+        if (string.IsNullOrWhiteSpace(data.checkpointName))
+        {
+            Warp(OriginalSpawn.position, OriginalSpawn.rotation);
+            return;
+        }
+
+        Vector3 Position = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointPosition);
+        Vector3 Eular = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointRotation);
+        Quaternion Rotation = Quaternion.Euler(Eular);
+
+        Warp(Position, Rotation);
+    }
+
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Rigidbody body = hit.collider.attachedRigidbody;
@@ -96,10 +146,26 @@ public class PlayerSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 moveDelta = IsOnWetCement ?
-            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * (MoveSpeed / 1.85f): (IsScurrying ?
+        PhysicMaterial physical = null;
+
+        if (Physics.Raycast(new Ray(transform.position + Vector3.up, Vector3.down), out RaycastHit hit))
+            physical = hit.collider.sharedMaterial;
+
+        if (physical != null)
+        {
+            foreach (SurfaceMaterial material in Materials)
+            {
+                if (physical != material) continue;
+                FloorMaterial = material;
+            }
+        }
+
+        // DICTATE MATH USAGE HERE!
+        // ORIGINAL STATEMENT: IsOnWetCement ? (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * (MoveSpeed / 1.85f) : [OLD moveDelta STATEMENT]
+
+        Vector3 moveDelta = IsScurrying ?
             (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed :
-            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed);
+            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
 
         if (!IsClimbing)
         {
@@ -108,7 +174,8 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsGrounded)
             {
-                if (IsJumping && !IsOnWetCement) Velocity.y = JumpForce;
+                // This first if statement may not work!
+                if (IsJumping && FloorMaterial != null && !FloorMaterial.PreventJumping) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
@@ -174,10 +241,30 @@ public class PlayerSystem : MonoBehaviour
         if (WarpPosition == Vector3.zero) return;
 
         Character.enabled = false;
+        
         transform.position = WarpPosition;
+        
+        if (WarpRotation.eulerAngles != Vector3.zero)
+        {
+            transform.rotation = WarpRotation;
+            CharacterRotation = WarpRotation;
+        }
+
         Character.enabled = true;
 
+        WarpRotation.eulerAngles = Vector3.zero;
         WarpPosition = Vector3.zero;
+    }
+
+    private void Start()
+    {
+        OriginalSpawn = new()
+        {
+            position = transform.position,
+            rotation = transform.rotation
+        };
+
+        SpawnAtCheckpoint();
     }
 
     private void Awake() => Character = GetComponent<CharacterController>();

@@ -1,8 +1,8 @@
 using UnityEngine;
 
 [System.Serializable]
-public struct CameraTarget
+public struct CameraTarget // << Come up with a much better name than this!
 {
-    public Vector3 Position;
-    public Quaternion Rotation;
+    public Vector3 position;
+    public Quaternion rotation;
 }

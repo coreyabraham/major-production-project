@@ -22,6 +22,11 @@ public class SaveData
     public float gameProgress;
 
     /// <summary>
+    /// The name of the checkpoint `GameObject`, used to validate if the target checkpoint has already been registered or not.
+    /// </summary>
+    public string checkpointName;
+
+    /// <summary>
     /// The exact Position values of where the Player was when they reached the latest Checkpoint Instance.
     /// </summary>
     public float[] checkpointPosition;

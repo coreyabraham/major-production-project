@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 
 using UnityEngine;
@@ -32,6 +33,10 @@ public class PlayUI : MonoBehaviour
 
     [field: SerializeField] private string NonSelectedText = "Selected File: N / A";
 
+    [field: Header("Prompter")]
+    [field: SerializeField] private PromptUI PromptSystem;
+    [field: SerializeField] private PromptDataUI ClearData;
+
     private SaveFileUI[] CachedFiles;
     private int SaveFileUI_Index = -1;
 
@@ -62,6 +67,7 @@ public class PlayUI : MonoBehaviour
 
     public void PlayButtonPressed()
     {
+        DataHandler.Instance.SetCurrentSaveFileIndex((uint)SaveFileUI_Index);
         SaveData targetData = CachedFiles[SaveFileUI_Index].GetData();
 
        if (string.IsNullOrWhiteSpace(targetData.levelName))
@@ -79,7 +85,28 @@ public class PlayUI : MonoBehaviour
 
     public void ClearButtonPressed()
     {
-        print("Clear Data from File: " + CachedFiles[SaveFileUI_Index].name);
+        ClearData.PromptFinalized = ClearDataFinished;
+        PromptSystem.Begin(ClearData);
+    }
+
+    private void ClearDataFinished(bool result)
+    {
+        if (!result) return;
+
+        SaveData clearData = new()
+        {
+            filename = System.IO.Path.GetFileNameWithoutExtension(DataHandler.Instance.GetFileName(SaveFileUI_Index)),
+
+            checkpointPosition = new float[3],
+            checkpointRotation = new float[3],
+
+            modificationData = DateTime.Now.ToString()
+        };
+
+        DataHandler.Instance.SaveFileData(DataHandler.Instance.GetFileName(SaveFileUI_Index), clearData);
+        CachedFiles[SaveFileUI_Index].AssignData(clearData);
+
+        print("Refresh User Interface Here!");
     }
 
     private void SceneButtonClicked(int SceneIndex) => SceneManager.LoadScene(SceneIndex, LoadSceneMode.Single);

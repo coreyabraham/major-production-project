@@ -46,19 +46,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetPlayer: 1
-  Offsets:
-    Position: {x: 0, y: 1, z: -4}
-    Rotation: {x: 0.05233596, y: 0, z: 0, w: 0.9986295}
+  Offset:
+    position: {x: 0, y: 1, z: -4}
+    rotation: {x: 0.034899496, y: 0, z: 0, w: 0.99939084}
+  PreviousOffset:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  FieldOfViewClamp: {x: 0, y: 180}
   FieldOfView: 85
   DepthOfField: 0
   LerpCamera: 1
-  LerpSettings: 1
+  LerpVFX: 1
   CameraLerpSpeed: 5
-  SettingsLerpSpeed: 4
+  VFXLerpSpeed: 4
   EasingStyle: 1
   EasingDirection: 0
   Player: {fileID: 0}
   main: {fileID: 0}
+  Events:
+    CutsceneStarted:
+      m_PersistentCalls:
+        m_Calls: []
+    CutsceneFinished:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &9170917592866041194
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,96 @@
-using UnityEngine;
+using System.Collections;
 
-public class GameSystem : MonoBehaviour
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+
+public class GameSystem : Singleton<GameSystem>
 {
-    // There is currently nothing here to store, please look into what needs to be here or delete both this script AND the game object from "Essentials"!
+    [System.Serializable]
+    public class GameEvents
+    {
+        public UnityEvent PlayerDied;
+
+        public UnityEvent RequestLoadingUI;
+        [HideInInspector] public UnityEvent LoadingUIFinished;
+
+        public UnityEvent LoadingStarted;
+        public UnityEvent LoadingFinished;
+        public UnityEvent<float> LoadingProgress;
+
+        public UnityEvent<Scene> SceneUnloaded;
+        public UnityEvent<Scene, LoadSceneMode> SceneLoaded;
+        public UnityEvent<Scene, Scene> SceneChanged;
+    }
+
+    public bool GameplayPaused = false;
+    public string[] LevelNames;
+    public GameEvents Events;
+
+    private string TargetSceneName;
+    private float ElapsedPlaytime;
+
+    public float GetElapsedPlaytime() => ElapsedPlaytime;
+    public void SetPausedState(bool State) => GameplayPaused = State; 
+
+    public void RequestLoadScene(string SceneName)
+    {
+        TargetSceneName = SceneName;
+        Events.RequestLoadingUI?.Invoke();
+    }
+
+    public void LoadScene()
+    {
+        if (string.IsNullOrWhiteSpace(TargetSceneName))
+        {
+            Debug.LogWarning(name + " | Could not Load Scene with Name: " + TargetSceneName + "\nMake sure the target Scene you're attempting to load is in the `Build Settings` 'Scenes in Build' list!");
+            return;
+        }
+
+        Events.LoadingStarted?.Invoke();
+
+        StartCoroutine(LoadSceneInBackground(TargetSceneName));
+        StartCoroutine(UnloadSceneInBackground());
+
+        TargetSceneName = string.Empty;
+    }
+
+    // Could possibly be done in an Update loop instead? If so, then try adding Lerping to it!
+    IEnumerator LoadSceneInBackground(string SceneName)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(SceneName);
+
+        while (!operation.isDone)
+        {
+            Events.LoadingProgress?.Invoke(Mathf.Clamp01(operation.progress / 0.9f));
+            yield return null;
+        }
+
+        Events.LoadingFinished?.Invoke();
+    }
+
+    IEnumerator UnloadSceneInBackground()
+    {
+        AsyncOperation operation = SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
+        while (!operation.isDone) yield return null;
+    }
+
+    private void SceneLoaded(Scene Scene, LoadSceneMode Mode) => Events.SceneLoaded?.Invoke(Scene, Mode);
+    private void SceneUnloaded(Scene Scene) => Events.SceneUnloaded?.Invoke(Scene);
+    private void ActiveSceneChanged(Scene Old, Scene New) => Events.SceneChanged?.Invoke(Old, New);
+
+    private void Update()
+    {
+        if (GameplayPaused) return;
+        ElapsedPlaytime += Time.deltaTime;
+    }
+
+    protected override void Initialize()
+    {
+        SceneManager.activeSceneChanged += ActiveSceneChanged;
+        SceneManager.sceneLoaded += SceneLoaded;
+        SceneManager.sceneUnloaded += SceneUnloaded;
+
+        Events.LoadingUIFinished.AddListener(LoadScene);
+    }
 }
