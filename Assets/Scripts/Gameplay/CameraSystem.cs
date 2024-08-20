@@ -88,17 +88,6 @@ public class CameraSystem : MonoBehaviour
             return;
         }
 
-        /* 
-         * TODO:
-         * 1. Detach Camera from Player IF the Camera isn't already being used in a Cutscene 
-         * 2. Iterate through all Camera Points and time them through `Update()`
-         * 3. Start doing a count-up timer to the `Interval` float
-         * 4. Once reached, reset the timer then proceed to the next item in the array
-         * 5. If there's nothing left, discontinue the loop and run one final interval at the end
-         * 6. After the last interval (using `float Duration`), enable `TargetPlayer` once again and continue as normal!
-         * 7. Look into potentially adding in Events for when an index is registered, when it finishes and when the entire method finishes!
-         */
-
         PreviousMoveType = Player.GetMovementType();
         Player.SetMovementType(MovementType.None, true);
 
@@ -255,7 +244,7 @@ public class CameraSystem : MonoBehaviour
             //main.depthOfField = DepthOfField;
         }
 
-        var Target = (!CutsceneRunning) ? GetPlayerCamPositionAndRotation() : CutscenePoints[CutsceneIndex];
+        CameraTarget Target = (!CutsceneRunning) ? GetPlayerCamPositionAndRotation() : CutscenePoints[CutsceneIndex];
         LerpCameraTransform(Target, CutsceneSpeed);
     }
     
