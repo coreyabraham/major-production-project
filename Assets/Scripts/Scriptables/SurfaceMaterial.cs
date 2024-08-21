@@ -15,6 +15,9 @@ public class SurfaceMaterial : ScriptableObject
     [Tooltip("Prevents the Player from jumping when on this surface.")]
     public bool PreventJumping;
 
+    [Tooltip("Prevents the Player from scurrying when on this surface.")]
+    public bool PreventScurrying;
+
     //[Tooltip("The Members who are exempt from this Surface Material Instance.")]
     //public GameObject[] BlacklistMembers;
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -42,8 +43,10 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public bool IsHidden = false;
 
     [field: Header("Miscellaneous")]
-    [field: Tooltip("All the Surface Types that the Player can interact with, this needs to be ported elsewhere for safe-keeping!")]
-    [field: SerializeField] private SurfaceMaterial[] Materials; // This should also be converted into a Dictionary when possible!
+    [field: SerializeField] private string SurfaceMaterialsPath = "SurfaceMaterials";
+    [field: SerializeField] private SurfaceMaterial GenericSurface;
+    [field: Tooltip("All the Surface Types that the Player can interact with")]
+    private Dictionary<string, SurfaceMaterial> Surfaces = new();
     #endregion
 
     #region Private Variables
@@ -148,24 +151,26 @@ public class PlayerSystem : MonoBehaviour
     {
         PhysicMaterial physical = null;
 
-        if (Physics.Raycast(new Ray(transform.position + Vector3.up, Vector3.down), out RaycastHit hit))
-            physical = hit.collider.sharedMaterial;
+        if (Physics.Raycast(new Ray(transform.position, Vector3.down), out RaycastHit hit)) physical = hit.collider.sharedMaterial;
+        if (physical != null) Surfaces.TryGetValue(physical.name, out FloorMaterial);
+        else FloorMaterial = (IsGrounded) ? GenericSurface : null;
 
-        if (physical != null)
+        float speed = (!IsScurrying) ? MoveSpeed : ScurrySpeed;
+
+        if (FloorMaterial != null)
         {
-            foreach (SurfaceMaterial material in Materials)
+            if (FloorMaterial.PreventScurrying) speed = MoveSpeed;
+
+            switch (FloorMaterial.MathUsage)
             {
-                if (physical != material) continue;
-                FloorMaterial = material;
+                case MathType.Addition: speed += FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Subtraction: speed -= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Multiplication: speed *= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Division: speed /= FloorMaterial.PlayerSpeedModifier; break;
             }
         }
 
-        // DICTATE MATH USAGE HERE!
-        // ORIGINAL STATEMENT: IsOnWetCement ? (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * (MoveSpeed / 1.85f) : [OLD moveDelta STATEMENT]
-
-        Vector3 moveDelta = IsScurrying ?
-            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * ScurrySpeed :
-            (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * MoveSpeed;
+        Vector3 moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * speed;
 
         if (!IsClimbing)
         {
@@ -174,8 +179,7 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsGrounded)
             {
-                // This first if statement may not work!
-                if (IsJumping && FloorMaterial != null && !FloorMaterial.PreventJumping) Velocity.y = JumpForce;
+                if (IsJumping && !FloorMaterial.PreventJumping) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
@@ -258,6 +262,11 @@ public class PlayerSystem : MonoBehaviour
 
     private void Start()
     {
+        foreach (SurfaceMaterial material in Resources.LoadAll<SurfaceMaterial>(SurfaceMaterialsPath))
+        {
+            Surfaces.Add(material.Material.name, material);
+        }
+
         OriginalSpawn = new()
         {
             position = transform.position,
