@@ -51,7 +51,6 @@ MonoBehaviour:
   ScurrySpeed: 5.7
   MoveEasing: 24
   MoveType: 3
-  AssignInputsOnAwake: 1
   ClimbingRequested: 0
   IsClimbing: 0
   JumpForce: 4.5
@@ -63,7 +62,9 @@ MonoBehaviour:
   Camera: {fileID: 0}
   Character: {fileID: 0}
   IsHidden: 0
-  IsOnWetCement: 0
+  GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
+  TargetSurfaces:
+  - {fileID: 11400000, guid: e0d48851b2fa8a54e9e519837616c856, type: 2}
 --- !u!143 &1534051186
 CharacterController:
   m_ObjectHideFlags: 0
@@ -177,7 +178,7 @@ MonoBehaviour:
     m_ActionName: Generic/Pause[/Keyboard/escape]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1001 &6199982600700703816
