@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TEMP_ACfanblade : MonoBehaviour
 {
-    [field: SerializeField] bool poweredOn;
+    public bool poweredOn;
     [field: SerializeField] GameObject blade1, blade2;
 
     private void Update()
