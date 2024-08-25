@@ -5,6 +5,9 @@ using UnityEngine;
 // The player can avoid being seen if their "IsHidden" bool is enabled.
 public class HazardTrigger : MonoBehaviour
 {
+    float resetTimer = 0;
+
+
     #region Private Variables
     private PlayerSystem playerSystem;
     private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
@@ -58,4 +61,12 @@ public class HazardTrigger : MonoBehaviour
         }
     }
     #endregion
+
+
+
+    private void Update()
+    {
+        if (hasBeenSpotted) { resetTimer += Time.deltaTime; }
+        if (resetTimer > 1) { hasBeenSpotted = false; resetTimer = 0; }
+    }
 }

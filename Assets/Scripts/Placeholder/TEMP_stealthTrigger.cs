@@ -1,26 +1,29 @@
 using UnityEngine;
 
-
-public class WetCementSurface : MonoBehaviour
+public class TEMP_stealthTrigger : MonoBehaviour
 {
+    #region Private Variables
     private PlayerSystem playerSystem;
+    #endregion
 
-
+    #region Functions - Private
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             playerSystem = other.GetComponent<PlayerSystem>();
-            playerSystem.IsOnWetCement = true;
+            playerSystem.IsHidden = true;
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            playerSystem.IsOnWetCement = false;
+            playerSystem.IsHidden = false;
             playerSystem = null;
         }
     }
+    #endregion
 }

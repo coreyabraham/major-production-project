@@ -249,7 +249,6 @@ MonoBehaviour:
   ScurrySpeed: 3.7
   MoveEasing: 24
   MoveType: 3
-  AssignInputsOnAwake: 1
   ClimbingRequested: 0
   IsClimbing: 0
   JumpForce: 3.8
@@ -261,7 +260,8 @@ MonoBehaviour:
   Camera: {fileID: 0}
   Character: {fileID: 0}
   IsHidden: 0
-  IsOnWetCement: 0
+  SurfaceMaterialsPath: SurfaceMaterials
+  GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
 --- !u!143 &1886212965
 CharacterController:
   m_ObjectHideFlags: 0

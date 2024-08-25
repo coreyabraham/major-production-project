@@ -46,12 +46,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 5
+  ScurrySpeed: 0
+  MoveEasing: 0
+  MoveType: 1
+  ClimbingRequested: 0
+  IsClimbing: 0
   JumpForce: 4
   GravityMultiplier: 1
   VelocityYIdle: -1.36
-  MoveType: 1
+  LerpRotation: 0
+  LerpSpeed: 0
+  PushForce: 0
   Camera: {fileID: 0}
   Character: {fileID: 0}
+  IsHidden: 0
+  SurfaceMaterialsPath: SurfaceMaterials
+  GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
 --- !u!1 &5077910196565739720
 GameObject:
   m_ObjectHideFlags: 0
@@ -82,8 +92,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 334766399974130575}
+  m_Children: []
   m_Father: {fileID: 7739629105857444364}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -155,86 +164,3 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1001 &8557961060824681079
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 2815706152693381153}
-    m_Modifications:
-    - target: {fileID: 4752684361715650652, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 10.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 10.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 10.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8731768116609356610, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-      propertyPath: m_Name
-      value: SM_Rat_Blockout_01
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4752684361715650652, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-  m_SourcePrefab: {fileID: 100100000, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
---- !u!4 &334766399974130575 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8243461411114928632, guid: 79ac6eeb8c3c3c14abe26c8daa2ab5fc, type: 3}
-  m_PrefabInstance: {fileID: 8557961060824681079}
-  m_PrefabAsset: {fileID: 0}

@@ -15,8 +15,8 @@ public class InputHandler : Singleton<InputHandler>
 
     private InputActionMap InputActionMap;
 
-    public void EnableControls() => InputActionMap.Enable();
-    public void DisableControls() => InputActionMap.Disable();
+    public void EnableControls() => InputActionMap.Enable(); // "Object reference not set to an instance of an object"
+    public void DisableControls() => InputActionMap.Disable(); // "Object reference not set to an instance of an object"
 
     private void OnEnable() => EnableControls();
 

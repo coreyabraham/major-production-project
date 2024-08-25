@@ -28,22 +28,140 @@ public class DataHandler : Singleton<DataHandler>
     [field: Space(0.5f)]
 
     [field: SerializeField] private bool ValidateDataOnStartup = true;
+    [field: SerializeField] private bool CacheDataOnStartup = false;
 
     private const int MaxSaveFiles = 3;
+    private int CurrentSaveFileIndex = -1;
+
     private SaveData CachedData;
+
+    public int GetCurrentSaveFileIndex() => CurrentSaveFileIndex;
+    public void SetCurrentSaveFileIndex(uint Value) => CurrentSaveFileIndex = (int)Value;
+
+    public SaveData RefreshCachedData(string Filename)
+    {
+        CachedData = LoadSaveFile(Filename);
+        return CachedData;
+    }
+    public SaveData RefreshCachedData()
+    {
+        CachedData = LoadSaveFile();
+        return CachedData;
+    }
 
     public SaveData GetCachedData() => CachedData;
     public void SetCachedData(SaveData Data) => CachedData = Data;
-    public void SaveCachedDataToFile(string Filename) => SaveFileData(Filename, CachedData);
+    public bool SaveCachedDataToFile(string Filename) => SaveFileData(Filename, CachedData);
+    public bool SaveCachedDataToFile() => SaveFileData(GetFileName(), CachedData);
 
     public int GetMaxSaveFiles() => MaxSaveFiles;
     public string GetFileName(int Index) => GetFilePath() + "/" + SaveFileName + "_" + Index.ToString() + ExtensionName;
     public string GetFilePath() => TargetPath + "/" + FolderName;
 
+    public Vector3 ConvertFloatArrayToVector3(float[] array)
+    {
+        Vector3 vector = new()
+        {
+            x = float.MaxValue,
+            y = float.MaxValue,
+            z = float.MaxValue
+        };
+
+        vector.x = array[0];
+        vector.y = array[1];
+        vector.z = array[2];
+
+        if (vector.x == float.MaxValue)
+        {
+            Debug.LogWarning(name + " | Could not convert provided Float Array (float[] array) into a Vector3 instance, returning empty Vector3...");
+            return Vector3.zero;
+        }
+
+        if (vector.y == float.MaxValue)
+        {
+            Debug.LogWarning(name + " | Could not convert provided Float Array (float[] array) into a Vector3 instance, returning empty Vector3...");
+            return Vector3.zero;
+        }
+
+        if (vector.z == float.MaxValue)
+        {
+            Debug.LogWarning(name + " | Could not convert provided Float Array (float[] array) into a Vector3 instance, returning empty Vector3...");
+            return Vector3.zero;
+        }
+
+        return vector;
+    }
+
+    public float[] ConvertVector3ToFloatArray(Vector3 vector)
+    {
+        float[] floats = new float[3]
+        {
+            float.MaxValue,
+            float.MaxValue,
+            float.MaxValue
+        };
+
+        floats[0] = vector.x;
+        floats[1] = vector.y;
+        floats[2] = vector.z;
+
+        for (int i = 0; i < floats.Length; i++)
+        {
+            if (floats[i] != float.MaxValue) continue;
+            
+            Debug.LogWarning(name + " | Could not convert provided Vector3 Instance (Vector3 vector) into a Float Array (float[] array), returning empty float array...");
+            return new float[3];
+        }
+
+        return floats;
+    }
+
+    public string GetFileName()
+    {
+        if (CurrentSaveFileIndex == -1)
+        {
+            Debug.LogWarning(name + " | CurrentSaveFileIndex was set to -1 due to it not being set prior, setting to 0 for debugging reasons!");
+            CurrentSaveFileIndex = 0;
+        }
+
+        return GetFileName(CurrentSaveFileIndex);
+    }
+
+    public int GetFileIndexWithName(string Filename)
+    {
+        string[] names = GetSaveFileNames();
+        int found = -1;
+
+        for (int i = 0; i < names.Length; i++)
+        {
+            if (names[i] != Filename) continue;
+            string[] contents = names[i].Split('_');
+
+            foreach (string str in contents)
+            {
+                if (!int.TryParse(str, out found)) continue;
+                break;
+            }
+        }
+
+        if (found == -1) Debug.LogWarning(name + " | Could not find Integer Index with Name: " + Filename + "! Please make sure it exists before calling this method!");
+
+        return found;
+    }
+
     public bool SaveFileData(string filename, SaveData data)
     {
-        if (string.IsNullOrWhiteSpace(filename)) return false;
-        if (!File.Exists(filename)) return false;
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            Debug.LogWarning(name + " | No Filename was provided! Please provide a Filename when Saving File Data!");
+            return false;
+        }
+
+        if (!File.Exists(filename))
+        {
+            Debug.LogWarning(name + " | File with Filename: " + filename + " doesn't exist! Please create it first before attempting to save to it!");
+            return false;
+        }
 
         BinaryFormatter formatter = new();
         FileStream file = File.Create(filename);
@@ -54,10 +172,21 @@ public class DataHandler : Singleton<DataHandler>
         return true;
     }
 
+    public bool SaveFileData() => SaveFileData(GetFileName(), CachedData);
+
     public SaveData LoadSaveFile(string filename)
     {
-        if (string.IsNullOrWhiteSpace(filename)) return null;
-        if (!File.Exists(filename)) return null;
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            Debug.LogWarning(name + " | Could not retrive `SaveData` struct due to a filename not being provided, be sure your string has actual contents within it before requesting to Load Data!");
+            return null;
+        }
+
+        if (!File.Exists(filename))
+        {
+            Debug.LogWarning(name + " | File with Filename: " + filename + " doesn't exist! Please create it first before attempting to load from it!");
+            return null;
+        }
 
         BinaryFormatter formatter = new();
         FileStream file = File.Open(filename, FileMode.Open);
@@ -65,18 +194,26 @@ public class DataHandler : Singleton<DataHandler>
         SaveData data = (SaveData)formatter.Deserialize(file);
         file.Close();
 
-        if (data == null)
-        {
-            Debug.LogWarning(name + " | Failed to Deserialize file: " + filename);
-        }
+        if (data == null) Debug.LogWarning(name + " | Failed to Deserialize file: " + filename + ", nothing will be returned as a result.");
 
         return data;
     }
 
-    public void CreateSaveFile(string filename)
+    public SaveData LoadSaveFile() => LoadSaveFile(GetFileName());
+
+    public void CreateSaveFile(string filename, bool skipExistanceWarning = false)
     {
-        if (string.IsNullOrWhiteSpace(filename)) return;
-        if (File.Exists(filename)) return;
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            Debug.LogWarning(name + " | No Filename was provided! Please provide a Filename when Creating a File!");
+            return;
+        }
+
+        if (File.Exists(filename))
+        {
+            if (!skipExistanceWarning) Debug.LogWarning(name + " | File with Filename: " + filename + " already exists within Directory: " + GetFilePath() + "! You cannot create a File with that Filename as a result.");
+            return;
+        }
 
         BinaryFormatter formatter = new();
         FileStream file = File.Create(filename);
@@ -97,21 +234,27 @@ public class DataHandler : Singleton<DataHandler>
 
     public string[] GetSaveFileNames()
     {
-        if (!Directory.Exists(GetFilePath())) return new string[0];
+        if (!Directory.Exists(GetFilePath()))
+        {
+            Debug.LogWarning(name + " | Directory: " + GetFilePath() + " does not seem to exist right now... please make sure it exists first before getting ALL save file names!");
+            return new string[0];
+        }
+
         return Directory.GetFiles(GetFilePath());
     }
 
     public SaveData[] GetSaveFiles()
     {
-        if (!Directory.Exists(GetFilePath())) return new SaveData[0];
+        if (!Directory.Exists(GetFilePath()))
+        {
+            Debug.LogWarning(name + " | Directory: " + GetFilePath() + " does not seem to exist right now... please make sure it exists first before getting ALL save files!");
+            return new SaveData[0];
+        }
 
         string[] files = Directory.GetFiles(GetFilePath());
         SaveData[] data = new SaveData[files.Length];
 
-        for (int i = 0; i < files.Length; i++)
-        {
-            data[i] = LoadSaveFile(files[i]);
-        }
+        for (int i = 0; i < files.Length; i++) data[i] = LoadSaveFile(files[i]);
 
         return data;
     }
@@ -119,14 +262,13 @@ public class DataHandler : Singleton<DataHandler>
     public void ValidateData()
     {
         if (!Directory.Exists(GetFilePath())) Directory.CreateDirectory(GetFilePath());
-        for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i));
+        for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i), true);
     }
 
     protected override void Initialize()
     {
         if (string.IsNullOrWhiteSpace(TargetPath)) TargetPath = Application.persistentDataPath;
-        if (!ValidateDataOnStartup) return;
-
-        ValidateData();
+        if (CacheDataOnStartup) RefreshCachedData();
+        if (ValidateDataOnStartup) ValidateData();
     }
 }
