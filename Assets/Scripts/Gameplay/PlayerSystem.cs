@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,9 +19,11 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
 
+    // Most of these values need to be re-factored!
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public bool IsJumpingFromClimb;
+    [HideInInspector] public bool FallingFromClimb;
 
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
@@ -80,6 +83,10 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Public
+    public Vector2 GetMoveInput() => MoveInput;
+    public bool IsPlayerMoving() => IsMoving;
+    public bool IsPlayerJumping() => IsJumping;
+    public bool IsPlayerGrounded() => IsGrounded;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
@@ -185,7 +192,11 @@ public class PlayerSystem : MonoBehaviour
                 IsScurryingLocked = true;
                 IsJumpingFromClimb = true;
             }
-            else if (ClimbingRequested) IsClimbing = false;
+            else if (ClimbingRequested)
+            {
+                IsClimbing = false;
+                FallingFromClimb = true;
+            }
         }
 
         Vector3 actualVelocity;
@@ -199,6 +210,7 @@ public class PlayerSystem : MonoBehaviour
             {
                 IsScurryingLocked = false;
                 IsJumpingFromClimb = false;
+                FallingFromClimb = false;
 
                 if (IsJumping && !FloorMaterial.PreventJumping) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
@@ -263,8 +275,6 @@ public class PlayerSystem : MonoBehaviour
         }
 
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
-
-
     }
 
     private void LateUpdate()

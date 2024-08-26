@@ -1,8 +1,9 @@
 public enum EasingStyle
 {
-    Linear = 0,
+    None = 0,
+    Linear,
     Sine,
-    Cubic,
-    Exponential,
-    Elastic
+    //Cubic,
+    //Exponential,
+    //Elastic
 }
