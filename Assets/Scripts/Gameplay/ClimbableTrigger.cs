@@ -2,25 +2,32 @@ using UnityEngine;
 
 public class ClimbableTrigger : MonoBehaviour
 {
-    public GameObject PipePoint;
-    public GameObject GroundPoint;
+    [field: SerializeField] private GameObject PipePoint;
+    [field: SerializeField] private bool SkipJumpToClimbCheck;
 
     private PlayerSystem playerSystem;
 
     private void DetermineClimbHook()
     {
+        if (!SkipJumpToClimbCheck && playerSystem.IsJumpingFromClimb)
+        {
+            playerSystem.IsClimbing = true;
+            playerSystem.IsJumpingFromClimb = false;
+        }
+
         if (!playerSystem.ClimbingRequested) return;
 
         playerSystem.IsClimbing = !playerSystem.IsClimbing;
         playerSystem.SetVelocity(Vector3.zero);
 
-        playerSystem.Warp(playerSystem.IsClimbing ? PipePoint.transform.position : GroundPoint.transform.position);
+        if (playerSystem.IsClimbing) playerSystem.Warp(PipePoint.transform.position);
+        
         playerSystem.ClimbingRequested = false;
     }
 
     private void Update()
     {
-        if (playerSystem == null) return;
+        if (!playerSystem) return;
 
         DetermineClimbHook();
 
@@ -60,18 +67,14 @@ public class ClimbableTrigger : MonoBehaviour
     #region OnTrigger Functions
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerSystem = other.GetComponent<PlayerSystem>();
-        }
+        if (!other.CompareTag("Player")) return;
+        playerSystem = other.GetComponent<PlayerSystem>();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerSystem = null;
-        }
+        if (!other.CompareTag("Player")) return;
+        playerSystem = null;
     }
     #endregion
 }
