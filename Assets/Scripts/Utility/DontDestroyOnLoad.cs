@@ -7,13 +7,13 @@ public class DontDestroyOnLoad : MonoBehaviour
 
     private void Awake()
     {
-        if (Instantiated.ContainsKey(this.gameObject.name))
+        if (Instantiated.ContainsKey(gameObject.name))
         {
-            Destroy(this.gameObject); // "Object reference not set to an instance of an object"
+            Destroy(gameObject);
             return;
         }
 
-        DontDestroyOnLoad(this.gameObject);
-        Instantiated.Add(this.gameObject.name, this.gameObject);
+        DontDestroyOnLoad(gameObject);
+        Instantiated.Add(gameObject.name, gameObject);
     }
 }
