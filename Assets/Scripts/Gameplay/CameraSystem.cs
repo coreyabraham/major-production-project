@@ -11,7 +11,7 @@ public class CameraSystem : MonoBehaviour
     }
 
     [field: Header("Toggleables")]
-    public bool TargetPlayer = false;
+    [field: SerializeField] private bool TargetPlayer = false;
 
     [field: Header("Angles and Offsets")]
     [field: SerializeField] private CameraTarget Offset;
@@ -244,7 +244,7 @@ public class CameraSystem : MonoBehaviour
             //main.depthOfField = DepthOfField;
         }
 
-        CameraTarget Target = (!CutsceneRunning) ? GetPlayerCamPositionAndRotation() : CutscenePoints[CutsceneIndex];
+        CameraTarget Target = (!CutsceneRunning && TargetPlayer) ? GetPlayerCamPositionAndRotation() : CutscenePoints[CutsceneIndex];
         LerpCameraTransform(Target, CutsceneSpeed);
     }
     
