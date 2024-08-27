@@ -49,11 +49,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 2.8
   ScurrySpeed: 5.7
+  ScurryLimit: 3
+  ScurryRecoveryTime: 6
   MoveEasing: 24
   MoveType: 3
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
+  FallingFromClimb: 0
   JumpForce: 4.5
   GravityMultiplier: 1.05
   VelocityYIdle: 0
@@ -61,6 +64,7 @@ MonoBehaviour:
   LerpSpeed: 20
   PushForce: 1
   Camera: {fileID: 0}
+  Animator: {fileID: 0}
   Character: {fileID: 0}
   IsHidden: 0
   SurfaceMaterialsPath: SurfaceMaterials

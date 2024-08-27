@@ -75,7 +75,8 @@ public class CameraSystem : MonoBehaviour
         };
     }
     public void SetCameraOffsets(CameraTarget Target) => SetCameraOffsets(Target.position, Target.rotation);
-    public void SetCameraOffsets(Transform Target) => SetCameraOffsets(Target.position, Target.rotation);
+    public void SetCameraOffsets(Vector3 Target) => SetCameraOffsets(Target, PreviousCameraLocation.rotation);
+    public void SetCameraOffsets(Quaternion Target) => SetCameraOffsets(PreviousCameraLocation.position, Target);
 
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
@@ -169,7 +170,7 @@ public class CameraSystem : MonoBehaviour
             newPos.y = (newPos.y >= GroundCameraPosition.y) ? GroundCameraPosition.y : newPos.y;
         }
 
-        if (Player.IsPlayerMoving())
+        if (Player.IsPlayerMoving() && CameraSubject == Player.gameObject)
         {
             Vector2 moveInput = Player.GetMoveInput();
             if (moveInput.x > 0) newPos.x += AnticipationOffset;
