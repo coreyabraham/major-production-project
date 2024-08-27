@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ClimbableTrigger : MonoBehaviour
+public class TEMP_PipeTrigger_FORBUILD : MonoBehaviour
 {
 
     [field: SerializeField] private GameObject PipePoint;
@@ -35,13 +35,20 @@ public class ClimbableTrigger : MonoBehaviour
         {
             playerSystem.Warp(PipePoint.transform.position);
             SkipJumpToClimbCheck = true;
+            playerSystem.SetMovementType(MovementType.LockToForwardBack);
         }
-        else if (!playerSystem.IsClimbing && useGroundPoint)
+        else if (!playerSystem.IsClimbing)
         {
-            playerSystem.Warp(GroundPoint.transform.position);
+            playerSystem.SetMovementType(MovementType.LockToLeftRight);
+
+            if (useGroundPoint)
+            {
+                playerSystem.Warp(GroundPoint.transform.position);
+            }
         }
         playerSystem.ClimbingRequested = false;
     }
+
 
     private void Update()
     {
