@@ -33,7 +33,7 @@ public class PlayerSystem : MonoBehaviour
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] private float JumpForce;
-    
+
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
     [field: SerializeField] private float VelocityYIdle = 0.0f;
@@ -58,8 +58,6 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private SurfaceMaterial GenericSurface;
     [field: Tooltip("All the Surface Types that the Player can interact with")]
     private Dictionary<string, SurfaceMaterial> Surfaces = new();
-
-    [field: SerializeField] Animator animator;
     #endregion
 
     #region Private Variables
@@ -154,7 +152,7 @@ public class PlayerSystem : MonoBehaviour
     private void SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
-        
+
         if (string.IsNullOrWhiteSpace(data.checkpointName))
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
@@ -300,23 +298,6 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
 
-<<<<<<< HEAD
-        //Animations
-        if(MoveInput == Vector2.zero)
-        {
-            animator.SetFloat("Speed", 0);
-        }
-        else if (!Input.GetKey(KeyCode.LeftShift))
-        {
-            //Walk
-            animator.SetFloat("Speed", 0.5f);
-        }
-        else
-        {
-            //Scurry
-            animator.SetFloat("Speed", 1);
-        }
-=======
         if (IsScurrying)
         {
             if (CanScurry && CurrentScurryTime < ScurryLimit)
@@ -343,7 +324,6 @@ public class PlayerSystem : MonoBehaviour
 
         CurrentScurryTime = 0.0f;
         CurrentRecoveryTime = 0.0f;
->>>>>>> 41a1859ecf259f022af4a18e8508eaf5ca5d4b65
     }
 
     private void LateUpdate()
