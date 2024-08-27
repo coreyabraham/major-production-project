@@ -49,6 +49,8 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private SurfaceMaterial GenericSurface;
     [field: Tooltip("All the Surface Types that the Player can interact with")]
     private Dictionary<string, SurfaceMaterial> Surfaces = new();
+
+    [field: SerializeField] Animator animator;
     #endregion
 
     #region Private Variables
@@ -264,7 +266,21 @@ public class PlayerSystem : MonoBehaviour
 
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
 
-
+        //Animations
+        if(MoveInput == Vector2.zero)
+        {
+            animator.SetFloat("Speed", 0);
+        }
+        else if (!Input.GetKey(KeyCode.LeftShift))
+        {
+            //Walk
+            animator.SetFloat("Speed", 0.5f);
+        }
+        else
+        {
+            //Scurry
+            animator.SetFloat("Speed", 1);
+        }
     }
 
     private void LateUpdate()
