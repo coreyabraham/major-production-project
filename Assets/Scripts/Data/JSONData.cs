@@ -3,6 +3,10 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// A Class that is designed to convert `PlayerSettings.cs` class data into human-readable Json data. <br/>
+/// This script is mainly called from the `SettingsUI.cs` script.
+/// </summary>
 public class JSONData : MonoBehaviour
 {
     [field: SerializeField] private string FileName = "SettingsData.json";

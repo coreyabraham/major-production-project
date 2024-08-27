@@ -23,10 +23,19 @@ public class PromptUI : Singleton<PromptUI>
 
     private PromptDataUI cachedData;
 
+    public bool PromptActive() => Prompt.activeSelf;
+
     public void Begin(PromptDataUI data)
     {
         Prompt.SetActive(true);
         SetupPrompt(data);
+    }
+
+    public void ForceEnd()
+    {
+        Prompt.SetActive(false);
+        SetupPrompt(DefaultData);
+        cachedData = new();
     }
 
     private void SetupPrompt(PromptDataUI data)
@@ -44,7 +53,9 @@ public class PromptUI : Singleton<PromptUI>
     private void NavigatorInteracted(bool DidPlayerAccept)
     {
         Prompt.SetActive(false);
+
         cachedData.PromptFinalized?.Invoke(DidPlayerAccept);
+        cachedData = new();
 
         SetupPrompt(DefaultData);
     }

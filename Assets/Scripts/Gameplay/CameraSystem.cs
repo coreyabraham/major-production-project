@@ -1,8 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -24,18 +21,15 @@ public class CameraSystem : MonoBehaviour
     [HideInInspector] private CameraTarget DefaultOffset;
 
     [field: Header("View Fields")]
-
     [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
     [field: SerializeField] private float DepthOfField = 0.0f;
 
     [field: Header("Lerping Speeds")]
-
     [field: SerializeField] private float CameraLerpSpeed;
     [field: SerializeField] private float VFXLerpSpeed;
 
     [field: Header("Enumerations")]
-
     [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Sine;
     [field: SerializeField] private CameraType CameraType = CameraType.Follow;
 
@@ -81,7 +75,8 @@ public class CameraSystem : MonoBehaviour
         };
     }
     public void SetCameraOffsets(CameraTarget Target) => SetCameraOffsets(Target.position, Target.rotation);
-    public void SetCameraOffsets(Transform Target) => SetCameraOffsets(Target.position, Target.rotation);
+    public void SetCameraOffsets(Vector3 Target) => SetCameraOffsets(Target, PreviousCameraLocation.rotation);
+    public void SetCameraOffsets(Quaternion Target) => SetCameraOffsets(PreviousCameraLocation.position, Target);
 
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
@@ -175,7 +170,7 @@ public class CameraSystem : MonoBehaviour
             newPos.y = (newPos.y >= GroundCameraPosition.y) ? GroundCameraPosition.y : newPos.y;
         }
 
-        if (Player.IsPlayerMoving())
+        if (Player.IsPlayerMoving() && CameraSubject == Player.gameObject)
         {
             Vector2 moveInput = Player.GetMoveInput();
             if (moveInput.x > 0) newPos.x += AnticipationOffset;
@@ -273,7 +268,7 @@ public class CameraSystem : MonoBehaviour
         {
             switch (CameraType)
             {
-                case CameraType.Idle: break;
+                case CameraType.Fixed: break;
                 case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
                 case CameraType.Dolly: Debug.LogWarning(name + " | Couldn't "); break;
             }
