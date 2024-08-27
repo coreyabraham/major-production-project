@@ -1,3 +1,7 @@
+/// <summary>
+/// A class that contains all savable data for the Player. <br/>
+/// This class is serialized into binary files from the `DataHandler.cs` script.
+/// </summary>
 [System.Serializable]
 public class SaveData
 {

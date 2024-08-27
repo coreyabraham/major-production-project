@@ -1,8 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -24,18 +21,15 @@ public class CameraSystem : MonoBehaviour
     [HideInInspector] private CameraTarget DefaultOffset;
 
     [field: Header("View Fields")]
-
     [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
     [field: SerializeField] private float DepthOfField = 0.0f;
 
     [field: Header("Lerping Speeds")]
-
     [field: SerializeField] private float CameraLerpSpeed;
     [field: SerializeField] private float VFXLerpSpeed;
 
     [field: Header("Enumerations")]
-
     [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Sine;
     [field: SerializeField] private CameraType CameraType = CameraType.Follow;
 
@@ -273,7 +267,7 @@ public class CameraSystem : MonoBehaviour
         {
             switch (CameraType)
             {
-                case CameraType.Idle: break;
+                case CameraType.Fixed: break;
                 case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
                 case CameraType.Dolly: Debug.LogWarning(name + " | Couldn't "); break;
             }
