@@ -15,14 +15,12 @@ public class InputHandler : Singleton<InputHandler>
 
     private InputActionMap InputActionMap;
 
-    // "Object reference not set to an instance of an object"
     public void EnableControls()
     {
         if (InputActionMap == null) return;
         InputActionMap.Enable();
     }
 
-    // "Object reference not set to an instance of an object"
     public void DisableControls()
     {
         if (InputActionMap == null) return;

@@ -1,23 +1,18 @@
 using UnityEngine;
 
-public class UpdatePlayerPos : MonoBehaviour, ITouchEvent
+public class UpdatePlayerPos : MonoBehaviour
 {
-    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
-    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
-
     [field: SerializeField] private Transform TargetTransform;
 
-    public void Triggered(Collider Other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (!PlayerExclusive) return;
+        if (!other.CompareTag("Player")) return;
 
-        PlayerSystem player = Other.gameObject.GetComponentInParent<PlayerSystem>();
+        PlayerSystem player = other.GetComponent<PlayerSystem>();
 
         if (!player) return;
-        if (!transform) return;
+        if (!TargetTransform) return;
 
         player.Warp(TargetTransform.position);
     }
-
-    private void OnTriggerEnter(Collider other) => Triggered(other);
 }
