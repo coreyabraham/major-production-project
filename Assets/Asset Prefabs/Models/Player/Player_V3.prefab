@@ -1,37 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &661404308647368980
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7768850616224398124}
-  m_Layer: 0
-  m_Name: Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7768850616224398124
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661404308647368980}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7691173357451885928}
-  m_Father: {fileID: 6765966995821839399}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6246030398808792733
 GameObject:
   m_ObjectHideFlags: 0
@@ -63,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7768850616224398124}
+  - {fileID: 7691173357451885928}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -85,6 +53,7 @@ MonoBehaviour:
   MoveType: 3
   ClimbingRequested: 0
   IsClimbing: 0
+  IsJumpingFromClimb: 0
   JumpForce: 3.8
   GravityMultiplier: 1.15
   VelocityYIdle: -3.2
@@ -113,7 +82,7 @@ CharacterController:
   m_StepOffset: 0.001
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.05, z: 0}
+  m_Center: {x: 0, y: 0.05, z: 0.28}
 --- !u!114 &1811432823432441354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +186,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 7768850616224398124}
+    m_TransformParent: {fileID: 6765966995821839399}
     m_Modifications:
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_RootOrder
@@ -233,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 70.859
+      value: 70.85901
       objectReference: {fileID: 0}
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -241,15 +210,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 13.81
+      value: 13.809996
       objectReference: {fileID: 0}
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.38081205
+      value: 0.38081202
       objectReference: {fileID: 0}
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -7.993661e-17
+      value: -7.993662e-17
       objectReference: {fileID: 0}
     - target: {fileID: 1250814886599927750, guid: bd956a85a0f2f584c8f1192e12ab4dc9, type: 3}
       propertyPath: m_LocalRotation.y
