@@ -20,7 +20,7 @@ public class SettingsUI : MonoBehaviour
     #region Variables
     [field: Header("External References")]
     [field: SerializeField] private JSONData JsonHandler;
-    [field: SerializeField] private PromptUI PromptHandler;
+    public PromptUI PromptHandler;
 
     [field: Header("Sliders")]
     [field: SerializeField] private SliderUI MasterSlider;

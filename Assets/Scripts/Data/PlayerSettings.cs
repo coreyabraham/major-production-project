@@ -1,5 +1,7 @@
-using UnityEngine;
-
+/// <summary>
+/// A Class for the Player's Audio, Graphics, Visual and Input Settings used during gameplay. <br/>
+/// This data is converted into the Json file format and kept under the Player's "PersistantFilePath" location by the `JsonData.cs` script.
+/// </summary>
 [System.Serializable]
 public class PlayerSettings
 {
@@ -33,7 +35,7 @@ public class PlayerSettings
     public string Quality;
 
     /// <summary>
-    /// The Fullscreen Mode the current session will run in. <br/>
+    /// The Fullscreen Mode the current session will run in.
     /// </summary>
     public string WindowMode;
 
@@ -71,5 +73,9 @@ public class PlayerSettings
     /// The filter type the game will use to support those who have colour-based imparements.
     /// </summary>
     public string ColourAccessibility;
+    #endregion
+
+    #region Input
+    // There is currently not information stored here, have a discussion in regards to how Input data should be saved to JSON!
     #endregion
 }

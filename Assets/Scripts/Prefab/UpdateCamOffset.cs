@@ -1,37 +1,83 @@
 using UnityEngine;
 
-public class UpdateCamOffset : MonoBehaviour, ITouchEvent
+public class UpdateCamOffset : MonoBehaviour
 {
-    public enum UpdateCamOffsetType
-    {
-        Target = 0,
-        Default,
-        Previous
-    }
-    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
-    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
+    [field: SerializeField] private bool HideOnStartup = true;
+    [field: SerializeField] private bool UseDampening = false;
+    [field: SerializeField] private bool RevertOnExit = false;
+
+    [field: Space(5.0f)]
+
+    [field: SerializeField] private GameObject Goal;
+
+    [field: Space(5.0f)]
+
+    [field: SerializeField] private UpdateCamOffsetType Type;
+    [field: SerializeField] private UpdateCamOffsetValue Value;
+
+    [field: Space(5.0f)]
 
     [field: SerializeField] private CameraTarget Target;
-    [field: SerializeField] private UpdateCamOffsetType Type;
 
-    [field: SerializeField] private bool HideOnStartup = true;
+    private PlayerSystem Player;
+    private CameraSystem Camera;
 
-    public void Triggered(Collider Other)
+    private CameraTarget BeforeChanges = new();
+
+    private void OnTriggerEnter(Collider other)
     {
-        if (!PlayerExclusive) return;
+        if (!other.CompareTag("Player")) return;
 
-        PlayerSystem player = Other.gameObject.GetComponentInParent<PlayerSystem>();
-        if (!player) return;
+        Player = other.gameObject.GetComponent<PlayerSystem>();
+        if (!Player) return;
 
-        CameraSystem camera = player.Camera;
-        if (!camera) return;
+        Camera = Player.Camera;
+        if (!Camera) return;
+
+        BeforeChanges = Camera.GetCameraOffset();
 
         switch (Type)
         {
-            case UpdateCamOffsetType.Target: camera.SetCameraOffsets(Target); return;
-            case UpdateCamOffsetType.Default: camera.SetToDefaultOffsets(); return;
-            case UpdateCamOffsetType.Previous: camera.RevertCameraOffsets(); return;
+            case UpdateCamOffsetType.Target:
+                {
+                    switch (Value)
+                    {
+                        case UpdateCamOffsetValue.Both: Camera.SetCameraOffsets(Target); break;
+                        case UpdateCamOffsetValue.Position: Camera.SetCameraOffsets(Target.position); break;
+                        case UpdateCamOffsetValue.Rotation: Camera.SetCameraOffsets(Target.rotation); break;
+                    }
+                }
+                return;
+
+            case UpdateCamOffsetType.Default: Camera.SetToDefaultOffsets(); return;
+            case UpdateCamOffsetType.Previous: Camera.RevertCameraOffsets(); return;
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!Player || !Camera) return;
+
+        if (RevertOnExit)
+        {
+            Camera.SetCameraOffsets(BeforeChanges);
+            BeforeChanges = new();
+        }
+
+        Player = null;
+        Camera = null;
+    }
+
+    private void Update()
+    {
+        if (!UseDampening || !Player || !Camera) return;
+
+        float Distance = Vector3.Distance(
+            Player.gameObject.transform.position,
+            Goal.transform.position
+        );
+
+        print(Distance);
     }
 
     private void Awake()
@@ -43,6 +89,4 @@ public class UpdateCamOffset : MonoBehaviour, ITouchEvent
 
         renderer.enabled = false;
     }
-
-    private void OnTriggerEnter(Collider other) => Triggered(other);
 }

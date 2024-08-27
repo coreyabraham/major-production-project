@@ -49,11 +49,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 2.8
   ScurrySpeed: 5.7
+  ScurryLimit: 3
+  ScurryRecoveryTime: 6
   MoveEasing: 24
   MoveType: 3
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
+  FallingFromClimb: 0
   JumpForce: 4.5
   GravityMultiplier: 1.05
   VelocityYIdle: 0
@@ -61,6 +64,7 @@ MonoBehaviour:
   LerpSpeed: 20
   PushForce: 1
   Camera: {fileID: 0}
+  Animator: {fileID: 0}
   Character: {fileID: 0}
   IsHidden: 0
   SurfaceMaterialsPath: SurfaceMaterials
@@ -76,13 +80,13 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 0.05
-  m_Radius: 0.05
+  m_Height: 0
+  m_Radius: 0.12
   m_SlopeLimit: 45
   m_StepOffset: 0.005
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.05, z: 0}
+  m_Center: {x: 0, y: 0.07, z: 0}
 --- !u!114 &410204144542357463
 MonoBehaviour:
   m_ObjectHideFlags: 0

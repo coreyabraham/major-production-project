@@ -1,16 +1,13 @@
 using UnityEngine;
 
-public class PlrCheckpoint : MonoBehaviour, ITouchEvent
+public class PlrCheckpoint : MonoBehaviour
 {
-    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
-    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
-
     [field: Space(2.5f), SerializeField] private string OverrideName;
     [field: SerializeField] private Transform OverrideTranform;
 
-    public void Triggered(Collider Other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (!Other.TryGetComponent(out PlayerSystem _)) return;
+        if (other.CompareTag("Player")) return;
 
         SaveData data = DataHandler.Instance.GetCachedData();
 
@@ -32,6 +29,4 @@ public class PlrCheckpoint : MonoBehaviour, ITouchEvent
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
         else Debug.LogWarning(name +  "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
-
-    private void OnTriggerEnter(Collider other) => Triggered(other);
 }
