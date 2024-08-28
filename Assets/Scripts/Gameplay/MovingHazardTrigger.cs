@@ -30,18 +30,18 @@ public class MovingHazardTrigger : MonoBehaviour
 
         if (!dir)
         {
-            transform.position = Vector3.Lerp(transform.position, endPos, easing);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, endPos, easing);
             if (timeElapsed > 3) { dir = true; timeElapsed = 0; } 
         }
         else
         {
-            transform.position = Vector3.Lerp(transform.position, startPos, easing);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, startPos, easing);
             if (timeElapsed > 3) { dir = false; timeElapsed = 0; }
         }
     }
 
     private void Start()
     {
-        startPos = transform.position;
+        startPos = transform.localPosition;
     }
 }

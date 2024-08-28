@@ -35,27 +35,21 @@ public class ClimbableTrigger : MonoBehaviour
 
         if (playerSystem.IsClimbing)
         {
-            playerSystem.Warp(PipePoint.transform.position);
+            if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
+            else { playerSystem.Warp(PipePoint.transform.position); }
 
-            if (playerSystem.IsClimbing)
-            {
-                if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
-                else { playerSystem.Warp(PipePoint.transform.position); }
+            //playerSystem.SetMovementType(MovementType.LockToForwardBack);
 
-                SkipJumpToClimbCheck = true;
-            }
-            else if (!playerSystem.IsClimbing && useGroundPoint)
-            {
-                playerSystem.Warp(GroundPoint.transform.position);
             SkipJumpToClimbCheck = true;
         }
         else if (!playerSystem.IsClimbing && useGroundPoint)
         {
             playerSystem.Warp(GroundPoint.transform.position);
 
-                playerSystem = null;
-                SkipJumpToClimbCheck = false;
-            }
+            //playerSystem.SetMovementType(MovementType.LockToLeftRight);
+
+            playerSystem = null;
+            SkipJumpToClimbCheck = false;
 
             playerSystem.ClimbingRequested = false;
         }
