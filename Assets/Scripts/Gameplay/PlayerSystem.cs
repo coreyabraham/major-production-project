@@ -33,7 +33,7 @@ public class PlayerSystem : MonoBehaviour
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] private float JumpForce;
-    
+
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
     [field: SerializeField] private float VelocityYIdle = 0.0f;
@@ -152,7 +152,7 @@ public class PlayerSystem : MonoBehaviour
     private void SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
-        
+
         if (string.IsNullOrWhiteSpace(data.checkpointName))
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
@@ -298,6 +298,7 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
 
+<<<<<<< HEAD
         if (Animator != null)
         {
             //Animations
@@ -319,6 +320,8 @@ public class PlayerSystem : MonoBehaviour
             //}
         }
 
+=======
+>>>>>>> design
         if (IsScurrying)
         {
             if (CanScurry && CurrentScurryTime < ScurryLimit)
