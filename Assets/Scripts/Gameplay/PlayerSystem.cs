@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,18 +13,27 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The speed that the player moves when scurrying on the ground.")]
     [field: SerializeField] private float ScurrySpeed;
 
+    [field: Tooltip("The amount of time (in seconds) the player can scurry for before stopping")]
+    [field: SerializeField] private float ScurryLimit;
+
+    [field: Tooltip("The amount of time (in seconds) it takes for the player to recover their scurry ability")]
+    [field: SerializeField] private float ScurryRecoveryTime;
+
     [field: Tooltip("The acceleration that will be applied to the player when they begin moving. Likewise, the time it takes for them to stop moving.")]
     [field: SerializeField] private float MoveEasing;
 
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
+
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
+    [HideInInspector] public bool IsJumpingFromClimb;
+    [HideInInspector] public bool FallingFromClimb;
 
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] private float JumpForce;
-    
+
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
     [field: SerializeField] private float VelocityYIdle = 0.0f;
@@ -35,9 +45,10 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The force that the player will push objects.")]
     [field: SerializeField] private float PushForce;
 
-    [field: Header("External References")]
+    [field: Header("Externals")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
+    public Animator Animator;
 
     [HideInInspector] public CharacterController Character;
     [HideInInspector] public bool IsHidden = false;
@@ -63,13 +74,29 @@ public class PlayerSystem : MonoBehaviour
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
 
+    private float CurrentScurryTime;
+    private float CurrentRecoveryTime;
+
+    private bool CanScurry = true;
+
     private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
     #endregion
 
     #region Functions - Handlers
     public void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
-    public void OnScurry(InputAction.CallbackContext ctx) => IsScurrying = ctx.ReadValueAsButton();
-    public void OnClimbing(InputAction.CallbackContext ctx) => ClimbingRequested = ctx.ReadValueAsButton();
+    public void OnClimbing(InputAction.CallbackContext ctx)
+    {
+        if (MoveType == MovementType.None) return;
+        ClimbingRequested = ctx.ReadValueAsButton();
+    }
+    public void OnScurry(InputAction.CallbackContext ctx)
+    {
+        if (MoveType == MovementType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed) return;
+        IsScurrying = !IsScurrying;
+
+        if (IsScurrying || !CanScurry) return;
+        CanScurry = false;
+    }
     public void OnJumping(InputAction.CallbackContext ctx)
     {
         if (MoveType == MovementType.None) return;
@@ -78,6 +105,10 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Public
+    public Vector2 GetMoveInput() => MoveInput;
+    public bool IsPlayerMoving() => IsMoving;
+    public bool IsPlayerJumping() => IsJumping;
+    public bool IsPlayerGrounded() => IsGrounded;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
@@ -98,9 +129,10 @@ public class PlayerSystem : MonoBehaviour
          * TODO:
          * 1. Trigger cut to black
          * 2. Hold screen for a few seconds
-         * 3. Fade from black with the player reloaded at the previous checkpoint
-         * 4. Add to the current save file's "Deaths" data
-         * 5. Save to disk!
+         * 3. Reload previously interacted objects and Scene data so they can be used again
+         * 4. Fade from black with the player reloaded at the previous checkpoint
+         * 5. Add to the current save file's "Deaths" data
+         * 6. Save to disk!
          */
 
         SaveData data = DataHandler.Instance.GetCachedData();
@@ -120,7 +152,7 @@ public class PlayerSystem : MonoBehaviour
     private void SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
-        
+
         if (string.IsNullOrWhiteSpace(data.checkpointName))
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
@@ -149,13 +181,17 @@ public class PlayerSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        PhysicMaterial physical = null;
+        if (IsGrounded)
+        {
+            PhysicMaterial physical = null;
 
-        if (Physics.Raycast(new Ray(transform.position, Vector3.down), out RaycastHit hit)) physical = hit.collider.sharedMaterial;
-        if (physical != null) Surfaces.TryGetValue(physical.name, out FloorMaterial);
-        else FloorMaterial = (IsGrounded) ? GenericSurface : null;
+            if (Physics.Raycast(new Ray(transform.position, Vector3.down), out RaycastHit hit)) physical = hit.collider.sharedMaterial;
+            if (physical != null) Surfaces.TryGetValue(physical.name, out FloorMaterial);
+            else FloorMaterial = GenericSurface;
+        }
+        else FloorMaterial = null;
 
-        float speed = (!IsScurrying) ? MoveSpeed : ScurrySpeed;
+        float speed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
 
         if (FloorMaterial != null)
         {
@@ -172,6 +208,23 @@ public class PlayerSystem : MonoBehaviour
 
         Vector3 moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * speed;
 
+        if (IsClimbing)
+        {
+            if (IsJumping)
+            {
+                Velocity.y = JumpForce / 2.0f;
+                IsClimbing = false;
+                IsJumpingFromClimb = true;
+            }
+            else if (ClimbingRequested)
+            {
+                IsClimbing = false;
+                FallingFromClimb = true;
+            }
+        }
+
+        Vector3 actualVelocity;
+
         if (!IsClimbing)
         {
             Velocity.z = moveDelta.z;
@@ -179,26 +232,28 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsGrounded)
             {
+                IsJumpingFromClimb = false;
+                FallingFromClimb = false;
+
                 if (IsJumping && !FloorMaterial.PreventJumping) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
-            Vector3 actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
-            Character.Move(actualVelocity * Time.fixedDeltaTime);
-
-            lastFrameVelocity = new(actualVelocity.x, Velocity.y, actualVelocity.z);
+            actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
         }
         else
         {
+            // Properly lerp the movement up and down since it's really jarring moving linearly between movements
+
             Velocity.y = moveDelta.z;
 
-            Vector3 actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             actualVelocity.z = 0;
-            Character.Move(actualVelocity * Time.fixedDeltaTime);
-
-            lastFrameVelocity = new(actualVelocity.x, actualVelocity.y, Velocity.z);
         }
+
+        Character.Move(actualVelocity * Time.fixedDeltaTime);
+        lastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
 
@@ -215,12 +270,17 @@ public class PlayerSystem : MonoBehaviour
             return;
         }
 
+        if (IsClimbing)
+        {
+            // Climbing based rotation goes here!
+            return;
+        }
+
         float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
         CharacterRotation = Quaternion.Euler(0.0f, IsMoving ? rotation + 90.0f : 90.0f, 0.0f);
-
         if (LerpRotation) CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
 
         Character.transform.rotation = CharacterRotation;
@@ -228,8 +288,6 @@ public class PlayerSystem : MonoBehaviour
 
     private void Update()
     {
-        IsGrounded = Character.isGrounded;
-
         switch (MoveType)
         {
             case MovementType.None: MoveInput = Vector2.zero; break;
@@ -237,7 +295,41 @@ public class PlayerSystem : MonoBehaviour
             case MovementType.LockToForwardBack: MoveInput.x = 0.0f; break;
         }
 
+        IsGrounded = Character.isGrounded;
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
+
+        if (Animator != null)
+        {
+            //Animations
+            Animator.SetFloat("Speed", MoveInput.magnitude);
+        }
+
+        if (IsScurrying)
+        {
+            if (CanScurry && CurrentScurryTime < ScurryLimit)
+            {
+                CurrentScurryTime += Time.deltaTime;
+                return;
+            }
+
+            CanScurry = false;
+            IsScurrying = false;
+
+            return;
+        }
+
+        if (CanScurry) return;
+
+        if (CurrentRecoveryTime < ScurryRecoveryTime)
+        {
+            CurrentRecoveryTime += Time.deltaTime;
+            return;
+        }
+
+        CanScurry = true;
+
+        CurrentScurryTime = 0.0f;
+        CurrentRecoveryTime = 0.0f;
     }
 
     private void LateUpdate()
@@ -245,9 +337,8 @@ public class PlayerSystem : MonoBehaviour
         if (WarpPosition == Vector3.zero) return;
 
         Character.enabled = false;
-        
         transform.position = WarpPosition;
-        
+
         if (WarpRotation.eulerAngles != Vector3.zero)
         {
             transform.rotation = WarpRotation;
@@ -255,7 +346,6 @@ public class PlayerSystem : MonoBehaviour
         }
 
         Character.enabled = true;
-
         WarpRotation.eulerAngles = Vector3.zero;
         WarpPosition = Vector3.zero;
     }
