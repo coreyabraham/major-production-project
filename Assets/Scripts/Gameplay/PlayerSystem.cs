@@ -298,30 +298,12 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
 
-<<<<<<< HEAD
         if (Animator != null)
         {
             //Animations
             Animator.SetFloat("Speed", MoveInput.magnitude);
-
-            //if (MoveInput == Vector2.zero)
-            //{
-            //    Animator.SetFloat("Speed", 0);
-            //}
-            //else if (!Input.GetKey(KeyCode.LeftShift))
-            //{
-            //    //Walk
-            //    Animator.SetFloat("Speed", 0.5f);
-            //}
-            //else
-            //{
-            //    //Scurry
-            //    Animator.SetFloat("Speed", 1);
-            //}
         }
 
-=======
->>>>>>> design
         if (IsScurrying)
         {
             if (CanScurry && CurrentScurryTime < ScurryLimit)
