@@ -298,6 +298,12 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
 
+        if (Animator != null)
+        {
+            //Animations
+            Animator.SetFloat("Speed", MoveInput.magnitude);
+        }
+
         if (IsScurrying)
         {
             if (CanScurry && CurrentScurryTime < ScurryLimit)

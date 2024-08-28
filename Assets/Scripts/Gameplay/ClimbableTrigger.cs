@@ -14,11 +14,8 @@ public class ClimbableTrigger : MonoBehaviour
     [field: Tooltip("Determines if the \"Ground Point\" variable should be used. If set as false, then \"Ground Point\" can be left empty.")]
     [field: SerializeField] private bool useGroundPoint;
 
-
     private bool SkipJumpToClimbCheck = false;  // Used to disallow player to reattach to pipe they're already in the trigger of.
     private PlayerSystem playerSystem;
-
-
 
     private void DetermineClimbHook()
     {
@@ -38,17 +35,29 @@ public class ClimbableTrigger : MonoBehaviour
 
         if (playerSystem.IsClimbing)
         {
-            if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
-            else { playerSystem.Warp(PipePoint.transform.position); }
+            playerSystem.Warp(PipePoint.transform.position);
 
+            if (playerSystem.IsClimbing)
+            {
+                if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
+                else { playerSystem.Warp(PipePoint.transform.position); }
+
+                SkipJumpToClimbCheck = true;
+            }
+            else if (!playerSystem.IsClimbing && useGroundPoint)
+            {
+                playerSystem.Warp(GroundPoint.transform.position);
             SkipJumpToClimbCheck = true;
         }
         else if (!playerSystem.IsClimbing && useGroundPoint)
         {
             playerSystem.Warp(GroundPoint.transform.position);
 
-            playerSystem = null;
-            SkipJumpToClimbCheck = false;
+                playerSystem = null;
+                SkipJumpToClimbCheck = false;
+            }
+
+            playerSystem.ClimbingRequested = false;
         }
 
         playerSystem.ClimbingRequested = false;
@@ -95,14 +104,12 @@ public class ClimbableTrigger : MonoBehaviour
         playerSystem.IsClimbing = false;
     }
 
-
     #region OnTrigger Functions
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
         playerSystem = other.GetComponent<PlayerSystem>();
     }
-
 
     private void OnTriggerStay(Collider other)
     {
