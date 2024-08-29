@@ -93,7 +93,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5561349426305759274, guid: 310aa91ef72e03c40b0d41bebe9f559d, type: 3}
+  - {fileID: 2100000, guid: 9993c7a8f8d484547b80a36ce5c2b73a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -124,6 +124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6464603006299989583}
+  - component: {fileID: 7671132083650284768}
   m_Layer: 0
   m_Name: SM_DumpsterClosed_BO
   m_TagString: Untagged
@@ -138,7 +139,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5979991416139332853}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.3930397, y: 0.50000024, z: -60.774975}
   m_LocalScale: {x: 5.9570913, y: 5.9570913, z: 5.9570913}
   m_ConstrainProportionsScale: 0
@@ -147,3 +148,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7671132083650284768
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5979991416139332853}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7257995476608574271, guid: 310aa91ef72e03c40b0d41bebe9f559d, type: 3}
