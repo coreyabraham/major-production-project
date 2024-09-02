@@ -76,10 +76,11 @@ public class PlayerSystem : MonoBehaviour
 
     private float CurrentScurryTime;
     private float CurrentRecoveryTime;
+    private float TimeUntilJumpButtonIsDisabled;
 
     private bool CanScurry = true;
 
-    private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
+    private bool IsJumping, JumpButtonIsHeld = false, IsScurrying, IsGrounded, IsMoving;
     #endregion
 
     #region Functions - Handlers
@@ -99,7 +100,9 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnJumping(InputAction.CallbackContext ctx)
     {
+        // Prevent holding the button from continuously firing inputs. Only fire once. //////////////////////////////////////////////
         if (MoveType == MovementType.None) return;
+
         IsJumping = ctx.ReadValueAsButton();
     }
     #endregion
@@ -208,9 +211,22 @@ public class PlayerSystem : MonoBehaviour
 
         Vector3 moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * speed;
 
+        if (IsJumping)
+        {
+            // If IsJumping is true, set JumpButtonIsHeld to true after .05 seconds.
+            TimeUntilJumpButtonIsDisabled += Time.fixedDeltaTime;
+
+            if (TimeUntilJumpButtonIsDisabled > 0.05f)
+            {
+                JumpButtonIsHeld = true;
+            }
+        }
+
         if (IsClimbing)
         {
-            if (IsJumping)
+            if (!IsJumping && JumpButtonIsHeld) { JumpButtonIsHeld = false; TimeUntilJumpButtonIsDisabled = 0; }
+
+            if (IsJumping && !JumpButtonIsHeld)
             {
                 Velocity.y = JumpForce / 2.0f;
                 IsClimbing = false;
@@ -235,7 +251,9 @@ public class PlayerSystem : MonoBehaviour
                 IsJumpingFromClimb = false;
                 FallingFromClimb = false;
 
-                if (IsJumping && !FloorMaterial.PreventJumping) Velocity.y = JumpForce;
+                if (!IsJumping && JumpButtonIsHeld) { JumpButtonIsHeld = false; TimeUntilJumpButtonIsDisabled = 0; }
+
+                if (IsJumping && !FloorMaterial.PreventJumping && !JumpButtonIsHeld) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
