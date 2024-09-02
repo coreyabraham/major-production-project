@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class PipeFall : MonoBehaviour
 {
-    public bool gravityEnabled = false;
-    new public Rigidbody pipeRb;
+    public Rigidbody pipeRb;
     private readonly static float initialTime = 1f;
     private float timer = 0;
 
@@ -17,27 +16,24 @@ public class PipeFall : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        pipeRb = GetComponent<Rigidbody>();
+        pipeRb.constraints = RigidbodyConstraints.FreezePositionY;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.CompareTag("Player"))
         {
-            gravityEnabled = true;
-            if (gravityEnabled)
+            pipeRb.constraints = RigidbodyConstraints.None;
+            Debug.Log("HELLO?");
+            timer += Time.deltaTime;
+            if (timer >= initialTime)
             {
-                timer += Time.deltaTime;
-                if (timer >= initialTime)
-                {
-                    pipeRb.useGravity = true;
-                }
+                Destroy(this);
             }
             else
             {
                 timer = 0; // reset timer
             }
         }
-        else return;
     }
 }
