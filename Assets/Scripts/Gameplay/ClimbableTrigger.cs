@@ -126,7 +126,7 @@ public class ClimbableTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         if (playerSystem.IsClimbing) { playerSystem.ClimbingRequested = true; }
-        playerSystem.SetMovementType(MovementType.LockToLeftRight);
+        //playerSystem.SetMoveType(MoveType.LockToLeftRight);
 
         playerSystem = null;
 

@@ -35,11 +35,11 @@ public class TEMP_PipeTrigger_FORBUILD : MonoBehaviour
         {
             playerSystem.Warp(PipePoint.transform.position);
             SkipJumpToClimbCheck = true;
-            playerSystem.SetMovementType(MovementType.LockToForwardBack);
+            playerSystem.SetMoveType(MoveType.LockToForwardBack);
         }
         else if (!playerSystem.IsClimbing)
         {
-            playerSystem.SetMovementType(MovementType.LockToLeftRight);
+            playerSystem.SetMoveType(MoveType.LockToLeftRight);
 
             if (useGroundPoint)
             {

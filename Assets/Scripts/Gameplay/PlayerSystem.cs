@@ -23,7 +23,7 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private float MoveEasing;
 
     [field: Tooltip("Locks the player's movement to a specific axis.")]
-    [field: SerializeField] private MovementType MoveType = MovementType.FreeRoam;
+    [field: SerializeField] private MoveType MoveType = MoveType.TwoDimensionsOnly;
 
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
@@ -44,6 +44,10 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("The force that the player will push objects.")]
     [field: SerializeField] private float PushForce;
+
+    [field: Header("Animations")]
+    [field: Tooltip("The Value Name that's targeted within the \"Animator\" reference")]
+    [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
 
     [field: Header("Externals")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
@@ -68,8 +72,8 @@ public class PlayerSystem : MonoBehaviour
     private Vector3 Velocity;
     private Vector2 MoveInput;
     private Vector3 HitDirection;
-
-    private Vector3 lastFrameVelocity = Vector3.zero;
+    private Vector3 LastFrameVelocity;
+    private Vector3 MoveDelta;
 
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
@@ -78,21 +82,24 @@ public class PlayerSystem : MonoBehaviour
     private float CurrentRecoveryTime;
     private float TimeUntilJumpButtonIsDisabled;
 
-    private bool CanScurry = true;
+    private float CurrentMoveSpeed;
 
-    private bool IsJumping, JumpButtonIsHeld = false, IsScurrying, IsGrounded, IsMoving;
+    private bool CanScurry = true;
+    private bool JumpButtonIsHeld = false;
+
+    private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
     #endregion
 
     #region Functions - Handlers
     public void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
     public void OnClimbing(InputAction.CallbackContext ctx)
     {
-        if (MoveType == MovementType.None) return;
+        if (MoveType == MoveType.None) return;
         ClimbingRequested = ctx.ReadValueAsButton();
     }
     public void OnScurry(InputAction.CallbackContext ctx)
     {
-        if (MoveType == MovementType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed) return;
+        if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed) return;
         IsScurrying = !IsScurrying;
 
         if (IsScurrying || !CanScurry) return;
@@ -100,9 +107,8 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnJumping(InputAction.CallbackContext ctx)
     {
-        // Prevent holding the button from continuously firing inputs. Only fire once. //////////////////////////////////////////////
-        if (MoveType == MovementType.None) return;
-
+        // Prevent holding the button from continuously firing inputs. Only fire once.
+        if (MoveType == MoveType.None) return;
         IsJumping = ctx.ReadValueAsButton();
     }
     #endregion
@@ -119,8 +125,8 @@ public class PlayerSystem : MonoBehaviour
         WarpRotation = NewRotation;
     }
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
-    public MovementType GetMovementType() => MoveType;
-    public void SetMovementType(MovementType Type, bool ResetVelocity = false)
+    public MoveType GetMoveType() => MoveType;
+    public void SetMoveType(MoveType Type, bool ResetVelocity = false)
     {
         MoveType = Type;
         if (!ResetVelocity) return;
@@ -194,37 +200,40 @@ public class PlayerSystem : MonoBehaviour
         }
         else FloorMaterial = null;
 
-        float speed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
-
         if (FloorMaterial != null)
         {
-            if (FloorMaterial.PreventScurrying) speed = MoveSpeed;
+            if (FloorMaterial.PreventScurrying)
+            {
+                CurrentMoveSpeed = MoveSpeed;
+                CanScurry = false;
+            }
 
             switch (FloorMaterial.MathUsage)
             {
-                case MathType.Addition: speed += FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Subtraction: speed -= FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Multiplication: speed *= FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Division: speed /= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Addition: CurrentMoveSpeed += FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Subtraction: CurrentMoveSpeed -= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Multiplication: CurrentMoveSpeed *= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Division: CurrentMoveSpeed /= FloorMaterial.PlayerSpeedModifier; break;
             }
         }
 
-        Vector3 moveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * speed;
+        CurrentMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
+        MoveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * CurrentMoveSpeed;
 
         if (IsJumping)
         {
             // If IsJumping is true, set JumpButtonIsHeld to true after .05 seconds.
             TimeUntilJumpButtonIsDisabled += Time.fixedDeltaTime;
-
-            if (TimeUntilJumpButtonIsDisabled > 0.05f)
-            {
-                JumpButtonIsHeld = true;
-            }
+            if (TimeUntilJumpButtonIsDisabled > 0.05f) JumpButtonIsHeld = true;
         }
 
         if (IsClimbing)
         {
-            if (!IsJumping && JumpButtonIsHeld) { JumpButtonIsHeld = false; TimeUntilJumpButtonIsDisabled = 0; }
+            if (!IsJumping && JumpButtonIsHeld) 
+            { 
+                JumpButtonIsHeld = false; 
+                TimeUntilJumpButtonIsDisabled = 0; 
+            }
 
             if (IsJumping && !JumpButtonIsHeld)
             {
@@ -243,8 +252,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (!IsClimbing)
         {
-            Velocity.z = moveDelta.z;
-            Velocity.x = moveDelta.x;
+            Velocity.z = MoveDelta.z;
+            Velocity.x = MoveDelta.x;
 
             if (IsGrounded)
             {
@@ -258,20 +267,20 @@ public class PlayerSystem : MonoBehaviour
             }
 
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
-            actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
         }
         else
         {
             // Properly lerp the movement up and down since it's really jarring moving linearly between movements
 
-            Velocity.y = moveDelta.z;
+            Velocity.y = MoveDelta.z;
 
-            actualVelocity = Vector3.Lerp(lastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             actualVelocity.z = 0;
         }
 
         Character.Move(actualVelocity * Time.fixedDeltaTime);
-        lastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
+        LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
 
@@ -308,18 +317,69 @@ public class PlayerSystem : MonoBehaviour
     {
         switch (MoveType)
         {
-            case MovementType.None: MoveInput = Vector2.zero; break;
-            case MovementType.LockToLeftRight: MoveInput.y = 0.0f; break;
-            case MovementType.LockToForwardBack: MoveInput.x = 0.0f; break;
+            case MoveType.None: MoveInput = Vector2.zero; break;
+            case MoveType.LockToLeftRight: MoveInput.y = 0.0f; break;
+            case MoveType.LockToForwardBack: MoveInput.x = 0.0f; break;
+            case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing) ? 0.0f : MoveInput.y; break;
         }
 
         IsGrounded = Character.isGrounded;
-        IsMoving = MoveInput.x != 0 || MoveInput.y != 0;
+        IsMoving = MoveDelta.magnitude != 0.0f;
 
         if (Animator != null)
         {
-            //Animations
-            Animator.SetFloat("Speed", MoveInput.magnitude);
+            foreach (PlayerAnimation PA in PlayerAnimations)
+            {
+                if (PA.AnimationType == AnimType.Custom)
+                {
+                    object value = null;
+
+                    switch (PA.AnimationValueType)
+                    {
+                        case AnimValueType.Integer: value = Animator.GetInteger(PA.ValueName); break;
+                        case AnimValueType.Float: value = Animator.GetFloat(PA.ValueName); break;
+                        case AnimValueType.Boolean: value = Animator.GetBool(PA.ValueName); break;
+                    }
+
+                    if (value == null) continue;
+                }
+
+                switch (PA.AnimationType)
+                {
+                    case AnimType.Custom:
+                        {
+                            switch (PA.AnimationValueType)
+                            {
+                                case AnimValueType.Integer:
+                                    {
+                                        bool result = int.TryParse(PA.InputValue, out int input);
+                                        if (!result) continue;
+                                        Animator.SetInteger(PA.ValueName, input);
+                                    }
+                                    break;
+
+                                case AnimValueType.Float:
+                                    {
+                                        bool result = float.TryParse(PA.InputValue, out float input);
+                                        if (!result) continue;
+                                        Animator.SetFloat(PA.ValueName, input);
+                                    }
+                                    break;
+                                case AnimValueType.Boolean:
+                                    {
+                                        bool result = bool.TryParse(PA.InputValue, out bool input);
+                                        if (!result) continue;
+                                        Animator.SetBool(PA.ValueName, input);
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+
+                    case AnimType.Moving: Animator.SetFloat(PA.ValueName, (IsGrounded && IsMoving) ? CurrentMoveSpeed : 0.0f); break;
+                    case AnimType.Jumping: /* TODO: ADD CONTENT HERE! */ break;
+                }
+            }
         }
 
         if (IsScurrying)

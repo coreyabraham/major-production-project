@@ -54,7 +54,7 @@ public class CameraSystem : MonoBehaviour
     private int CutsceneIndex = 0;
     private CameraTarget[] CutscenePoints;
 
-    private MovementType PreviousMoveType;
+    private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
 
     public bool IsCutsceneActive() => CutsceneRunning;
@@ -86,8 +86,8 @@ public class CameraSystem : MonoBehaviour
             return;
         }
 
-        PreviousMoveType = Player.GetMovementType();
-        Player.SetMovementType(MovementType.None, true);
+        PreviousMoveType = Player.GetMoveType();
+        Player.SetMoveType(MoveType.None, true);
 
         CameraType = CameraType.Scriptable;
 
@@ -156,7 +156,7 @@ public class CameraSystem : MonoBehaviour
         CutsceneIndex = 0;
         CutscenePoints = null;
 
-        Player.SetMovementType(PreviousMoveType, true);
+        Player.SetMoveType(PreviousMoveType, true);
         Events.CutsceneFinished?.Invoke();
     }
 

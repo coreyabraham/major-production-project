@@ -33,6 +33,11 @@ public class GameSystem : Singleton<GameSystem>
     public float GetElapsedPlaytime() => ElapsedPlaytime;
     public void SetPausedState(bool State) => GameplayPaused = State; 
 
+    public void PlayerDiedScenario()
+    {
+        // TODO: Reset all interactable / moveable objects the Player interacts with in the level they're currently in during the death transition!
+    }
+
     public void RequestLoadScene(string SceneName)
     {
         TargetSceneName = SceneName;
