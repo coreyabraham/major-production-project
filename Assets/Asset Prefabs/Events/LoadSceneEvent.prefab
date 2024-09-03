@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &846746977986220068
+--- !u!1 &3300957034081187128
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8663015474001745644}
-  - component: {fileID: 3239815764922950309}
-  - component: {fileID: 6016132894878842647}
-  - component: {fileID: 4030984592309968051}
-  - component: {fileID: 4414608591109658938}
+  - component: {fileID: 2585954608685965399}
+  - component: {fileID: 3997687256695591478}
+  - component: {fileID: 460964096448119442}
   m_Layer: 0
-  m_Name: LoadSceneEvent
+  m_Name: SM_CardboardBox_BO
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8663015474001745644
+--- !u!4 &2585954608685965399
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846746977986220068}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 3300957034081187128}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 4572956251564661715}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3239815764922950309
+--- !u!33 &3997687256695591478
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846746977986220068}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &6016132894878842647
+  m_GameObject: {fileID: 3300957034081187128}
+  m_Mesh: {fileID: -4611630521253245383, guid: 724e17d7493d0aa4a9eb10acb3730465, type: 3}
+--- !u!23 &460964096448119442
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846746977986220068}
+  m_GameObject: {fileID: 3300957034081187128}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -63,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5f50a47e34a39f84aa9860f6c7434fec, type: 2}
+  - {fileID: 2100000, guid: 9993c7a8f8d484547b80a36ce5c2b73a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85,32 +83,49 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &4030984592309968051
-MeshCollider:
+--- !u!1 &3764367001512411497
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846746977986220068}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4572956251564661715}
+  - component: {fileID: 6722884346976936169}
+  m_Layer: 0
+  m_Name: _CardboardBox_BO
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4572956251564661715
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3764367001512411497}
+  m_LocalRotation: {x: -0, y: -0.8443355, z: -0, w: 0.5358149}
+  m_LocalPosition: {x: -9.351, y: 0.16799964, z: 13.386}
+  m_LocalScale: {x: 5.9570913, y: 5.9570913, z: 5.9570913}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2585954608685965399}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: -115.202, z: 0}
+--- !u!65 &6722884346976936169
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3764367001512411497}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &4414608591109658938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846746977986220068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bee9de38d8ce8a7488df8a461ca70da1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <TriggeringEnabled>k__BackingField: 1
-  <PlayerExclusive>k__BackingField: 1
-  SceneName: Josh
+  serializedVersion: 2
+  m_Size: {x: 0.135, y: 0.08874256, z: 0.1}
+  m_Center: {x: 0, y: 0.04437128, z: -0}
