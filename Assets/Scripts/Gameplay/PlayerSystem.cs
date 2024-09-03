@@ -62,6 +62,9 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private SurfaceMaterial GenericSurface;
     [field: Tooltip("All the Surface Types that the Player can interact with")]
     private Dictionary<string, SurfaceMaterial> Surfaces = new();
+
+    [field: Header("Events")]
+    public PlayerEvents Events = new();
     #endregion
 
     #region Private Variables
@@ -91,16 +94,24 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Handlers
-    public void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
+    // Surely there's an easier way to format all of this... right?
+    public void OnMove(InputAction.CallbackContext ctx)
+    {
+        MoveInput = ctx.ReadValue<Vector2>();
+        Events.Moving.Invoke(MoveInput);
+    }
     public void OnClimbing(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None) return;
         ClimbingRequested = ctx.ReadValueAsButton();
+        Events.Climbing.Invoke(ClimbingRequested);
     }
     public void OnScurry(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed) return;
         IsScurrying = !IsScurrying;
+
+        Events.Scurrying.Invoke(IsScurrying);
 
         if (IsScurrying || !CanScurry) return;
         CanScurry = false;
@@ -110,6 +121,12 @@ public class PlayerSystem : MonoBehaviour
         // Prevent holding the button from continuously firing inputs. Only fire once.
         if (MoveType == MoveType.None) return;
         IsJumping = ctx.ReadValueAsButton();
+        Events.Jumping.Invoke(IsJumping);
+    }
+    public void OnInteracting(InputAction.CallbackContext ctx)
+    {
+        if (ctx.phase == InputActionPhase.Canceled || ctx.phase == InputActionPhase.Disabled) return;
+        Events.Interacting.Invoke(ctx.ReadValueAsButton());
     }
     #endregion
 
@@ -444,6 +461,15 @@ public class PlayerSystem : MonoBehaviour
         SpawnAtCheckpoint();
     }
 
-    private void Awake() => Character = GetComponent<CharacterController>();
+    private void Awake()
+    {
+        Character = GetComponent<CharacterController>();
+
+        Events.Moving ??= new();
+        Events.Jumping ??= new();
+        Events.Scurrying ??= new();
+        Events.Climbing ??= new();
+        Events.Interacting ??= new();
+    }
     #endregion
 }
