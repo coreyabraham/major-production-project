@@ -1,37 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &661404308647368980
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7768850616224398124}
-  m_Layer: 0
-  m_Name: Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7768850616224398124
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661404308647368980}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3035225370365381510}
-  m_Father: {fileID: 6765966995821839399}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6246030398808792733
 GameObject:
   m_ObjectHideFlags: 0
@@ -63,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7768850616224398124}
+  - {fileID: 3035225370365381510}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -81,23 +49,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 1.8
   ScurrySpeed: 3.7
+  ScurryLimit: 4
+  ScurryRecoveryTime: 4
   MoveEasing: 24
   MoveType: 3
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
+  FallingFromClimb: 0
   JumpForce: 3.8
   GravityMultiplier: 1.15
   VelocityYIdle: -3.2
   LerpRotation: 1
   LerpSpeed: 20
   PushForce: 1
+  PlayerAnimations:
+  - ValueName: Speed
+    InputValue: 
+    AnimationType: 1
+    AnimationValueType: 1
   Camera: {fileID: 0}
+  Animator: {fileID: 4095228785318712889}
   Character: {fileID: 0}
   IsHidden: 0
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
-  animator: {fileID: 0}
 --- !u!143 &1886212965
 CharacterController:
   m_ObjectHideFlags: 0
@@ -209,6 +185,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: def9cd2f-9fc4-4cfe-8133-1e3b8b614bef
     m_ActionName: Generic/Pause[/Keyboard/escape]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 590231323864142498}
+        m_TargetAssemblyTypeName: PlayerSystem, Assembly-CSharp
+        m_MethodName: OnInteracting
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a52396c5-967e-4b58-8fac-adf39fa7a420
+    m_ActionName: Player/Interact[/Keyboard/e]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -219,7 +211,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 7768850616224398124}
+    m_TransformParent: {fileID: 6765966995821839399}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_RootOrder
@@ -243,15 +235,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

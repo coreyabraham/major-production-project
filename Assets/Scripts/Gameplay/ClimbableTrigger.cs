@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class ClimbableTrigger : MonoBehaviour
 {
+    [field: Header("Override Move Type")]
+    [field: Tooltip("Determine whether the player's movement type should be changed through this script. Disable only for debugging.")]
+    [field: SerializeField] private bool OverrideMoveType;
+
     [field: Header("Pipe Point Variables")]
     [field: Tooltip("The point in world space that the player will warp to when attaching to a pipe.")]
     [field: SerializeField] private GameObject PipePoint;
@@ -19,15 +23,20 @@ public class ClimbableTrigger : MonoBehaviour
 
     private void DetermineClimbHook()
     {
-        if (playerSystem.IsJumpingFromClimb && !SkipJumpToClimbCheck)
+        // If Player jumps to pipe, latch on.
+        if ((playerSystem.IsJumpingFromClimb || playerSystem.IsPlayerJumping()) && !SkipJumpToClimbCheck)
         {
             playerSystem.IsClimbing = true;
             playerSystem.IsJumpingFromClimb = false;
             playerSystem.SetVelocity(Vector3.zero);
 
+            if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
+            else { playerSystem.Warp(PipePoint.transform.position); }
+
             SkipJumpToClimbCheck = true;
         }
 
+        // Beyond here, they've requested to latch on.
         if (!playerSystem.ClimbingRequested) return;
 
         playerSystem.IsClimbing = !playerSystem.IsClimbing;
@@ -35,33 +44,28 @@ public class ClimbableTrigger : MonoBehaviour
 
         if (playerSystem.IsClimbing)
         {
-            playerSystem.Warp(PipePoint.transform.position);
+            if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
+            else { playerSystem.Warp(PipePoint.transform.position); }
 
-            if (playerSystem.IsClimbing)
-            {
-                if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
-                else { playerSystem.Warp(PipePoint.transform.position); }
+            //playerSystem.SetMovementType(MovementType.LockToForwardBack);
 
-                SkipJumpToClimbCheck = true;
-            }
-            else if (!playerSystem.IsClimbing && useGroundPoint)
-            {
-                playerSystem.Warp(GroundPoint.transform.position);
             SkipJumpToClimbCheck = true;
         }
         else if (!playerSystem.IsClimbing && useGroundPoint)
         {
             playerSystem.Warp(GroundPoint.transform.position);
 
-                playerSystem = null;
-                SkipJumpToClimbCheck = false;
-            }
+            //playerSystem.SetMovementType(MovementType.LockToLeftRight);
+
+            playerSystem = null;
+            SkipJumpToClimbCheck = false;
 
             playerSystem.ClimbingRequested = false;
         }
 
         playerSystem.ClimbingRequested = false;
     }
+
 
     private void Update()
     {
@@ -122,6 +126,8 @@ public class ClimbableTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         if (playerSystem.IsClimbing) { playerSystem.ClimbingRequested = true; }
+        //playerSystem.SetMoveType(MoveType.LockToLeftRight);
+
         playerSystem = null;
 
         SkipJumpToClimbCheck = false;

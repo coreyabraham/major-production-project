@@ -23,6 +23,15 @@ public class GameSystem : Singleton<GameSystem>
         public UnityEvent<Scene, Scene> SceneChanged;
     }
 
+    [field: Header("Tags")]
+    public string PlayerTag = "Player";
+    public string CameraTag = "Camera";
+
+    [field: Header("Externals")]
+    public PlayerSystem Player;
+    public CameraSystem Camera;
+
+    [field: Header("Miscellaneous")]
     public bool GameplayPaused = false;
     public string[] LevelNames;
     public GameEvents Events;
@@ -32,6 +41,32 @@ public class GameSystem : Singleton<GameSystem>
 
     public float GetElapsedPlaytime() => ElapsedPlaytime;
     public void SetPausedState(bool State) => GameplayPaused = State; 
+
+    public void PlayerDiedScenario()
+    {
+        // TODO: Reset all interactable / moveable objects the Player interacts with in the level they're currently in during the death transition!
+    }
+
+    public void RefreshCachedExternals()
+    {
+        if (Player == null)
+        {
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(PlayerTag))
+            {
+                obj.TryGetComponent(out Player);
+                if (Player != null) break;
+            }
+        }
+
+        if (Camera == null)
+        {
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(CameraTag))
+            {
+                obj.TryGetComponent(out Camera);
+                if (Camera != null) break;
+            }
+        }
+    }
 
     public void RequestLoadScene(string SceneName)
     {
@@ -87,6 +122,8 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
+        RefreshCachedExternals();
+
         SceneManager.activeSceneChanged += ActiveSceneChanged;
         SceneManager.sceneLoaded += SceneLoaded;
         SceneManager.sceneUnloaded += SceneUnloaded;
