@@ -1,5 +1,61 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &628796763312687118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1839727242840358466}
+  - component: {fileID: 3107903445060924916}
+  m_Layer: 0
+  m_Name: Audio Handler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1839727242840358466
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628796763312687118}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6975320980592092749}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3107903445060924916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628796763312687118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b963bf7e127c2824cbf2872a6937a915, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioMixer: {fileID: 24100000, guid: 142fccf1582619749aa7b932b853062f, type: 2}
+  MixerReferences:
+  - ExposedName: MasterVolume
+    AudioType: 1
+    AudioMixerGroup: {fileID: 24300002, guid: 142fccf1582619749aa7b932b853062f, type: 2}
+  - ExposedName: MusicVolume
+    AudioType: 2
+    AudioMixerGroup: {fileID: -1884974607607332590, guid: 142fccf1582619749aa7b932b853062f, type: 2}
+  - ExposedName: SoundVolume
+    AudioType: 3
+    AudioMixerGroup: {fileID: -8211331919460887159, guid: 142fccf1582619749aa7b932b853062f, type: 2}
+  JsonHandler: {fileID: 8337814683459291855}
 --- !u!1 &2153579411323000234
 GameObject:
   m_ObjectHideFlags: 0
@@ -44,6 +100,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ffb82ec49249f14fa414fbe259f89e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerTag: Player
+  CameraTag: Camera
+  Player: {fileID: 0}
+  Camera: {fileID: 0}
   GameplayPaused: 0
   LevelNames: []
   Events:
@@ -169,37 +229,6 @@ MonoBehaviour:
   Actions: {fileID: -944628639613478452, guid: 37717043224923d4c96574aabac3b2bf, type: 3}
   ActionMap: Player
   InputUsability: 1
---- !u!1 &7146247506601753373
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1308041854113873011}
-  m_Layer: 0
-  m_Name: SoundManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1308041854113873011
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7146247506601753373}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 23.191013, y: 1.2316608, z: -42.736824}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6975320980592092749}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7229351052136600103
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,7 +408,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1308041854113873011}
+  - {fileID: 1839727242840358466}
   - {fileID: 2484744880080825465}
   - {fileID: 1123271157784043412}
   - {fileID: 2389180204614053018}
@@ -537,6 +566,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PauseMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 7033943551672774518, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: JsonHandler
+      value: 
+      objectReference: {fileID: 8337814683459291855}
     - target: {fileID: 8331667794523562643, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: JsonHandler
       value: 

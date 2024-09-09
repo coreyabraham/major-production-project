@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class InterfaceTester : MonoBehaviour, IInteractable
 {
@@ -8,7 +7,13 @@ public class InterfaceTester : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        print("Interacted!");
+        if (Vector3.Distance(Player.transform.position, this.transform.position) > InteractionRange)
+        {
+            Debug.Log("Interacted!... but you're too far away :(");
+            return;
+        }
+
+        Debug.Log("INTERACTED!");
     }
 
     private void Interacted(bool result)
@@ -18,8 +23,5 @@ public class InterfaceTester : MonoBehaviour, IInteractable
         Interact();
     }
 
-    private void Start()
-    {
-        Player.Events.Interacting.AddListener(Interacted);
-    }
+    private void Start() => Player.Events.Interacting.AddListener(Interacted);
 }
