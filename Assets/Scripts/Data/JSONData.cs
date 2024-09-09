@@ -25,6 +25,7 @@ public class JSONData : MonoBehaviour
     public PlayerSettings GetDefaultData() => DefaultSettings;
     public PlayerSettings GetCurrentData()
     {
+        if (FilePath == null || string.IsNullOrWhiteSpace(FilePath)) return null;
         string fileContents = File.ReadAllText(FilePath);
         return JsonUtility.FromJson<PlayerSettings>(fileContents);
     }
