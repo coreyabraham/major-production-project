@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 
 using UnityEngine;
-using UnityEngine.Audio;
 using System;
 
 public class SettingsUI : MonoBehaviour
@@ -53,6 +52,7 @@ public class SettingsUI : MonoBehaviour
     [field: SerializeField] private TMP_Text TitleLabel;
     [field: SerializeField] private string TitleText = "Player Settings";
     [field: SerializeField] private string DividerText = " // ";
+    [field: SerializeField] private GameObject Container;
 
     [field: Header("Prompt UI Data")]
     [field: SerializeField] PromptDataUI SavePromptData;
@@ -63,33 +63,40 @@ public class SettingsUI : MonoBehaviour
     [field: SerializeField] private SettingsGroup[] Groups;
 
     [field: Header("Audio")]
-    [field: SerializeField] private AudioSource SoundTest;
-    [field: SerializeField] private AudioMixerGroup AudioMixer;
-    [field: SerializeField] private MixerReference[] MixerReferences;
+    [field: SerializeField] private AudioClip SoundTestClip;
+    private AudioSource SoundTest;
     #endregion
 
     #region Button References
-    public void SaveButtonClicked() => PromptHandler.Begin(SavePromptData);
-    public void ResetButtonClicked() => PromptHandler.Begin(ResetPromptData);
+    public void SaveButtonClicked()
+    {
+        Container.SetActive(false);
+        PromptHandler.Begin(SavePromptData);
+    }
+    public void ResetButtonClicked()
+    {
+        Container.SetActive(false);
+        PromptHandler.Begin(ResetPromptData);
+    }
     #endregion
 
     #region Public References
     public void MasterVolumeChanged(float value)
     {
-        MixerReference reference = GetMixerReference(AudioType.Master);
-        AudioMixer.audioMixer.SetFloat(reference.ExposedName, AudioCalculations(value));
+        MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Master);
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
     }
 
     public void MusicVolumeChanged(float value)
     {
-        MixerReference reference = GetMixerReference(AudioType.Music);
-        AudioMixer.audioMixer.SetFloat(reference.ExposedName, AudioCalculations(value));
+        MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Music);
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
     }
 
     public void SoundVolumeChanged(float value)
     {
-        MixerReference reference = GetMixerReference(AudioType.Sound);
-        AudioMixer.audioMixer.SetFloat(reference.ExposedName, AudioCalculations(value));
+        MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Sound);
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
 
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();
@@ -114,6 +121,8 @@ public class SettingsUI : MonoBehaviour
     #region PromptMethods
     private void SavePromptFinished(bool Result)
     {
+        Container.SetActive(true);
+
         if (!Result) return;
 
         PlayerSettings newSettings = new()
@@ -141,6 +150,8 @@ public class SettingsUI : MonoBehaviour
 
     private void ResetPromptFinished(bool Result)
     {
+        Container.SetActive(true);
+
         if (!Result) return;
 
         PlayerSettings defaults = JsonHandler.GetDefaultData();
@@ -152,19 +163,6 @@ public class SettingsUI : MonoBehaviour
     #endregion
 
     #region Private Methods
-    private float AudioCalculations(float value) => Mathf.Log10(value) * 20.0f;
-
-    private MixerReference GetMixerReference(AudioType TargetAudioType)
-    {
-        foreach (MixerReference mixer in MixerReferences)
-        {
-            if (mixer.AudioType != TargetAudioType) continue;
-            return mixer;
-        }
-
-        return null;
-    }
-
     private int GetDropdownOptionIndex(List<TMP_Dropdown.OptionData> Options, string Text)
     {
         int index = -1;
@@ -213,6 +211,11 @@ public class SettingsUI : MonoBehaviour
         {
             string currentResolution = ResolutionDD.Dropdown.options[ResolutionDD.Dropdown.value].text;
             strings = currentResolution.Split('x');
+        }
+
+        for (int i = 0; i < strings.Length; i++)
+        {
+            print("Index: " + i.ToString() + ", Value: " + strings[i]);
         }
 
         int.TryParse(strings[0], out int width);
@@ -271,6 +274,8 @@ public class SettingsUI : MonoBehaviour
         if (VisibleIndexOnStartup > Groups.Length || VisibleIndexOnStartup < 0) return;
 
         ChangeSubFrame(Groups[VisibleIndexOnStartup].Frame);
+
+        SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip);
     }
     #endregion
 }

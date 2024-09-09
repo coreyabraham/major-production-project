@@ -337,12 +337,15 @@ public class PlayerSystem : MonoBehaviour
             case MoveType.None: MoveInput = Vector2.zero; break;
             case MoveType.LockToLeftRight: MoveInput.y = 0.0f; break;
             case MoveType.LockToForwardBack: MoveInput.x = 0.0f; break;
+
+            // TODO: This may need more work, get everyone to test with this and then decide whether it needs to be improved or not!
             case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing) ? 0.0f : MoveInput.y; break;
         }
 
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
-
+        
+        // TODO: This may have to be improved in the future!
         if (Animator != null)
         {
             foreach (PlayerAnimation PA in PlayerAnimations)
@@ -394,7 +397,7 @@ public class PlayerSystem : MonoBehaviour
                         break;
 
                     case AnimType.Moving: Animator.SetFloat(PA.ValueName, (IsGrounded && IsMoving) ? CurrentMoveSpeed : 0.0f); break;
-                    case AnimType.Jumping: /* TODO: ADD CONTENT HERE! */ break;
+                    case AnimType.Jumping: Animator.SetBool(PA.ValueName, (IsJumping && !IsGrounded)); break;
                 }
             }
         }
