@@ -14,9 +14,9 @@ public enum CameraType
     Follow,
 
     /// <summary>
-    /// Similar to Fixed, however the Camera rotates depending on where the `CameraSubject` is within the scene.
+    /// The Camera rotates depending on where the `CameraSubject` is within the scene with a locked position.
     /// </summary>
-    Dolly,
+    Panning,
 
     /// <summary>
     /// Allow the `CameraSystem.cs` script to be manipulated by other scripts that choose to do so, mainly for cutscenes.

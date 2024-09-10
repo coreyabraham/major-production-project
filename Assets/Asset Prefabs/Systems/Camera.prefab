@@ -52,7 +52,31 @@ MonoBehaviour:
   AnticipationOffset: 1
   FieldOfViewClamp: {x: 0, y: 180}
   FieldOfView: 80
-  DepthOfField: 0
+  DepthOfFieldData:
+    Volume: {fileID: 0}
+    Active: 0
+    FocusMode:
+      m_OverrideState: 1
+      m_Value: 2
+    NearRangeStart:
+      m_OverrideState: 1
+      m_Value: 0
+    NearRangeEnd:
+      m_OverrideState: 1
+      m_Value: 1
+    FarRangeStart:
+      m_OverrideState: 1
+      m_Value: 2
+    FarRangeEnd:
+      m_OverrideState: 1
+      m_Value: 6
+    Quality:
+      ignoreOverride: 0
+      quality: 0
+    NearSampleCount: 8
+    FarSampleCount: 7
+    NearMaxBlur: 14
+    FarMaxBlur: 13
   CameraLerpSpeed: 5
   VFXLerpSpeed: 4
   EasingStyle: 2
