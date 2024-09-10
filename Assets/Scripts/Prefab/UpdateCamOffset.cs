@@ -79,19 +79,9 @@ public class UpdateCamOffset : MonoBehaviour
             Goal.transform.position
         );
 
-        // CameraTarget.cs : `position`, `rotation`
+        Target.position = Vector3.Lerp(Vector3.zero, Target.position, Time.deltaTime);
 
-        CameraTarget CamTransform = Camera.GetCameraOffset();
-
-        CameraTarget target = new()
-        {
-            position = Vector3.Lerp(CamTransform.position, Target.position, Time.deltaTime),
-            rotation = Quaternion.Lerp(CamTransform.rotation, Target.rotation, Time.deltaTime)
-        };
-
-        print(Distance);
-
-        Camera.SetCameraOffsets(target);
+        Camera.SetCameraOffsets(Target);
     }
 
     private void Awake()
