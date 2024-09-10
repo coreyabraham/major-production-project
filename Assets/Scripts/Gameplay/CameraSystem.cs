@@ -228,13 +228,13 @@ public class CameraSystem : MonoBehaviour
             }
         }
 
-        main.transform.SetPositionAndRotation(Position, Rotation);
-
         PreviousCameraLocation = new()
         {
-            position = Position,
-            rotation = Rotation
+            position = main.transform.position,
+            rotation = main.transform.rotation
         };
+
+        main.transform.SetPositionAndRotation(Position, Rotation);
 
         if (!CutsceneRunning || TrackCutsceneInterval) return;
         if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
@@ -324,7 +324,6 @@ public class CameraSystem : MonoBehaviour
         {
             switch (CameraType)
             {
-                case CameraType.Fixed: break;
                 case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
                 case CameraType.Panning:
                     {
