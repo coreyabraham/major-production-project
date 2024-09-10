@@ -36,6 +36,8 @@ public class UpdateCamOffset : MonoBehaviour
 
         BeforeChanges = Camera.GetCameraOffset();
 
+        if (UseDampening) return;
+
         switch (Type)
         {
             case UpdateCamOffsetType.Target:
@@ -77,7 +79,19 @@ public class UpdateCamOffset : MonoBehaviour
             Goal.transform.position
         );
 
+        // CameraTarget.cs : `position`, `rotation`
+
+        CameraTarget CamTransform = Camera.GetCameraOffset();
+
+        CameraTarget target = new()
+        {
+            position = Vector3.Lerp(CamTransform.position, Target.position, Time.deltaTime),
+            rotation = Quaternion.Lerp(CamTransform.rotation, Target.rotation, Time.deltaTime)
+        };
+
         print(Distance);
+
+        Camera.SetCameraOffsets(target);
     }
 
     private void Awake()

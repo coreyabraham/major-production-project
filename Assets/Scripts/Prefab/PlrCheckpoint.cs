@@ -7,7 +7,7 @@ public class PlrCheckpoint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player")) return;
 
         SaveData data = DataHandler.Instance.GetCachedData();
 
