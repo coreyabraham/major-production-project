@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -23,7 +25,9 @@ public class CameraSystem : MonoBehaviour
     [field: Header("View Fields")]
     [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
-    [field: SerializeField] private float DepthOfField = 0.0f;
+
+    [field: Header("Depth of Field")]
+    [field: SerializeField] private DOF_Data DepthOfFieldData;
 
     [field: Header("Lerping Speeds")]
     [field: SerializeField] private float CameraLerpSpeed;
@@ -56,6 +60,8 @@ public class CameraSystem : MonoBehaviour
 
     private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
+
+    private DepthOfField DOF;
 
     public bool IsCutsceneActive() => CutsceneRunning;
 
@@ -251,15 +257,58 @@ public class CameraSystem : MonoBehaviour
     {
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
+        DOF.active = DepthOfFieldData.Active;
+
         if (EasingStyle != EasingStyle.None)
         {
             main.fieldOfView = Mathf.Lerp(main.fieldOfView, CameraFOV, Time.fixedDeltaTime * VFXLerpSpeed);
-            //main.depthOfField = Mathf.Lerp(main.depthOfField, DepthOfField, Time.fixedDeltaTime * SettingsLerpSpeed);
+
+            if (DOF.active)
+            {
+                DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+                DOF.farFocusStart.Interp(DOF.farFocusStart.value, DepthOfFieldData.FarRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.farFocusEnd.Interp(DOF.farFocusEnd.value, DepthOfFieldData.FarRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+                DOF.nearSampleCount = (int)Mathf.Lerp(DOF.nearSampleCount, DepthOfFieldData.NearSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.farSampleCount = (int)Mathf.Lerp(DOF.farSampleCount, DepthOfFieldData.FarSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+
+                DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+            }
         }
         else
         {
             main.fieldOfView = CameraFOV;
-            //main.depthOfField = DepthOfField;
+
+            if (DOF.active)
+            {
+                DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
+                DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
+
+                DOF.farFocusStart = DepthOfFieldData.FarRangeStart;
+                DOF.farFocusEnd = DepthOfFieldData.FarRangeEnd;
+
+                DOF.nearSampleCount = DepthOfFieldData.NearSampleCount;
+                DOF.farSampleCount = DepthOfFieldData.FarSampleCount;
+
+                DOF.nearMaxBlur = DepthOfFieldData.NearMaxBlur;
+                DOF.farMaxBlur = DepthOfFieldData.FarMaxBlur;
+            }
+        }
+
+        if (DOF.active)
+        {
+            DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
+            DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
+
+            DOF.farFocusStart.overrideState = DepthOfFieldData.FarRangeStart.overrideState;
+            DOF.farFocusEnd.overrideState = DepthOfFieldData.FarRangeEnd.overrideState;
+
+            DOF.focusMode = DepthOfFieldData.FocusMode;
+
+            DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
         }
 
         CameraTarget Target = (!CutsceneRunning) ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
@@ -296,5 +345,15 @@ public class CameraSystem : MonoBehaviour
         PreviousCameraType = CameraType;
 
         if (!CameraSubject) CameraSubject = Player.gameObject;
+
+        bool result = DepthOfFieldData.Volume.profile.TryGet(out DepthOfField component);
+
+        if (!result)
+        {
+            Debug.LogWarning(name + " | Couldn't get Depth of Field Processing Effect!");
+            return;
+        }
+
+        DOF = component;
     }
 }
