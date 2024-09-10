@@ -36,6 +36,8 @@ public class UpdateCamOffset : MonoBehaviour
 
         BeforeChanges = Camera.GetCameraOffset();
 
+        if (UseDampening) return;
+
         switch (Type)
         {
             case UpdateCamOffsetType.Target:
@@ -77,7 +79,9 @@ public class UpdateCamOffset : MonoBehaviour
             Goal.transform.position
         );
 
-        print(Distance);
+        Target.position = Vector3.Lerp(Vector3.zero, Target.position, Time.deltaTime);
+
+        Camera.SetCameraOffsets(Target);
     }
 
     private void Awake()

@@ -10,12 +10,17 @@ public enum EasingStyle
     None = 0,
 
     /// <summary>
-    /// Interpolate the current value to the target value using linear interpolation.
+    /// Move from Point A to Point B with no interpolation.
     /// </summary>
-    Linear,
+    Basic,
 
     /// <summary>
-    /// Interpolate the current value to the target value using sine interpolation (slerp).
+    /// Interpolate the current value to the target value using linear interpolation.
     /// </summary>
-    Sine,
+    Lerp,
+
+    /// <summary>
+    /// Interpolate the current value to the target value using spherical interpolation (slerp).
+    /// </summary>
+    Slerp,
 }

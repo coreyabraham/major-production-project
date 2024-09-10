@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -23,14 +25,16 @@ public class CameraSystem : MonoBehaviour
     [field: Header("View Fields")]
     [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
-    [field: SerializeField] private float DepthOfField = 0.0f;
+
+    [field: Header("Depth of Field")]
+    [field: SerializeField] private DOF_Data DepthOfFieldData;
 
     [field: Header("Lerping Speeds")]
     [field: SerializeField] private float CameraLerpSpeed;
     [field: SerializeField] private float VFXLerpSpeed;
 
     [field: Header("Enumerations")]
-    [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Sine;
+    [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Lerp;
     [field: SerializeField] private CameraType CameraType = CameraType.Follow;
 
     [field: Header("External References")]
@@ -56,6 +60,8 @@ public class CameraSystem : MonoBehaviour
 
     private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
+
+    private DepthOfField DOF;
 
     public bool IsCutsceneActive() => CutsceneRunning;
 
@@ -199,29 +205,36 @@ public class CameraSystem : MonoBehaviour
         {
             switch (EasingStyle)
             {
-                case EasingStyle.Linear:
+                case EasingStyle.Basic:
                     {
                         Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
                     }
                     break;
                 
-                case EasingStyle.Sine:
+                case EasingStyle.Lerp:
                     {
                         Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
                         Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
                     }
                     break;
+
+                case EasingStyle.Slerp:
+                    {
+                        Position = Vector3.Slerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                    }
+                    break;
             }
         }
 
-        main.transform.SetPositionAndRotation(Position, Rotation);
-
         PreviousCameraLocation = new()
         {
-            position = Position,
-            rotation = Rotation
+            position = main.transform.position,
+            rotation = main.transform.rotation
         };
+
+        main.transform.SetPositionAndRotation(Position, Rotation);
 
         if (!CutsceneRunning || TrackCutsceneInterval) return;
         if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
@@ -251,15 +264,58 @@ public class CameraSystem : MonoBehaviour
     {
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
+        if (DOF) DOF.active = DepthOfFieldData.Active;
+
         if (EasingStyle != EasingStyle.None)
         {
             main.fieldOfView = Mathf.Lerp(main.fieldOfView, CameraFOV, Time.fixedDeltaTime * VFXLerpSpeed);
-            //main.depthOfField = Mathf.Lerp(main.depthOfField, DepthOfField, Time.fixedDeltaTime * SettingsLerpSpeed);
+
+            if (DOF != null && DOF.active)
+            {
+                DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+                DOF.farFocusStart.Interp(DOF.farFocusStart.value, DepthOfFieldData.FarRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.farFocusEnd.Interp(DOF.farFocusEnd.value, DepthOfFieldData.FarRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+                DOF.nearSampleCount = (int)Mathf.Lerp(DOF.nearSampleCount, DepthOfFieldData.NearSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.farSampleCount = (int)Mathf.Lerp(DOF.farSampleCount, DepthOfFieldData.FarSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+
+                DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+                DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+            }
         }
         else
         {
             main.fieldOfView = CameraFOV;
-            //main.depthOfField = DepthOfField;
+
+            if (DOF != null && DOF.active)
+            {
+                DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
+                DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
+
+                DOF.farFocusStart = DepthOfFieldData.FarRangeStart;
+                DOF.farFocusEnd = DepthOfFieldData.FarRangeEnd;
+
+                DOF.nearSampleCount = DepthOfFieldData.NearSampleCount;
+                DOF.farSampleCount = DepthOfFieldData.FarSampleCount;
+
+                DOF.nearMaxBlur = DepthOfFieldData.NearMaxBlur;
+                DOF.farMaxBlur = DepthOfFieldData.FarMaxBlur;
+            }
+        }
+
+        if (DOF != null && DOF.active)
+        {
+            DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
+            DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
+
+            DOF.farFocusStart.overrideState = DepthOfFieldData.FarRangeStart.overrideState;
+            DOF.farFocusEnd.overrideState = DepthOfFieldData.FarRangeEnd.overrideState;
+
+            DOF.focusMode = DepthOfFieldData.FocusMode;
+
+            DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
         }
 
         CameraTarget Target = (!CutsceneRunning) ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
@@ -268,9 +324,19 @@ public class CameraSystem : MonoBehaviour
         {
             switch (CameraType)
             {
-                case CameraType.Fixed: break;
                 case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
-                case CameraType.Dolly: Debug.LogWarning(name + " | Couldn't "); break;
+                case CameraType.Panning:
+                    {
+                        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
+                        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
+
+                        Target = new()
+                        {
+                            position = PreviousCameraLocation.position,
+                            rotation = targetRot
+                        };
+                    }
+                    break;
             }
         }
 
@@ -285,5 +351,16 @@ public class CameraSystem : MonoBehaviour
         PreviousCameraType = CameraType;
 
         if (!CameraSubject) CameraSubject = Player.gameObject;
+        if (!DepthOfFieldData.Volume) return;
+
+        bool result = DepthOfFieldData.Volume.profile.TryGet(out DepthOfField component);
+
+        if (!result)
+        {
+            Debug.LogWarning(name + " | Couldn't get Depth of Field Processing Effect!");
+            return;
+        }
+
+        DOF = component;
     }
 }
