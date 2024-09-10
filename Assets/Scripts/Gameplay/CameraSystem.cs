@@ -34,7 +34,7 @@ public class CameraSystem : MonoBehaviour
     [field: SerializeField] private float VFXLerpSpeed;
 
     [field: Header("Enumerations")]
-    [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Sine;
+    [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Lerp;
     [field: SerializeField] private CameraType CameraType = CameraType.Follow;
 
     [field: Header("External References")]
@@ -205,17 +205,24 @@ public class CameraSystem : MonoBehaviour
         {
             switch (EasingStyle)
             {
-                case EasingStyle.Linear:
+                case EasingStyle.Basic:
                     {
                         Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
                     }
                     break;
                 
-                case EasingStyle.Sine:
+                case EasingStyle.Lerp:
                     {
                         Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
                         Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                    }
+                    break;
+
+                case EasingStyle.Slerp:
+                    {
+                        Position = Vector3.Slerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
                     }
                     break;
             }
@@ -257,13 +264,13 @@ public class CameraSystem : MonoBehaviour
     {
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
-        DOF.active = DepthOfFieldData.Active;
+        if (DOF) DOF.active = DepthOfFieldData.Active;
 
         if (EasingStyle != EasingStyle.None)
         {
             main.fieldOfView = Mathf.Lerp(main.fieldOfView, CameraFOV, Time.fixedDeltaTime * VFXLerpSpeed);
 
-            if (DOF.active)
+            if (DOF != null && DOF.active)
             {
                 DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
                 DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
@@ -282,7 +289,7 @@ public class CameraSystem : MonoBehaviour
         {
             main.fieldOfView = CameraFOV;
 
-            if (DOF.active)
+            if (DOF != null && DOF.active)
             {
                 DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
                 DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
@@ -298,7 +305,7 @@ public class CameraSystem : MonoBehaviour
             }
         }
 
-        if (DOF.active)
+        if (DOF != null && DOF.active)
         {
             DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
             DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
@@ -345,6 +352,7 @@ public class CameraSystem : MonoBehaviour
         PreviousCameraType = CameraType;
 
         if (!CameraSubject) CameraSubject = Player.gameObject;
+        if (!DepthOfFieldData.Volume) return;
 
         bool result = DepthOfFieldData.Volume.profile.TryGet(out DepthOfField component);
 
