@@ -270,7 +270,18 @@ public class CameraSystem : MonoBehaviour
             {
                 case CameraType.Fixed: break;
                 case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
-                case CameraType.Dolly: Debug.LogWarning(name + " | Couldn't "); break;
+                case CameraType.Panning:
+                    {
+                        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
+                        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
+
+                        Target = new()
+                        {
+                            position = PreviousCameraLocation.position,
+                            rotation = targetRot
+                        };
+                    }
+                    break;
             }
         }
 

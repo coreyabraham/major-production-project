@@ -25,6 +25,9 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MoveType MoveType = MoveType.TwoDimensionsOnly;
 
+    [field: Tooltip("Unhook the player's movement from the camera.")]
+    [field: SerializeField] private bool UnhookMovement = true;
+
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public bool IsJumpingFromClimb;
@@ -235,7 +238,11 @@ public class PlayerSystem : MonoBehaviour
         }
 
         CurrentMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
-        MoveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * CurrentMoveSpeed;
+
+        Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
+        Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
+
+        MoveDelta = (MoveInput.x * right + MoveInput.y * forward) * CurrentMoveSpeed;
 
         if (IsJumping)
         {
@@ -288,7 +295,7 @@ public class PlayerSystem : MonoBehaviour
         }
         else
         {
-            // Properly lerp the movement up and down since it's really jarring moving linearly between movements
+            // TODO: Properly lerp the movement up and down since it's really jarring moving linearly between movements
 
             Velocity.y = MoveDelta.z;
 
