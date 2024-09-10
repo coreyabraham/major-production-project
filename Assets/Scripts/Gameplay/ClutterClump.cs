@@ -16,32 +16,49 @@ public class ClutterClump : MonoBehaviour
 
     Rigidbody rb;
     Vector3 pos;
+    BoxCollider collision;
     bool buoyancyDir, setToBreak, isBroken;
-    float buoyancyTimer, breakTimer;
+    float buoyancyTimer, breakTimer, brokenTimer;
     AnimationCurve buoyancyCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     #endregion
 
 
     private void BreakClump()
     {
+        collision.enabled = false;
+        emulateBuoyancy = false;
         setToBreak = false;
         breakTimer = 0;
 
-        // At the moment, enables rigidbody gravity.
+        // At the moment, enables rigidbody gravity and makes it sink.
 
         rb.useGravity = true;
         rb.isKinematic = false;
+
+        isBroken = true;
     }
 
 
-
-    private void OnCollisionEnter(Collision other)
+    private void RespawnClump()
     {
-        // Detect player collision
+        rb.useGravity = false;
+        rb.isKinematic = true;
 
-        if (other.gameObject.CompareTag("Player"))
+        transform.position = pos;
+        collision.enabled = true;
+        emulateBuoyancy = true;
+        isBroken = false;
+        brokenTimer = 0;
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // This method for detecting if the player is on the clump feels so scuffed.
+        // There is a better way, but I spent an hour trying to get it to work with no success.
+
+        if (other.CompareTag("Player"))
         {
-            Debug.Log("Player is touching clump");
             setToBreak = true;
         }
     }
@@ -76,11 +93,21 @@ public class ClutterClump : MonoBehaviour
                 BreakClump();
             }
         }
+
+        if (isBroken)
+        {
+            brokenTimer += Time.deltaTime;
+            if (brokenTimer > cooldownDuration)
+            {
+                RespawnClump();
+            }
+        }
     }
 
     private void Start()
     {
         pos = transform.position;
         rb = GetComponent<Rigidbody>();
+        collision = GetComponent<BoxCollider>();
     }
 }
