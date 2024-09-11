@@ -33,7 +33,12 @@ public class GameSystem : Singleton<GameSystem>
 
     [field: Header("Miscellaneous")]
     public bool GameplayPaused = false;
+
+    [field: Header("Collections")]
     public string[] LevelNames;
+    public string[] BlacklistedPauseScenes;
+
+    [field: Header("Events")]
     public GameEvents Events;
 
     private string TargetSceneName;
@@ -42,11 +47,13 @@ public class GameSystem : Singleton<GameSystem>
     public float GetElapsedPlaytime() => ElapsedPlaytime;
     public void SetPausedState(bool State) => GameplayPaused = State; 
 
-    public void PlayerDiedScenario()
+    public void PlayerDiedCallback()
     {
         // TODO: Reset all interactable / moveable objects the Player interacts with in the level they're currently in during the death transition!
+        Events.PlayerDied?.Invoke();
     }
 
+    // TODO: IMPROVE THIS SEARCHING MECHANISM!
     public void RefreshCachedExternals()
     {
         if (Player == null)
@@ -112,7 +119,22 @@ public class GameSystem : Singleton<GameSystem>
 
     private void SceneLoaded(Scene Scene, LoadSceneMode Mode) => Events.SceneLoaded?.Invoke(Scene, Mode);
     private void SceneUnloaded(Scene Scene) => Events.SceneUnloaded?.Invoke(Scene);
-    private void ActiveSceneChanged(Scene Old, Scene New) => Events.SceneChanged?.Invoke(Old, New);
+    private void ActiveSceneChanged(Scene Old, Scene New)
+    {
+        RefreshCachedExternals();
+        Events.SceneChanged?.Invoke(Old, New);
+    }
+
+    private void LoadEvents()
+    {
+        Events.PlayerDied ??= new();
+        Events.RequestLoadingUI ??= new();
+        Events.LoadingStarted ??= new();
+        Events.LoadingProgress ??= new();
+        Events.SceneUnloaded ??= new();
+        Events.SceneLoaded ??= new();
+        Events.SceneChanged ??= new();
+    }
 
     private void Update()
     {
@@ -122,6 +144,7 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
+        LoadEvents();
         RefreshCachedExternals();
 
         SceneManager.activeSceneChanged += ActiveSceneChanged;

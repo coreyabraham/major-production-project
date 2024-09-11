@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class PauseMenuUI : MonoBehaviour
 {
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
-    [field: SerializeField] private bool ExcludePausingFromTS = true;
+    [field: SerializeField] private string TitleUIObject = "TitleUI";
 
     [field: Space(2.5f)]
 
@@ -22,11 +22,47 @@ public class PauseMenuUI : MonoBehaviour
     [field: Space(2.5f)]
 
     [field: SerializeField] private PromptDataUI ToMainMenuData;
-    
+
+    private bool PausingPermitted;
+
+    public void NewSceneLoaded(Scene Scene, LoadSceneMode Mode)
+    {
+        bool result = false;
+
+        foreach (string SceneName in GameSystem.Instance.BlacklistedPauseScenes)
+        {
+            result = Scene.name != SceneName;
+            if (result == true) break;
+        }
+
+        PausingPermitted = result;
+
+        if (Scene.name != TitleScreenScene) return;
+
+        TitleUI TitleUI = null;
+
+        foreach (GameObject obj in Scene.GetRootGameObjects())
+        {
+            if (obj.name != TitleUIObject) continue;
+
+            TitleUI title = obj.GetComponent<TitleUI>();
+            if (!title) continue;
+
+            TitleUI = title;
+            break;
+        }
+
+        if (!TitleUI) return;
+
+        TitleUI.ExitMenu.PromptUI = Settings.PromptHandler;
+
+        TitleUI.SettingsMenu.JsonHandler = Settings.JsonHandler;
+        TitleUI.SettingsMenu.PromptHandler = Settings.PromptHandler;
+    }
+
     public void InputCalled(InputAction.CallbackContext ctx)
     {
-        // PLEASE UNHARD CODE THIS AND ALLOW ANY SCENE TO DISABLE PAUSING!
-        if (ExcludePausingFromTS && SceneManager.GetActiveScene().name == TitleScreenScene) return;
+        if (!PausingPermitted) return;
         if (ctx.phase != InputActionPhase.Performed) return;
         ToggleUI();
     }

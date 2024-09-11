@@ -74,6 +74,18 @@ public class UpdateCamOffset : MonoBehaviour
     {
         if (!UseDampening || !Player || !Camera) return;
 
+        /*
+            TODO:
+                1. Get the Distance between where the Player is and the `Goal` GameObject
+                2. Caclulate the Position and Rotation that the Camera should currently be using between the current `CameraOffset` and the target `CameraOffset`
+
+            Notes:
+                - Lerping may not be a good way to solve this due to `SetCameraOffsets()` Setting the internal Camera Offset for the `CameraSystem.cs` Script
+                  and actively using lerping with the current camera's transform with the `CameraOffset` added on top
+                - This system should't be all that complex to add, however with the current setup of `CameraSystem.cs` combined with this logic below, it's proved
+                  to be a real struggle, if this system doesn't make it into Alpha, then hopefully it'll be obvious as to why!
+         */
+
         float Distance = Vector3.Distance(
             Player.gameObject.transform.position,
             Goal.transform.position
@@ -81,8 +93,10 @@ public class UpdateCamOffset : MonoBehaviour
 
         CameraTarget Current = Camera.GetCameraOffset();
 
-        Target.position = Vector3.Lerp(Current.position, Target.position, Distance / Time.deltaTime);
-        Target.rotation = Quaternion.Lerp(Current.rotation, Target.rotation, Distance / Time.deltaTime);
+        Target.position.x = Mathf.Lerp(Current.position.x, Target.position.x, Distance / Time.deltaTime);
+
+        //Target.position = Vector3.Lerp(Current.position, Target.position, Distance / Time.deltaTime);
+        //Target.rotation = Quaternion.Lerp(Current.rotation, Target.rotation, Distance / Time.deltaTime);
 
         Camera.SetCameraOffsets(Target);
     }

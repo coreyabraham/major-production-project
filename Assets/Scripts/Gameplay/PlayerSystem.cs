@@ -173,6 +173,7 @@ public class PlayerSystem : MonoBehaviour
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
         else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
 
+        GameSystem.Instance.PlayerDiedCallback();
         SpawnAtCheckpoint();
     }
     #endregion

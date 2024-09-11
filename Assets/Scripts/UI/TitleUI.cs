@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 public class TitleUI : MonoBehaviour
@@ -15,6 +13,11 @@ public class TitleUI : MonoBehaviour
     [field: SerializeField] private TMP_Text SubTitle;
     [field: SerializeField] private string SubTitleText = "TEAM NAME";
     [field: SerializeField] private string ButtonTag = "UI_BUTTON";
+
+    [field: Space(5.0f)]
+
+    public SettingsUI SettingsMenu;
+    public ExitUI ExitMenu;
 
     [field: Space(5.0f)]
 
