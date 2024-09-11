@@ -416,6 +416,7 @@ public class PlayerSystem : MonoBehaviour
 
                     case AnimType.Moving: Animator.SetFloat(PA.ValueName, (IsGrounded && IsMoving) ? CurrentMoveSpeed : 0.0f); break;
                     case AnimType.Jumping: Animator.SetBool(PA.ValueName, (IsJumping && !IsGrounded)); break;
+                    case AnimType.Climbing: Animator.SetBool(PA.ValueName, IsClimbing); break;
                 }
             }
         }
