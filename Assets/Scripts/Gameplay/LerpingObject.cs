@@ -20,6 +20,11 @@ public class LerpingObject : MonoBehaviour
     [field: SerializeField] float pauseTime;
     [field: Tooltip("The smoothing that will be applied to the object's movement. By default, it eases in and out.")]
     [field: SerializeField] AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+    [field: Header("Bools")]
+
+    [field: Tooltip("CURRENTLY DOES NOTHING\n\nDetermine whether or not the Player should become a child of this object when it comes into contact with it. Necessary if this script is applied to moving platforms that the Player will be standing on.")]
+    [field: SerializeField] bool parentToPlayer;
     #endregion
 
     #region Private Variables

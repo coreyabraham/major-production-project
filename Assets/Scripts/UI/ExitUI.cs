@@ -4,7 +4,7 @@ using UnityEngine;
 public class ExitUI : MonoBehaviour
 {
     [field: SerializeField] private GameObject Main;
-    [field: SerializeField] private PromptUI PromptUI;
+    public PromptUI PromptUI;
 
     [field: Space(5.0f)]
 

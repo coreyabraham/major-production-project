@@ -19,57 +19,57 @@ public class ClimbableTrigger : MonoBehaviour
     [field: SerializeField] private bool useGroundPoint;
 
     private bool SkipJumpToClimbCheck = false;  // Used to disallow player to reattach to pipe they're already in the trigger of.
-    private PlayerSystem playerSystem;
+    private PlayerSystem playSys;
 
     private void DetermineClimbHook()
     {
         // If Player jumps to pipe, latch on.
-        if ((playerSystem.IsJumpingFromClimb || playerSystem.IsPlayerJumping()) && !SkipJumpToClimbCheck)
+        if ((playSys.IsJumpingFromClimb || playSys.IsPlayerJumping()) && !SkipJumpToClimbCheck)
         {
-            playerSystem.IsClimbing = true;
-            playerSystem.IsJumpingFromClimb = false;
-            playerSystem.SetVelocity(Vector3.zero);
+            playSys.IsClimbing = true;
+            playSys.IsJumpingFromClimb = false;
+            playSys.SetVelocity(Vector3.zero);
 
-            if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
-            else { playerSystem.Warp(PipePoint.transform.position); }
+            if (!usePipePointYPos) { playSys.Warp(new(PipePoint.transform.position.x, playSys.transform.position.y, PipePoint.transform.position.z)); }
+            else { playSys.Warp(PipePoint.transform.position); }
 
             SkipJumpToClimbCheck = true;
         }
 
         // Beyond here, they've requested to latch on.
-        if (!playerSystem.ClimbingRequested) return;
+        if (!playSys.ClimbingRequested) return;
 
-        playerSystem.IsClimbing = !playerSystem.IsClimbing;
-        playerSystem.SetVelocity(Vector3.zero);
+        playSys.IsClimbing = !playSys.IsClimbing;
+        playSys.SetVelocity(Vector3.zero);
 
-        if (playerSystem.IsClimbing)
+        if (playSys.IsClimbing)
         {
-            if (!usePipePointYPos) { playerSystem.Warp(new(PipePoint.transform.position.x, playerSystem.transform.position.y, PipePoint.transform.position.z)); }
-            else { playerSystem.Warp(PipePoint.transform.position); }
+            if (!usePipePointYPos) { playSys.Warp(new(PipePoint.transform.position.x, playSys.transform.position.y, PipePoint.transform.position.z)); }
+            else { playSys.Warp(PipePoint.transform.position); }
 
             //playerSystem.SetMovementType(MovementType.LockToForwardBack);
 
             SkipJumpToClimbCheck = true;
         }
-        else if (!playerSystem.IsClimbing && useGroundPoint)
+        else if (!playSys.IsClimbing && useGroundPoint)
         {
-            playerSystem.Warp(GroundPoint.transform.position);
+            playSys.Warp(GroundPoint.transform.position);
 
             //playerSystem.SetMovementType(MovementType.LockToLeftRight);
 
-            playerSystem = null;
+            playSys = null;
             SkipJumpToClimbCheck = false;
 
-            playerSystem.ClimbingRequested = false;
+            playSys.ClimbingRequested = false;
         }
 
-        playerSystem.ClimbingRequested = false;
+        playSys.ClimbingRequested = false;
     }
 
 
     private void Update()
     {
-        if (!playerSystem) return;
+        if (!playSys) return;
 
         DetermineClimbHook();
 
@@ -105,30 +105,30 @@ public class ClimbableTrigger : MonoBehaviour
         #endregion
 
         if (!isOutsideBounds) return;
-        playerSystem.IsClimbing = false;
+        playSys.IsClimbing = false;
     }
 
     #region OnTrigger Functions
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        playerSystem = other.GetComponent<PlayerSystem>();
+        playSys = other.GetComponent<PlayerSystem>();
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (!other.CompareTag("Player") || playerSystem == null) return;
-        playerSystem = other.GetComponent<PlayerSystem>();
+        if (!other.CompareTag("Player") || playSys) return;
+        playSys = other.GetComponent<PlayerSystem>();
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Player")) return;
 
-        if (playerSystem.IsClimbing) { playerSystem.ClimbingRequested = true; }
+        if (playSys.IsClimbing) { playSys.ClimbingRequested = true; }
         //playerSystem.SetMoveType(MoveType.LockToLeftRight);
 
-        playerSystem = null;
+        playSys = null;
 
         SkipJumpToClimbCheck = false;
     }
