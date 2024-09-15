@@ -106,6 +106,8 @@ MonoBehaviour:
   Camera: {fileID: 0}
   GameplayPaused: 0
   LevelNames: []
+  BlacklistedPauseScenes:
+  - Title Screen
   Events:
     PlayerDied:
       m_PersistentCalls:
@@ -178,7 +180,19 @@ MonoBehaviour:
         m_Calls: []
     SceneLoaded:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 3298494259395902035}
+          m_TargetAssemblyTypeName: PauseMenuUI, Assembly-CSharp
+          m_MethodName: NewSceneLoaded
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     SceneChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -576,6 +590,17 @@ PrefabInstance:
       objectReference: {fileID: 8337814683459291855}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+--- !u!114 &3298494259395902035 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5773476190144420078, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+  m_PrefabInstance: {fileID: 9068306868183425725}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 786e80d160e4e674d94c0e6822067593, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7486792386640882602 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1891361273495079191, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}

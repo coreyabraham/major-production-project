@@ -25,6 +25,9 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Locks the player's movement to a specific axis.")]
     [field: SerializeField] private MoveType MoveType = MoveType.TwoDimensionsOnly;
 
+    [field: Tooltip("Unhook the player's movement from the camera.")]
+    [field: SerializeField] private bool UnhookMovement = true;
+
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public bool IsJumpingFromClimb;
@@ -39,7 +42,7 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private float VelocityYIdle = 0.0f;
 
     [field: Header("Lerping")]
-    [field: SerializeField] private bool LerpRotation;
+    [field: SerializeField] private EasingStyle LerpStyle;
     [field: SerializeField] private float LerpSpeed;
 
     [field: Tooltip("The force that the player will push objects.")]
@@ -170,6 +173,7 @@ public class PlayerSystem : MonoBehaviour
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
         else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
 
+        GameSystem.Instance.PlayerDiedCallback();
         SpawnAtCheckpoint();
     }
     #endregion
@@ -235,7 +239,11 @@ public class PlayerSystem : MonoBehaviour
         }
 
         CurrentMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
-        MoveDelta = (MoveInput.x * Camera.main.transform.right + MoveInput.y * Camera.main.transform.forward) * CurrentMoveSpeed;
+
+        Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
+        Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
+
+        MoveDelta = (MoveInput.x * right + MoveInput.y * forward) * CurrentMoveSpeed;
 
         if (IsJumping)
         {
@@ -288,7 +296,7 @@ public class PlayerSystem : MonoBehaviour
         }
         else
         {
-            // Properly lerp the movement up and down since it's really jarring moving linearly between movements
+            // TODO: Properly lerp the movement up and down since it's really jarring moving linearly between movements
 
             Velocity.y = MoveDelta.z;
 
@@ -324,8 +332,18 @@ public class PlayerSystem : MonoBehaviour
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
-        CharacterRotation = Quaternion.Euler(0.0f, IsMoving ? rotation + 90.0f : 90.0f, 0.0f);
-        if (LerpRotation) CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed);
+        CharacterRotation = Quaternion.Euler(
+            0.0f, 
+            IsMoving ? rotation + 90.0f : 90.0f, 
+            0.0f
+        );
+
+        switch (LerpStyle)
+        {
+            case EasingStyle.Basic: CharacterRotation = Quaternion.RotateTowards(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
+            case EasingStyle.Lerp: CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
+            case EasingStyle.Slerp: CharacterRotation = Quaternion.Slerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
+        }
 
         Character.transform.rotation = CharacterRotation;
     }
@@ -397,7 +415,8 @@ public class PlayerSystem : MonoBehaviour
                         break;
 
                     case AnimType.Moving: Animator.SetFloat(PA.ValueName, (IsGrounded && IsMoving) ? CurrentMoveSpeed : 0.0f); break;
-                    case AnimType.Jumping: /* TODO: ADD CONTENT HERE! */ break;
+                    case AnimType.Jumping: Animator.SetBool(PA.ValueName, (IsJumping && !IsGrounded)); break;
+                    case AnimType.Climbing: Animator.SetBool(PA.ValueName, IsClimbing); break;
                 }
             }
         }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>This script is used to enable GameObjects when a specially tagged object falls through it.</summary>
@@ -7,21 +8,41 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
     [field: Tooltip("The GameObjects in the scene that are going to be enabled when the tagged object enters this trigger.")]
     [field: SerializeField] GameObject[] elementsToEnable;
 
-    [field: Tooltip("The tag of the object that will enter this trigger.")]
+    [field: Tooltip("The tag of the object that is intended to enter this trigger. This does not need to (and should never) be set to \"Player\".")]
     [field: SerializeField] string tagToLookFor;
 
-    [field: Tooltip("When the tagged object enters this trigger, decide whether or not to destroy it.")]
+    [field: Tooltip("Instead of setting the corresponding GameObject as active, disregard that information and just enable a random object from the array. A check is put in place to prevent it from enabling an object that's already enabled.")]
+    [field: SerializeField] bool randomiseEnables;
+    [field: Tooltip("When the tagged object enters this trigger, should it be destroyed?")]
     [field: SerializeField] bool destroyTaggedObject;
     [field: Tooltip("If the player enters this trigger, will it be treated as a death?")]
     [field: SerializeField] bool canKillPlayer;
     #endregion
 
 
+
+    private void UpdateVisibilityRandomly()
+    {
+        List<GameObject> invisibleObjs = new();
+
+        for (int i = 0; i < elementsToEnable.Length; i++)
+        {
+            if (!elementsToEnable[i].activeInHierarchy) { invisibleObjs.Add(elementsToEnable[i]); }
+        }
+
+        int result = Random.Range(0, invisibleObjs.Count - 1);
+        invisibleObjs[result].SetActive(true);
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
+        if (tagToLookFor == "") { return; }
+
         if (other.CompareTag(tagToLookFor))
         {
-            for (int i = 0; i < elementsToEnable.Length; i++) { elementsToEnable[i].SetActive(true); }
+            if (randomiseEnables) { UpdateVisibilityRandomly(); }
+            else { other.gameObject.SetActive(true); }
 
             if (destroyTaggedObject) { Destroy(other); }
         }
