@@ -5,13 +5,13 @@ public class temp_MopBucketLaunch : MonoBehaviour
     #region Public Variables
     [field: Tooltip("The point in world space that the player will warp to when attaching to the Mop.")]
     [field: SerializeField] private GameObject MopPoint;
-
-    [field: SerializeField] private GameObject parent;
     #endregion
 
     #region Private Variables
+    Transform parentOfThis;
     PlayerSystem playSys;
     bool hasAttachedOnce = false;
+    float timer = 0;
     #endregion
 
 
@@ -20,6 +20,10 @@ public class temp_MopBucketLaunch : MonoBehaviour
     {
         // Move and rotate the mop handle.
         // use "parent' for this
+
+        timer += Time.deltaTime;
+
+
     }
 
     private void Update()
@@ -41,7 +45,14 @@ public class temp_MopBucketLaunch : MonoBehaviour
 
         if (!playSys.ClimbingRequested) { return; }
 
+        playSys.gameObject.transform.parent = null;
         // Put code to detach when jumping.
+    }
+
+
+    private void Start()
+    {
+        parentOfThis = gameObject.transform.parent;
     }
 
 
