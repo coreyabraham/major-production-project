@@ -12,7 +12,8 @@ public class AudioHandler : Singleton<AudioHandler>
     [field: Header("Extenal References")]
     [field: SerializeField] private JSONData JsonHandler;
 
-    private List<AudioSource> Sources = new();
+    [field: Header("Lists and Arrays")]
+    public List<AudioSource> Sources = new();
 
     public void AddSource(AudioSource Source) => Sources.Add(Source);
     public bool RemoveSource(AudioSource Source) => Sources.Remove(Source);
@@ -42,7 +43,7 @@ public class AudioHandler : Singleton<AudioHandler>
 
         if (!found)
         {
-            Debug.LogWarning(name + " | Could not find AudioSource with Name: " + Name + " in internal AudioSources.");
+            Debug.LogWarning(name + " | Could not find AudioSource with Name: " + Name + " in internal AudioSources list.");
             return null;
         }
 
@@ -114,5 +115,12 @@ public class AudioHandler : Singleton<AudioHandler>
         }
     }
 
-    protected override void Initialize() {  }
+    protected override void Initialize() 
+    {
+        // TODO: Figure out what needs to be done here in future revisions!
+        //foreach (AudioSource source in Sources)
+        //{
+
+        //}
+    }
 }

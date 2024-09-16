@@ -1,4 +1,5 @@
 /// <summary>
+/// [DEPRICATED] <br/>
 /// An Enumeration that dictates how the `UpdateCamOffset.cs` script changes the `Offset` `CameraTarget` in `CameraSystem.cs`.
 /// </summary>
 public enum UpdateCamOffsetType
