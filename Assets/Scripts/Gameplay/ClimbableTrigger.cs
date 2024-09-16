@@ -35,6 +35,17 @@ public class ClimbableTrigger : MonoBehaviour
 
             SkipJumpToClimbCheck = true;
         }
+        else if (!playSys.IsPlayerJumping() && !SkipJumpToClimbCheck)
+        {
+            playSys.IsClimbing = true;
+            playSys.IsJumpingFromClimb = false;
+            playSys.SetVelocity(Vector3.zero);
+
+            if (!usePipePointYPos) { playSys.Warp(new(PipePoint.transform.position.x, playSys.transform.position.y, PipePoint.transform.position.z)); }
+            else { playSys.Warp(PipePoint.transform.position); }
+
+            SkipJumpToClimbCheck = true;
+        }
 
         // Beyond here, they've requested to latch on.
         if (!playSys.ClimbingRequested) return;
