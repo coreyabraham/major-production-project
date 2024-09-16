@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 
 public class CameraSystem : MonoBehaviour
@@ -13,21 +12,17 @@ public class CameraSystem : MonoBehaviour
     }
 
     [field: Header("Booleans")]
-    [field: SerializeField] private bool IgnorePlayerJumps;
+    [field: SerializeField] private bool IgnorePlayerJumps = false;
+    public bool IgnoreAnticipationOffset = false;
+    public bool SeparateOffsets = false;
 
     [field: Header("Angles and Offsets")]
     [field: SerializeField] private CameraTarget Offset;
     [field: SerializeField] private float AnticipationOffset = 0.0f;
 
-    [HideInInspector] private CameraTarget PreviousOffset;
-    [HideInInspector] private CameraTarget DefaultOffset;
-
     [field: Header("View Fields")]
     [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
-
-    [field: Header("Depth of Field")]
-    [field: SerializeField] private DOF_Data DepthOfFieldData;
 
     [field: Header("Lerping Speeds")]
     [field: SerializeField] private float CameraLerpSpeed;
@@ -37,6 +32,9 @@ public class CameraSystem : MonoBehaviour
     [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Lerp;
     [field: SerializeField] private CameraType CameraType = CameraType.Follow;
 
+    [field: Header("Depth of Field")]
+    [field: SerializeField] private DOF_Data DepthOfFieldData;
+
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
     public PlayerSystem Player;
@@ -44,6 +42,9 @@ public class CameraSystem : MonoBehaviour
 
     [field: Space(2.5f)]
     [field: SerializeField] private CameraEvents Events;
+
+    [HideInInspector] private CameraTarget PreviousOffset;
+    [HideInInspector] private CameraTarget DefaultOffset;
 
     private CameraTarget PreviousCameraLocation;
     private Vector3 GroundCameraPosition;
@@ -71,7 +72,7 @@ public class CameraSystem : MonoBehaviour
     public void RevertCameraOffsets() => Offset = PreviousOffset;
     public void SetToDefaultOffsets() => Offset = DefaultOffset;
 
-    public void SetCameraOffsets(Vector3 Position, Quaternion Rotation)
+    public void SetCameraOffset(Vector3 Position, Quaternion Rotation)
     {
         PreviousOffset = Offset;
         Offset = new()
@@ -80,9 +81,10 @@ public class CameraSystem : MonoBehaviour
             rotation = Rotation
         };
     }
-    public void SetCameraOffsets(CameraTarget Target) => SetCameraOffsets(Target.position, Target.rotation);
-    public void SetCameraOffsets(Vector3 Target) => SetCameraOffsets(Target, PreviousCameraLocation.rotation);
-    public void SetCameraOffsets(Quaternion Target) => SetCameraOffsets(PreviousCameraLocation.position, Target);
+    public void SetCameraOffset(CameraTarget Target) => SetCameraOffset(Target.position, Target.rotation);
+    public void SetCameraOffset(Vector3 Target) => SetCameraOffset(Target, PreviousOffset.rotation);
+    public void SetCameraOffset(Quaternion Target) => SetCameraOffset(PreviousOffset.position, Target);
+    public void SetCameraOffset(Transform Target) => SetCameraOffset(Target.position, Target.rotation);
 
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
@@ -168,7 +170,8 @@ public class CameraSystem : MonoBehaviour
 
     private CameraTarget GetCamPositionAndRotation()
     {
-        Vector3 newPos = CameraSubject.transform.position + Offset.position;
+        Vector3 posModifier = (!SeparateOffsets) ? Offset.position : Vector3.zero;
+        Vector3 newPos = CameraSubject.transform.position + posModifier;
 
         // TODO: This needs to be improved!
         if (IgnorePlayerJumps && !Player.IsPlayerGrounded() && !Player.IsClimbing && !Player.IsJumpingFromClimb && !Player.FallingFromClimb)
@@ -179,12 +182,14 @@ public class CameraSystem : MonoBehaviour
         if (Player.IsPlayerMoving() && CameraSubject == Player.gameObject)
         {
             Vector2 moveInput = Player.GetMoveInput();
-            if (moveInput.x > 0) newPos.x += AnticipationOffset;
-            else if (moveInput.x < 0) newPos.x -= AnticipationOffset;
+            if (moveInput.x > 0) newPos.x += !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
+            else if (moveInput.x < 0) newPos.x -= !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
         }
 
-        Vector3 vecRot = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
-        Quaternion newRot = Quaternion.Euler(vecRot + Offset.rotation.eulerAngles);
+        Vector3 rotReference = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
+        Vector3 rotModifier = (!SeparateOffsets) ? Offset.rotation.eulerAngles : Vector3.zero;
+
+        Quaternion newRot = Quaternion.Euler(rotReference + rotModifier);
 
         CameraTarget target = new()
         {
@@ -197,9 +202,9 @@ public class CameraSystem : MonoBehaviour
         return target;
     }
 
-    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = -1.0f)
+    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
     {
-        float LerpSpeed = (CustomLerpSpeed > 0) ? CustomLerpSpeed : CameraLerpSpeed;
+        float LerpSpeed = (CustomLerpSpeed > 0.0f) ? CustomLerpSpeed : CameraLerpSpeed;
 
         if (EasingStyle != EasingStyle.None)
         {

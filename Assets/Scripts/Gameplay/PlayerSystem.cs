@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -55,7 +55,14 @@ public class PlayerSystem : MonoBehaviour
     [field: Header("Externals")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
+    [field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
     public Animator Animator;
+
+    [field: Header("Interacting")]
+    [field: Tooltip("The GameObject Tag used to identify ALL Interactable GameObjects within the current scene.")]
+    [field: SerializeField] private string InteractTag = "Interactable";
+    [field: Tooltip("The GameObject Tag used to identify ALL Touchable GameObjects within the current scene.")]
+    [field: SerializeField] private string TouchTag = "Touchable";
 
     [HideInInspector] public CharacterController Character;
     [HideInInspector] public bool IsHidden = false;
@@ -94,6 +101,9 @@ public class PlayerSystem : MonoBehaviour
     private bool JumpButtonIsHeld = false;
 
     private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
+
+    private List<GameObject> CachedInteractables = new();
+    private Dictionary<GameObject, ITouchable> CachedTouchables = new();
     #endregion
 
     #region Functions - Handlers
@@ -128,8 +138,18 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnInteracting(InputAction.CallbackContext ctx)
     {
-        if (ctx.phase == InputActionPhase.Canceled || ctx.phase == InputActionPhase.Disabled) return;
-        Events.Interacting.Invoke(ctx.ReadValueAsButton());
+        if (ctx.phase != InputActionPhase.Performed) return;
+
+        bool interactResult = ctx.ReadValueAsButton();
+        Events.Interacting.Invoke(interactResult);
+
+        if (!interactResult) return;
+
+        // TODO: Is this possible to optimize? I don't know how to feel about using .GetComponent() more than necessary!
+        foreach (GameObject interactable in CachedInteractables)
+        {
+            interactable.GetComponent<IInteractable>().Interact(interactable);
+        }
     }
     #endregion
 
@@ -198,6 +218,13 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        if (hit.gameObject != null && hit.gameObject.CompareTag(TouchTag))
+        {
+            bool result = CachedTouchables.TryGetValue(hit.gameObject, out ITouchable touchable);
+            if (!result) return;
+            touchable.Triggered(hit.gameObject);
+        }
+
         Rigidbody body = hit.collider.attachedRigidbody;
 
         if (body == null || body.isKinematic) return;
@@ -479,6 +506,23 @@ public class PlayerSystem : MonoBehaviour
             position = transform.position,
             rotation = transform.rotation
         };
+
+        GameObject[] InteractArray = GameObject.FindGameObjectsWithTag(InteractTag);
+        GameObject[] TriggerArray = GameObject.FindGameObjectsWithTag(TouchTag);
+
+        foreach (GameObject obj in InteractArray)
+        {
+            bool result = obj.TryGetComponent(out IInteractable _);
+            if (!result) continue;
+            CachedInteractables.Add(obj);
+        }
+
+        foreach (GameObject obj in TriggerArray)
+        {
+            bool result = obj.TryGetComponent(out ITouchable touchable);
+            if (!result) continue;
+            CachedTouchables.Add(obj, touchable);
+        }
 
         SpawnAtCheckpoint();
     }

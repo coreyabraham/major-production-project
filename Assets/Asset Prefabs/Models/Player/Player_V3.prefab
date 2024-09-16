@@ -70,8 +70,13 @@ MonoBehaviour:
     InputValue: 
     AnimationType: 1
     AnimationValueType: 1
+  - ValueName: JumpButtonIsHeld
+    InputValue: 
+    AnimationType: 2
+    AnimationValueType: 2
   Camera: {fileID: 0}
   Animator: {fileID: 4095228785318712889}
+  InteractionTag: Interactable
   Character: {fileID: 0}
   IsHidden: 0
   SurfaceMaterialsPath: SurfaceMaterials
@@ -217,9 +222,9 @@ AudioSource:
   m_GameObject: {fileID: 6246030398808792733}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -8211331919460887159, guid: 142fccf1582619749aa7b932b853062f, type: 2}
   m_audioClip: {fileID: 8300000, guid: 649ed2a397638fd468619317e17e719e, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
