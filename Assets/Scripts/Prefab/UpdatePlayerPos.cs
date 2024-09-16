@@ -1,18 +1,19 @@
 using UnityEngine;
 
-public class UpdatePlayerPos : MonoBehaviour
+public class UpdatePlayerPos : MonoBehaviour, ITouchable
 {
+    [field: Header("Inherited from `ITouchable`")]
+    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
+    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
+
+    [field: Header("Trigger Specific")]
     [field: SerializeField] private Transform TargetTransform;
 
-    private void OnTriggerEnter(Collider other)
+    public void Touched()
     {
-        if (!other.CompareTag("Player")) return;
-
-        PlayerSystem player = other.GetComponent<PlayerSystem>();
-
-        if (!player) return;
+        if (!GameSystem.Instance.Player) return;
         if (!TargetTransform) return;
 
-        player.Warp(TargetTransform.position);
+        GameSystem.Instance.Player.Warp(TargetTransform.position);
     }
 }

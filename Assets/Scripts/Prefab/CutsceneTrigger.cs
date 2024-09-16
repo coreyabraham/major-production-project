@@ -1,7 +1,12 @@
 using UnityEngine;
 
-public class CutsceneTrigger : MonoBehaviour
+public class CutsceneTrigger : MonoBehaviour, ITouchable
 {
+    [field: Header("Inherited from `ITouchable`")]
+    [field: SerializeField] public bool TriggeringEnabled { get; set; }
+    [field: SerializeField] public bool PlayerExclusive { get; set; }
+
+    [field: Header("Trigger Specific")]
     [field: SerializeField] private GameObject[] CutscenePoints;
     [field: SerializeField] private float TimeInterval;
     [field: SerializeField] private float CameraSpeed;
@@ -13,12 +18,10 @@ public class CutsceneTrigger : MonoBehaviour
         print("Cutscene has concluded");
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void Touched()
     {
-        if (!other.CompareTag("Player")) return;
-        PlayerSystem Player = other.GetComponent<PlayerSystem>();
-
-        if (!Player.Camera) return;
-        Player.Camera.BeginCutscene(CutscenePoints, TimeInterval, !UseDefaultSpeed ? CameraSpeed : -1.0f);
+        CameraSystem Camera = GameSystem.Instance.Camera;
+        if (!Camera) return;
+        Camera.BeginCutscene(CutscenePoints, TimeInterval, !UseDefaultSpeed ? CameraSpeed : -1.0f);
     }
 }

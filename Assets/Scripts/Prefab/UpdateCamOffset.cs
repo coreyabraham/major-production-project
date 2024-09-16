@@ -22,19 +22,16 @@ public class UpdateCamOffset : MonoBehaviour
     private PlayerSystem Player;
     private CameraSystem Camera;
 
+    private bool PlayerInTrigger = false;
+
     private CameraTarget BeforeChanges = new();
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
 
-        Player = other.gameObject.GetComponent<PlayerSystem>();
-        if (!Player) return;
-
-        Camera = Player.Camera;
-        if (!Camera) return;
-
         BeforeChanges = Camera.GetCameraOffset();
+        PlayerInTrigger = true;
 
         if (UseDampening) return;
 
@@ -44,9 +41,9 @@ public class UpdateCamOffset : MonoBehaviour
                 {
                     switch (Value)
                     {
-                        case UpdateCamOffsetValue.Both: Camera.SetCameraOffsets(Target); break;
-                        case UpdateCamOffsetValue.Position: Camera.SetCameraOffsets(Target.position); break;
-                        case UpdateCamOffsetValue.Rotation: Camera.SetCameraOffsets(Target.rotation); break;
+                        case UpdateCamOffsetValue.Both: Camera.SetCameraOffset(Target); break;
+                        case UpdateCamOffsetValue.Position: Camera.SetCameraOffset(Target.position); break;
+                        case UpdateCamOffsetValue.Rotation: Camera.SetCameraOffset(Target.rotation); break;
                     }
                 }
                 return;
@@ -58,21 +55,18 @@ public class UpdateCamOffset : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!Player || !Camera) return;
-
         if (RevertOnExit)
         {
-            Camera.SetCameraOffsets(BeforeChanges);
+            Camera.SetCameraOffset(BeforeChanges);
             BeforeChanges = new();
         }
 
-        Player = null;
-        Camera = null;
+        PlayerInTrigger = false;
     }
 
     private void Update()
     {
-        if (!UseDampening || !Player || !Camera) return;
+        if (!UseDampening || !PlayerInTrigger) return;
 
         /*
             TODO:
@@ -80,7 +74,7 @@ public class UpdateCamOffset : MonoBehaviour
                 2. Caclulate the Position and Rotation that the Camera should currently be using between the current `CameraOffset` and the target `CameraOffset`
 
             Notes:
-                - Lerping may not be a good way to solve this due to `SetCameraOffsets()` Setting the internal Camera Offset for the `CameraSystem.cs` Script
+                - Lerping may not be a good way to solve this due to `SetCameraOffset()` Setting the internal Camera Offset for the `CameraSystem.cs` Script
                   and actively using lerping with the current camera's transform with the `CameraOffset` added on top
                 - This system should't be all that complex to add, however with the current setup of `CameraSystem.cs` combined with this logic below, it's proved
                   to be a real struggle, if this system doesn't make it into Alpha, then hopefully it'll be obvious as to why!
@@ -98,7 +92,13 @@ public class UpdateCamOffset : MonoBehaviour
         //Target.position = Vector3.Lerp(Current.position, Target.position, Distance / Time.deltaTime);
         //Target.rotation = Quaternion.Lerp(Current.rotation, Target.rotation, Distance / Time.deltaTime);
 
-        Camera.SetCameraOffsets(Target);
+        Camera.SetCameraOffset(Target);
+    }
+
+    private void Start()
+    {
+        Player = GameSystem.Instance.Player;
+        Camera = GameSystem.Instance.Camera;
     }
 
     private void Awake()

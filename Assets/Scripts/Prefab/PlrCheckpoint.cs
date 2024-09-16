@@ -1,14 +1,17 @@
 using UnityEngine;
 
-public class PlrCheckpoint : MonoBehaviour
+public class PlrCheckpoint : MonoBehaviour, ITouchable
 {
-    [field: Space(2.5f), SerializeField] private string OverrideName;
+    [field: Header("Inherited from `ITouchable`")]
+    [field: SerializeField] public bool TriggeringEnabled { get; set; } = true;
+    [field: SerializeField] public bool PlayerExclusive { get; set; } = true;
+
+    [field: Header("Trigger Specific")]
+    [field: SerializeField] private string OverrideName;
     [field: SerializeField] private Transform OverrideTranform;
 
-    private void OnTriggerEnter(Collider other)
+    public void Touched()
     {
-        if (!other.CompareTag("Player")) return;
-
         SaveData data = DataHandler.Instance.GetCachedData();
 
         if (data.checkpointName == gameObject.name)
@@ -27,6 +30,6 @@ public class PlrCheckpoint : MonoBehaviour
         bool result = DataHandler.Instance.SaveCachedDataToFile();
 
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
-        else Debug.LogWarning(name +  "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
+        else Debug.LogWarning(name + "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
 }
