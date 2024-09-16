@@ -43,6 +43,7 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
             case "FallingPotPlant": elementsToEnable[2].SetActive(true); break;
             case "FallingSprayCan": elementsToEnable[1].SetActive(true); break;
             case "FallingPipe": elementsToEnable[0].SetActive(true); break;
+            case "FallingNoodleBox": elementsToEnable[0].SetActive(true); break;
         }
     }
 
