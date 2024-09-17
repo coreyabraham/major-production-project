@@ -68,6 +68,7 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public bool IsHidden = false;
 
     [field: Header("Miscellaneous")]
+    [field: SerializeField] private bool IgnoreCheckpointData = false;
     [field: SerializeField] private string SurfaceMaterialsPath = "SurfaceMaterials";
     [field: SerializeField] private SurfaceMaterial GenericSurface;
     [field: Tooltip("All the Surface Types that the Player can interact with")]
@@ -206,7 +207,11 @@ public class PlayerSystem : MonoBehaviour
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
 
-        if (string.IsNullOrWhiteSpace(data.checkpointName))
+#if !UNITY_EDITOR
+        IgnoreCheckpointData = false;
+#endif
+
+        if (string.IsNullOrWhiteSpace(data.checkpointName) || IgnoreCheckpointData == true)
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
             return;
@@ -564,5 +569,5 @@ public class PlayerSystem : MonoBehaviour
         Events.Climbing ??= new();
         Events.Interacting ??= new();
     }
-    #endregion
+#endregion
 }

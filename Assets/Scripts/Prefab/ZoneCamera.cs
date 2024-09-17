@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class ZoneCamera : MonoBehaviour, ITouchable
 {
+    // Offset State = Use Target Position and Rotation mixed with the "Target Offset Object" (Use `GetCameraOffset() and `SetCameraOffset()`)
+    // Target State = Directly use "Target Offset Object" Transform(Manually set Camera Transform)
+
     // TODO: MOVE THIS ENUMERATION LATER!
     [System.Serializable]
     public enum LocalScaleUsage
@@ -52,11 +55,11 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     private CameraTarget PreviousOffset;
 
+    private PlayerSystem Player;
     private CameraSystem Camera;
 
     public void Entered(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
         PlayerIsInTrigger = true;
 
         PreviousSeparateOffsets = Camera.SeparateOffsets;
@@ -65,8 +68,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
         Camera.SeparateOffsets = TargetOffsetObject != null;
         Camera.IgnoreAnticipationOffset = true;
-
-        if (TargetOffsetObject != null) Camera.SetCameraType(CameraType.Scriptable);
+        Camera.SetCameraType(CameraType.Scriptable);
 
         PreviousOffset = Camera.GetCameraOffset();
 
@@ -75,7 +77,6 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     public void Left(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
         PlayerIsInTrigger = false;
 
         Camera.SetCameraType(PreviousCameraType);
@@ -117,25 +118,29 @@ public class ZoneCamera : MonoBehaviour, ITouchable
         if (!PlayerIsInTrigger) return;
         if (!ZoneBlending) return;
 
-        //float distance = Vector3.Distance(
-        //    GameSystem.Instance.Player.gameObject.transform.position,
-        //    transform.position
-        //);
-
         // Add "Use X" and "Use Y" Localscale options in FixedUpdate() at runtime specifically
-        float distance = Mathf.Abs(GameSystem.Instance.Player.gameObject.transform.position.x - transform.position.x);
+        float distance = Mathf.Abs(Player.gameObject.transform.position.x - transform.position.x);
 
         float clamp = distance / (transform.localScale.x / 2);
         float value = LerpCurve.Evaluate(clamp);
 
         print(value);
-        
-        CameraTarget current = Camera.GetCameraOffset();
 
-        Camera.transform.position = Vector3.Lerp(Camera.transform.position + current.position, TargetOffsetObject.transform.position, value);
+        Transform current = Camera.GetCameraTransform();
+
+        //Camera.LerpCameraTransform(
+        //    TargetOffsetObject.transform.position, 
+        //    Time.fixedDeltaTime * value
+        //);
+
+        Camera.transform.position = Vector3.Lerp(current.position, TargetOffsetObject.transform.position, value);
     }
 
-    private void Start() => Camera = GameSystem.Instance.Camera;
+    private void Start()
+    {
+        Camera = GameSystem.Instance.Camera;
+        Player = GameSystem.Instance.Player;
+    }
 
     private void Awake()
     {
