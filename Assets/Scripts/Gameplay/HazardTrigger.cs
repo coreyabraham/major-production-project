@@ -11,12 +11,16 @@ public class HazardTrigger : MonoBehaviour
     #region Private Variables
     private PlayerSystem playerSystem;
     private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
+    public AudioSource crowCaw;
+    public AudioSource crowSwoop;
     #endregion
 
     #region Functions - Private
     private void PlayerIsSpotted()
     {
         hasBeenSpotted = true;
+        crowCaw.enabled = true;
+        crowSwoop.enabled = true;
         playerSystem.DeathTriggered();
     }
 
