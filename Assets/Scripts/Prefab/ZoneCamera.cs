@@ -1,8 +1,22 @@
-using System.Linq;
 using UnityEngine;
 
-public class ZoneCamera : MonoBehaviour
+public class ZoneCamera : MonoBehaviour, ITouchable
 {
+    // TODO: MOVE THIS ENUMERATION LATER!
+    [System.Serializable]
+    public enum LocalScaleUsage
+    {
+        LocalScaleX,
+        LocalScaleY,
+        LocalScaleZ
+    }
+
+    [field: Header("ITouchable Inheritance")]
+    [field: SerializeField] public bool Enabled { get; set; }
+
+    [field: Header("Scaling Options")]
+    [field: SerializeField] private LocalScaleUsage LocalScaleType;
+    
     [field: Header("Utilization Options")]
     [field: SerializeField] private bool UsePositionOffset;
     [field: SerializeField] private bool UseRotationOffset;
@@ -34,78 +48,91 @@ public class ZoneCamera : MonoBehaviour
 
     private bool PreviousSeparateOffsets;
     private bool PreviousPreviousAnticipationOffset;
+    private CameraType PreviousCameraType;
 
-    private CameraTarget DefaultOffset;
+    private CameraTarget PreviousOffset;
 
     private CameraSystem Camera;
 
-    private void OnTriggerEnter(Collider other)
+    public void Entered(Collider other)
     {
         if (!other.CompareTag("Player")) return;
         PlayerIsInTrigger = true;
 
         PreviousSeparateOffsets = Camera.SeparateOffsets;
         PreviousPreviousAnticipationOffset = Camera.IgnoreAnticipationOffset;
+        PreviousCameraType = Camera.GetCameraType();
 
         Camera.SeparateOffsets = TargetOffsetObject != null;
         Camera.IgnoreAnticipationOffset = true;
 
-        DefaultOffset = Camera.GetCameraOffset();
+        if (TargetOffsetObject != null) Camera.SetCameraType(CameraType.Scriptable);
+
+        PreviousOffset = Camera.GetCameraOffset();
+
+        NoBlendingSet();
     }
 
-    private void OnTriggerExit(Collider other)
+    public void Left(Collider other)
     {
         if (!other.CompareTag("Player")) return;
         PlayerIsInTrigger = false;
+
+        Camera.SetCameraType(PreviousCameraType);
 
         Camera.SeparateOffsets = PreviousSeparateOffsets;
         Camera.IgnoreAnticipationOffset = PreviousPreviousAnticipationOffset;
 
         Camera.SetCameraOffset(
-            !OverridePreviousPosition ? DefaultOffset.position : TargetPosition,
-            !OverridePreviousRotation ? DefaultOffset.rotation : TargetRotation
+            !OverridePreviousPosition ? PreviousOffset.position : TargetPosition,
+            !OverridePreviousRotation ? PreviousOffset.rotation : TargetRotation
         );
+    }
+
+    private void OnEnable()
+    {
+        if (!TargetOffsetObject) return;
+        TargetPosition = transform.position - TargetOffsetObject.transform.position;
+        TargetRotation = TargetOffsetObject.transform.rotation;
+    }
+
+    private void NoBlendingSet()
+    {
+        // This may need to be optimized in the future, for now, this should do for non-zone blending functionality!
+        // I'm not trying to become the next Yandare Dev, we should all take a note out of that for what NOT to do during C# scripting.
+
+        if (TargetOffsetObject != null)
+        {
+            Camera.SetCameraOffset(TargetOffsetObject.transform);
+            return;
+        }
+
+        if (UsePositionOffset && !UseRotationOffset) Camera.SetCameraOffset(TargetPosition);
+        else if (!UsePositionOffset && UseRotationOffset) Camera.SetCameraOffset(TargetRotation);
+        else if (UsePositionOffset && UseRotationOffset) Camera.SetCameraOffset(TargetPosition, TargetRotation);
     }
 
     private void FixedUpdate()
     {
         if (!PlayerIsInTrigger) return;
+        if (!ZoneBlending) return;
 
-        switch (BlendType)
-        {
-            case ZoneBlendType.OffsetState:
-                {
-                    if (!ZoneBlending)
-                    {
-                        if (!TargetOffsetObject)
-                        {
-                            if (UsePositionOffset && !UseRotationOffset) Camera.SetCameraOffset(TargetPosition);
-                            if (UseRotationOffset && !UsePositionOffset) Camera.SetCameraOffset(TargetRotation);
-                            else if (UsePositionOffset && UseRotationOffset) Camera.SetCameraOffset(TargetPosition, TargetRotation);
+        //float distance = Vector3.Distance(
+        //    GameSystem.Instance.Player.gameObject.transform.position,
+        //    transform.position
+        //);
 
-                            break;
-                        }
+        // Add "Use X" and "Use Y" Localscale options in FixedUpdate() at runtime specifically
+        float distance = Mathf.Abs(GameSystem.Instance.Player.gameObject.transform.position.x - transform.position.x);
 
-                        Camera.SetCameraOffset(TargetOffsetObject.transform);
+        float clamp = distance / (transform.localScale.x / 2);
+        float value = LerpCurve.Evaluate(clamp);
 
-                        break;
-                    }
+        print(value);
+        
+        CameraTarget current = Camera.GetCameraOffset();
 
-                    // ZONE BLENDING LOGIC GOES HERE!
-                }
-                break;
-
-            case ZoneBlendType.TargetState:
-                {
-                    if (!ZoneBlending)
-                    {
-
-                    }
-
-                    Camera.SetCameraOffset(TargetOffsetObject.transform);
-                }
-                break;
-        }
+        Camera.transform.position = Vector3.Lerp(Camera.transform.position + current.position, TargetOffsetObject.transform.position, value);
     }
 
     private void Start() => Camera = GameSystem.Instance.Camera;

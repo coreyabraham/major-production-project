@@ -2,20 +2,20 @@ using UnityEngine;
 
 public interface ITouchable
 {
-    public bool TriggeringEnabled { get; set; }
-    public bool PlayerExclusive { get; set; }
+    public bool Enabled { get; set; }
 
-    public virtual void Triggered(GameObject Collision)
+    public virtual void TriggerEnter(Collider other)
     {
-        if (!TriggeringEnabled) return;
-
-        if (PlayerExclusive)
-        {
-            if (!Collision.TryGetComponent(out PlayerSystem _)) return;
-        }
-
-        Touched();
+        if (!Enabled) return;
+        Entered(other);
     }
 
-    public virtual void Touched() { }
+    public virtual void TriggerLeave(Collider other)
+    {
+        if (!Enabled) return;
+        Left(other);
+    }
+
+    public virtual void Entered(Collider other) { }
+    public virtual void Left(Collider other) { }
 }

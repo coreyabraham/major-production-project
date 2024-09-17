@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering.HighDefinition;
+using static UnityEngine.GraphicsBuffer;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -66,6 +67,9 @@ public class CameraSystem : MonoBehaviour
 
     public bool IsCutsceneActive() => CutsceneRunning;
 
+    public CameraType GetCameraType() => CameraType;
+    public void SetCameraType(CameraType Enumeration) => CameraType = Enumeration;
+
     public Transform GetCameraTransform() => main.transform;
     public CameraTarget GetCameraOffset() => Offset;
 
@@ -82,9 +86,9 @@ public class CameraSystem : MonoBehaviour
         };
     }
     public void SetCameraOffset(CameraTarget Target) => SetCameraOffset(Target.position, Target.rotation);
+    public void SetCameraOffset(Transform Target) => SetCameraOffset(Target.position, Target.rotation);
     public void SetCameraOffset(Vector3 Target) => SetCameraOffset(Target, PreviousOffset.rotation);
     public void SetCameraOffset(Quaternion Target) => SetCameraOffset(PreviousOffset.position, Target);
-    public void SetCameraOffset(Transform Target) => SetCameraOffset(Target.position, Target.rotation);
 
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
@@ -168,7 +172,21 @@ public class CameraSystem : MonoBehaviour
         Events.CutsceneFinished?.Invoke();
     }
 
-    private CameraTarget GetCamPositionAndRotation()
+    private CameraTarget GetPanningTransformation()
+    {
+        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
+        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
+
+        CameraTarget Target = new()
+        {
+            position = PreviousCameraLocation.position,
+            rotation = targetRot
+        };
+
+        return Target;
+    }
+
+    private CameraTarget GetFollowTransformation()
     {
         Vector3 posModifier = (!SeparateOffsets) ? Offset.position : Vector3.zero;
         Vector3 newPos = CameraSubject.transform.position + posModifier;
@@ -204,7 +222,7 @@ public class CameraSystem : MonoBehaviour
 
     private void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
     {
-        float LerpSpeed = (CustomLerpSpeed > 0.0f) ? CustomLerpSpeed : CameraLerpSpeed;
+        float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : Time.fixedDeltaTime * CameraLerpSpeed;
 
         if (EasingStyle != EasingStyle.None)
         {
@@ -212,22 +230,22 @@ public class CameraSystem : MonoBehaviour
             {
                 case EasingStyle.Basic:
                     {
-                        Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Position = Vector3.MoveTowards(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
                 
                 case EasingStyle.Lerp:
                     {
-                        Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Position = Vector3.Lerp(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
 
                 case EasingStyle.Slerp:
                     {
-                        Position = Vector3.Slerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Position = Vector3.Slerp(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
             }
@@ -248,6 +266,8 @@ public class CameraSystem : MonoBehaviour
     }
 
     private void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
+    private void LerpCameraTransform(Vector3 Position, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Position, PreviousCameraLocation.rotation, CustomLerpSpeed);
+    private void LerpCameraTransform(Quaternion Rotation, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(PreviousCameraLocation.position, Rotation, CustomLerpSpeed);
 
     private void Update()
     {
@@ -267,6 +287,7 @@ public class CameraSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
+        #region TEMPORARY_REGION
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
         if (DOF) DOF.active = DepthOfFieldData.Active;
@@ -322,26 +343,16 @@ public class CameraSystem : MonoBehaviour
 
             DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
         }
+        #endregion
 
-        CameraTarget Target = (!CutsceneRunning) ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
+        CameraTarget Target = CutsceneRunning ? CutscenePoints[CutsceneIndex] : PreviousCameraLocation;
 
         if (!CutsceneRunning && CameraType != CameraType.Scriptable)
         {
             switch (CameraType)
             {
-                case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
-                case CameraType.Panning:
-                    {
-                        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
-                        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
-
-                        Target = new()
-                        {
-                            position = PreviousCameraLocation.position,
-                            rotation = targetRot
-                        };
-                    }
-                    break;
+                case CameraType.Follow: Target = GetFollowTransformation(); break;
+                case CameraType.Tracking: Target = GetPanningTransformation(); break;
             }
         }
 

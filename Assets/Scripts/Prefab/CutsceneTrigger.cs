@@ -3,8 +3,7 @@ using UnityEngine;
 public class CutsceneTrigger : MonoBehaviour, ITouchable
 {
     [field: Header("Inherited from `ITouchable`")]
-    [field: SerializeField] public bool TriggeringEnabled { get; set; }
-    [field: SerializeField] public bool PlayerExclusive { get; set; }
+    [field: SerializeField] public bool Enabled { get; set; }
 
     [field: Header("Trigger Specific")]
     [field: SerializeField] private GameObject[] CutscenePoints;
@@ -18,7 +17,7 @@ public class CutsceneTrigger : MonoBehaviour, ITouchable
         print("Cutscene has concluded");
     }
 
-    public void Touched()
+    public void Entered(Collider other)
     {
         CameraSystem Camera = GameSystem.Instance.Camera;
         if (!Camera) return;

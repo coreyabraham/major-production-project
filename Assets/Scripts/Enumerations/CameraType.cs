@@ -16,7 +16,7 @@ public enum CameraType
     /// <summary>
     /// The Camera rotates depending on where the `CameraSubject` is within the scene with a locked position.
     /// </summary>
-    Panning,
+    Tracking,
 
     /// <summary>
     /// Allow the `CameraSystem.cs` script to be manipulated by other scripts that choose to do so, mainly for cutscenes.
