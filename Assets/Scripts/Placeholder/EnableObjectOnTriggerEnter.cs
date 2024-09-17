@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
 
 /// <summary>This script is used to enable GameObjects when a specially tagged object falls through it.</summary>
 public class EnableObjectOnTriggerEnter : MonoBehaviour
@@ -35,6 +36,18 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
     }
 
 
+    private void UpdateVisibilitySpecifically(string nameOfObject)
+    {
+        switch (nameOfObject)
+        {
+            case "FallingPotPlant": elementsToEnable[2].SetActive(true); break;
+            case "FallingSprayCan": elementsToEnable[1].SetActive(true); break;
+            case "FallingPipe": elementsToEnable[0].SetActive(true); break;
+            case "FallingNoodleBox": elementsToEnable[0].SetActive(true); break;
+        }
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (tagToLookFor == "") { return; }
@@ -42,9 +55,9 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
         if (other.CompareTag(tagToLookFor))
         {
             if (randomiseEnables) { UpdateVisibilityRandomly(); }
-            else { other.gameObject.SetActive(true); }
+            else { UpdateVisibilitySpecifically(other.name); }
 
-            if (destroyTaggedObject) { Destroy(other); }
+            if (destroyTaggedObject) { Destroy(other.gameObject); }
         }
 
         if (other.CompareTag("Player") && canKillPlayer)

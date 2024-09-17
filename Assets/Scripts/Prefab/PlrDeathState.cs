@@ -1,10 +1,13 @@
 using UnityEngine;
 
-public class PlrDeathState : MonoBehaviour
+public class PlrDeathState : MonoBehaviour, ITouchable
 {
-    public void OnTriggerEnter(Collider other)
+    [field: Header("Inherited from `ITouchable`")]
+    [field: SerializeField] public bool Enabled { get; set; } = true;
+
+    public void Entered(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
-        other.GetComponent<PlayerSystem>().DeathTriggered();
+        if (!GameSystem.Instance.Player) return;
+        GameSystem.Instance.Player.DeathTriggered();
     }
 }

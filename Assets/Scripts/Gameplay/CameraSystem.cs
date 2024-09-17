@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
+using static UnityEngine.GraphicsBuffer;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -13,21 +13,17 @@ public class CameraSystem : MonoBehaviour
     }
 
     [field: Header("Booleans")]
-    [field: SerializeField] private bool IgnorePlayerJumps;
+    [field: SerializeField] private bool IgnorePlayerJumps = false;
+    public bool IgnoreAnticipationOffset = false;
+    public bool SeparateOffsets = false;
 
     [field: Header("Angles and Offsets")]
     [field: SerializeField] private CameraTarget Offset;
     [field: SerializeField] private float AnticipationOffset = 0.0f;
 
-    [HideInInspector] private CameraTarget PreviousOffset;
-    [HideInInspector] private CameraTarget DefaultOffset;
-
     [field: Header("View Fields")]
     [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
-
-    [field: Header("Depth of Field")]
-    [field: SerializeField] private DOF_Data DepthOfFieldData;
 
     [field: Header("Lerping Speeds")]
     [field: SerializeField] private float CameraLerpSpeed;
@@ -37,6 +33,9 @@ public class CameraSystem : MonoBehaviour
     [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Lerp;
     [field: SerializeField] private CameraType CameraType = CameraType.Follow;
 
+    [field: Header("Depth of Field")]
+    [field: SerializeField] private DOF_Data DepthOfFieldData;
+
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
     public PlayerSystem Player;
@@ -44,6 +43,9 @@ public class CameraSystem : MonoBehaviour
 
     [field: Space(2.5f)]
     [field: SerializeField] private CameraEvents Events;
+
+    [HideInInspector] private CameraTarget PreviousOffset;
+    [HideInInspector] private CameraTarget DefaultOffset;
 
     private CameraTarget PreviousCameraLocation;
     private Vector3 GroundCameraPosition;
@@ -65,13 +67,24 @@ public class CameraSystem : MonoBehaviour
 
     public bool IsCutsceneActive() => CutsceneRunning;
 
+    public CameraType GetCameraType() => CameraType;
+    public void SetCameraType(CameraType Enumeration) => CameraType = Enumeration;
+
     public Transform GetCameraTransform() => main.transform;
+
+    public void SetCameraTransform(Vector3 Position, Quaternion Rotation) => main.transform.SetPositionAndRotation(Position, Rotation);
+    public void SetCameraTransform(CameraTarget Transform) => SetCameraTransform(Transform.position, Transform.rotation);
+    public void SetCameraTransform(Transform Transform) => SetCameraTransform(Transform.position, Transform.rotation);
+    
+    public void SetCameraTransform(Vector3 Position) => main.transform.position = Position;
+    public void SetCameraTransform(Quaternion Rotation) => main.transform.rotation = Rotation;
+
     public CameraTarget GetCameraOffset() => Offset;
 
     public void RevertCameraOffsets() => Offset = PreviousOffset;
     public void SetToDefaultOffsets() => Offset = DefaultOffset;
 
-    public void SetCameraOffsets(Vector3 Position, Quaternion Rotation)
+    public void SetCameraOffset(Vector3 Position, Quaternion Rotation)
     {
         PreviousOffset = Offset;
         Offset = new()
@@ -80,9 +93,10 @@ public class CameraSystem : MonoBehaviour
             rotation = Rotation
         };
     }
-    public void SetCameraOffsets(CameraTarget Target) => SetCameraOffsets(Target.position, Target.rotation);
-    public void SetCameraOffsets(Vector3 Target) => SetCameraOffsets(Target, PreviousCameraLocation.rotation);
-    public void SetCameraOffsets(Quaternion Target) => SetCameraOffsets(PreviousCameraLocation.position, Target);
+    public void SetCameraOffset(CameraTarget Target) => SetCameraOffset(Target.position, Target.rotation);
+    public void SetCameraOffset(Transform Target) => SetCameraOffset(Target.position, Target.rotation);
+    public void SetCameraOffset(Vector3 Target) => SetCameraOffset(Target, PreviousOffset.rotation);
+    public void SetCameraOffset(Quaternion Target) => SetCameraOffset(PreviousOffset.position, Target);
 
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
@@ -166,9 +180,24 @@ public class CameraSystem : MonoBehaviour
         Events.CutsceneFinished?.Invoke();
     }
 
-    private CameraTarget GetCamPositionAndRotation()
+    private CameraTarget GetPanningTransformation()
     {
-        Vector3 newPos = CameraSubject.transform.position + Offset.position;
+        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
+        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
+
+        CameraTarget Target = new()
+        {
+            position = PreviousCameraLocation.position,
+            rotation = targetRot
+        };
+
+        return Target;
+    }
+
+    private CameraTarget GetFollowTransformation()
+    {
+        Vector3 posModifier = (!SeparateOffsets) ? Offset.position : Vector3.zero;
+        Vector3 newPos = CameraSubject.transform.position + posModifier;
 
         // TODO: This needs to be improved!
         if (IgnorePlayerJumps && !Player.IsPlayerGrounded() && !Player.IsClimbing && !Player.IsJumpingFromClimb && !Player.FallingFromClimb)
@@ -179,12 +208,14 @@ public class CameraSystem : MonoBehaviour
         if (Player.IsPlayerMoving() && CameraSubject == Player.gameObject)
         {
             Vector2 moveInput = Player.GetMoveInput();
-            if (moveInput.x > 0) newPos.x += AnticipationOffset;
-            else if (moveInput.x < 0) newPos.x -= AnticipationOffset;
+            if (moveInput.x > 0) newPos.x += !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
+            else if (moveInput.x < 0) newPos.x -= !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
         }
 
-        Vector3 vecRot = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
-        Quaternion newRot = Quaternion.Euler(vecRot + Offset.rotation.eulerAngles);
+        Vector3 rotReference = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
+        Vector3 rotModifier = (!SeparateOffsets) ? Offset.rotation.eulerAngles : Vector3.zero;
+
+        Quaternion newRot = Quaternion.Euler(rotReference + rotModifier);
 
         CameraTarget target = new()
         {
@@ -197,9 +228,9 @@ public class CameraSystem : MonoBehaviour
         return target;
     }
 
-    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = -1.0f)
+    public void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
     {
-        float LerpSpeed = (CustomLerpSpeed > 0) ? CustomLerpSpeed : CameraLerpSpeed;
+        float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : Time.fixedDeltaTime * CameraLerpSpeed;
 
         if (EasingStyle != EasingStyle.None)
         {
@@ -207,22 +238,22 @@ public class CameraSystem : MonoBehaviour
             {
                 case EasingStyle.Basic:
                     {
-                        Position = Vector3.MoveTowards(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Position = Vector3.MoveTowards(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
                 
                 case EasingStyle.Lerp:
                     {
-                        Position = Vector3.Lerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Position = Vector3.Lerp(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
 
                 case EasingStyle.Slerp:
                     {
-                        Position = Vector3.Slerp(main.transform.position, Position, Time.fixedDeltaTime * LerpSpeed);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, Time.fixedDeltaTime * LerpSpeed);
+                        Position = Vector3.Slerp(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
             }
@@ -242,7 +273,9 @@ public class CameraSystem : MonoBehaviour
         TrackCutsceneInterval = true;
     }
 
-    private void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(Vector3 Position, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Position, PreviousCameraLocation.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(Quaternion Rotation, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(PreviousCameraLocation.position, Rotation, CustomLerpSpeed);
 
     private void Update()
     {
@@ -262,6 +295,7 @@ public class CameraSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
+        #region TEMPORARY_REGION
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
         if (DOF) DOF.active = DepthOfFieldData.Active;
@@ -317,26 +351,16 @@ public class CameraSystem : MonoBehaviour
 
             DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
         }
+        #endregion
 
-        CameraTarget Target = (!CutsceneRunning) ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
+        CameraTarget Target = CutsceneRunning ? CutscenePoints[CutsceneIndex] : PreviousCameraLocation;
 
         if (!CutsceneRunning && CameraType != CameraType.Scriptable)
         {
             switch (CameraType)
             {
-                case CameraType.Follow: Target = GetCamPositionAndRotation(); break;
-                case CameraType.Panning:
-                    {
-                        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
-                        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
-
-                        Target = new()
-                        {
-                            position = PreviousCameraLocation.position,
-                            rotation = targetRot
-                        };
-                    }
-                    break;
+                case CameraType.Follow: Target = GetFollowTransformation(); break;
+                case CameraType.Tracking: Target = GetPanningTransformation(); break;
             }
         }
 

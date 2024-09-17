@@ -1,14 +1,17 @@
 using UnityEngine;
 
-public class PlrCheckpoint : MonoBehaviour
+public class PlrCheckpoint : MonoBehaviour, ITouchable
 {
-    [field: Space(2.5f), SerializeField] private string OverrideName;
+    [field: Header("Inherited from `ITouchable`")]
+    [field: SerializeField] public bool Enabled { get; set; } = true;
+
+    [field: Header("Trigger Specific")]
+    [field: SerializeField] private bool UseSceneName = true;
+    [field: SerializeField] private string OverrideName;
     [field: SerializeField] private Transform OverrideTranform;
 
-    private void OnTriggerEnter(Collider other)
+    public void Entered(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
-
         SaveData data = DataHandler.Instance.GetCachedData();
 
         if (data.checkpointName == gameObject.name)
@@ -16,6 +19,8 @@ public class PlrCheckpoint : MonoBehaviour
             Debug.LogWarning(name + " | You've already registered a Checkpoint with the name: " + gameObject.name + "! Please use a different Checkpoint to save!");
             return;
         }
+
+        if (UseSceneName && GameSystem.Instance.IsCurrentSceneAValidLevel()) data.levelName = GameSystem.Instance.GetLevelNameWithIndex();
 
         data.checkpointName = (!string.IsNullOrWhiteSpace(OverrideName)) ? OverrideName : gameObject.name;
 
@@ -27,6 +32,6 @@ public class PlrCheckpoint : MonoBehaviour
         bool result = DataHandler.Instance.SaveCachedDataToFile();
 
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
-        else Debug.LogWarning(name +  "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
+        else Debug.LogWarning(name + "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
 }
