@@ -21,7 +21,9 @@ public class HazardTrigger : MonoBehaviour
         hasBeenSpotted = true;
         crowCaw.enabled = true;
         crowSwoop.enabled = true;
+
         playerSystem.DeathTriggered();
+
     }
 
 
@@ -71,6 +73,12 @@ public class HazardTrigger : MonoBehaviour
     private void Update()
     {
         if (hasBeenSpotted) { resetTimer += Time.deltaTime; }
-        if (resetTimer > 1) { hasBeenSpotted = false; resetTimer = 0; }
+        if (resetTimer > 1)
+        {
+            hasBeenSpotted = false;
+            crowCaw.enabled = false;
+            crowSwoop.enabled = false;
+            resetTimer = 0;
+        }
     }
 }
