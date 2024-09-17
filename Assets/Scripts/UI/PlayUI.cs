@@ -93,18 +93,10 @@ public class PlayUI : MonoBehaviour
     {
         if (!result) return;
 
-        SaveData clearData = new()
-        {
-            filename = System.IO.Path.GetFileNameWithoutExtension(DataHandler.Instance.GetFileName(SaveFileUI_Index)),
+        string filename = DataHandler.Instance.GetFileName(SaveFileUI_Index);
 
-            checkpointPosition = new float[3],
-            checkpointRotation = new float[3],
-
-            modificationData = DateTime.Now.ToString()
-        };
-
-        DataHandler.Instance.SaveFileData(DataHandler.Instance.GetFileName(SaveFileUI_Index), clearData);
-        CachedFiles[SaveFileUI_Index].AssignData(clearData);
+        DataHandler.Instance.DestroyFileData(filename);
+        CachedFiles[SaveFileUI_Index].AssignData(DataHandler.Instance.LoadSaveFile(filename));
 
         print("Refresh User Interface Here!");
     }
