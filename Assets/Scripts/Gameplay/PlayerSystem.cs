@@ -216,15 +216,28 @@ public class PlayerSystem : MonoBehaviour
         Warp(Position, Rotation);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag(TouchTag) != true) return;
+
+        bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
+        if (!result) return;
+
+        touchable.Entered(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag(TouchTag) != true) return;
+
+        bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
+        if (!result) return;
+
+        touchable.Left(other);
+    }
+
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hit.gameObject != null && hit.gameObject.CompareTag(TouchTag))
-        {
-            bool result = CachedTouchables.TryGetValue(hit.gameObject, out ITouchable touchable);
-            if (!result) return;
-            touchable.Triggered(hit.gameObject);
-        }
-
         Rigidbody body = hit.collider.attachedRigidbody;
 
         if (body == null || body.isKinematic) return;
