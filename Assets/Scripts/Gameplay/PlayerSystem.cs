@@ -68,6 +68,7 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public bool IsHidden = false;
 
     [field: Header("Miscellaneous")]
+    [field: SerializeField] private bool IgnoreCheckpointData = false;
     [field: SerializeField] private string SurfaceMaterialsPath = "SurfaceMaterials";
     [field: SerializeField] private SurfaceMaterial GenericSurface;
     [field: Tooltip("All the Surface Types that the Player can interact with")]
@@ -95,7 +96,10 @@ public class PlayerSystem : MonoBehaviour
     private float CurrentRecoveryTime;
     private float TimeUntilJumpButtonIsDisabled;
 
-    private float CurrentMoveSpeed;
+    private float SetMoveSpeed = 0.0f;
+
+    private float CurrentMoveSpeed = 0.0f;
+    private float PreviousMoveSpeed;
 
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
@@ -203,7 +207,11 @@ public class PlayerSystem : MonoBehaviour
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
 
-        if (string.IsNullOrWhiteSpace(data.checkpointName))
+#if !UNITY_EDITOR
+        IgnoreCheckpointData = false;
+#endif
+
+        if (string.IsNullOrWhiteSpace(data.checkpointName) || IgnoreCheckpointData == true)
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
             return;
@@ -223,7 +231,7 @@ public class PlayerSystem : MonoBehaviour
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
         if (!result) return;
 
-        touchable.Entered(other);
+        touchable.TriggerEnter(other);
     }
 
     private void OnTriggerExit(Collider other)
@@ -233,7 +241,7 @@ public class PlayerSystem : MonoBehaviour
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
         if (!result) return;
 
-        touchable.Left(other);
+        touchable.TriggerLeave(other);
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -265,25 +273,25 @@ public class PlayerSystem : MonoBehaviour
         {
             if (FloorMaterial.PreventScurrying)
             {
-                CurrentMoveSpeed = MoveSpeed;
+                SetMoveSpeed = MoveSpeed;
                 CanScurry = false;
             }
 
             switch (FloorMaterial.MathUsage)
             {
-                case MathType.Addition: CurrentMoveSpeed += FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Subtraction: CurrentMoveSpeed -= FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Multiplication: CurrentMoveSpeed *= FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Division: CurrentMoveSpeed /= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Addition: SetMoveSpeed += FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Subtraction: SetMoveSpeed -= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Multiplication: SetMoveSpeed *= FloorMaterial.PlayerSpeedModifier; break;
+                case MathType.Division: SetMoveSpeed /= FloorMaterial.PlayerSpeedModifier; break;
             }
         }
 
-        CurrentMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
+        SetMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
 
         Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
         Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
 
-        MoveDelta = (MoveInput.x * right + MoveInput.y * forward) * CurrentMoveSpeed;
+        MoveDelta = (MoveInput.x * right + MoveInput.y * forward) * SetMoveSpeed;
 
         if (IsJumping)
         {
@@ -343,6 +351,11 @@ public class PlayerSystem : MonoBehaviour
             actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
             actualVelocity.z = 0;
         }
+
+        PreviousMoveSpeed = CurrentMoveSpeed;
+        CurrentMoveSpeed = new Vector2(actualVelocity.x, actualVelocity.z).magnitude;
+
+        if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
         Character.Move(actualVelocity * Time.fixedDeltaTime);
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
@@ -454,7 +467,13 @@ public class PlayerSystem : MonoBehaviour
                         }
                         break;
 
-                    case AnimType.Moving: Animator.SetFloat(PA.ValueName, (IsGrounded && IsMoving) ? CurrentMoveSpeed : 0.0f); break;
+                    case AnimType.Moving:
+                        {
+                            float value = Mathf.Lerp(PreviousMoveSpeed, CurrentMoveSpeed, Time.deltaTime * LerpSpeed);
+                            Animator.SetFloat(PA.ValueName, IsGrounded ? value : 0.0f);
+                        }
+                        break;
+
                     case AnimType.Jumping: Animator.SetBool(PA.ValueName, (IsJumping && !IsGrounded)); break;
                     case AnimType.Climbing: Animator.SetBool(PA.ValueName, IsClimbing); break;
                 }
@@ -550,5 +569,5 @@ public class PlayerSystem : MonoBehaviour
         Events.Climbing ??= new();
         Events.Interacting ??= new();
     }
-    #endregion
+#endregion
 }

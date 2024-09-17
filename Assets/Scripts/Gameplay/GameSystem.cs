@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.Events;
@@ -35,7 +36,8 @@ public class GameSystem : Singleton<GameSystem>
     public bool GameplayPaused = false;
 
     [field: Header("Collections")]
-    public string[] LevelNames;
+    [field: SerializeField] private List<string> LevelNames;
+    private Dictionary<int, string> Levels;
     public string[] BlacklistedPauseScenes;
 
     [field: Header("Events")]
@@ -44,8 +46,28 @@ public class GameSystem : Singleton<GameSystem>
     private string TargetSceneName;
     private float ElapsedPlaytime;
 
+    private bool SceneRequested = false;
+
     public float GetElapsedPlaytime() => ElapsedPlaytime;
-    public void SetPausedState(bool State) => GameplayPaused = State; 
+    public void SetPausedState(bool State) => GameplayPaused = State;
+
+    public int GetCurrentSceneBuildIndex() => SceneManager.GetActiveScene().buildIndex;
+
+    public string GetLevelName(int index)
+    {
+        bool result = Levels.TryGetValue(index, out string value);
+        if (!result) value = string.Empty;
+        return value;
+    }
+
+    public string GetLevelNameWithIndex() => GetLevelName(GetCurrentSceneBuildIndex());
+
+    public bool IsCurrentSceneAValidLevel()
+    {
+        Scene activeScene = SceneManager.GetActiveScene();
+        if (Levels.Count < activeScene.buildIndex) return false;
+        return Levels[activeScene.buildIndex] == activeScene.name;
+    }
 
     public void PlayerDiedCallback()
     {
@@ -77,6 +99,15 @@ public class GameSystem : Singleton<GameSystem>
 
     public void RequestLoadScene(string SceneName)
     {
+        if (string.IsNullOrWhiteSpace(TargetSceneName))
+        {
+            Debug.LogWarning(name + " | Could not Load Scene with Name: " + TargetSceneName + "\nMake sure the target Scene you're attempting to load is in the `Build Settings` 'Scenes in Build' list!");
+            return;
+        }
+
+        if (SceneRequested) return;
+        SceneRequested = true;
+
         TargetSceneName = SceneName;
         Events.RequestLoadingUI?.Invoke();
     }
@@ -95,6 +126,7 @@ public class GameSystem : Singleton<GameSystem>
         StartCoroutine(UnloadSceneInBackground());
 
         TargetSceneName = string.Empty;
+        SceneRequested = false;
     }
 
     // Could possibly be done in an Update loop instead? If so, then try adding Lerping to it!
@@ -144,6 +176,11 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
+        for (int i = 0; i < LevelNames.Count; i++)
+        {
+            Levels.Add(i, LevelNames[i]);
+        }
+
         LoadEvents();
         RefreshCachedExternals();
 

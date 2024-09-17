@@ -7,20 +7,31 @@ public class HazardTrigger : MonoBehaviour
 {
     float resetTimer = 0;
 
+    public bool useCrowSound, useSnap;
 
     #region Private Variables
     private PlayerSystem playerSystem;
     private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
     public AudioSource crowCaw;
     public AudioSource crowSwoop;
+    public AudioSource snap;
     #endregion
 
     #region Functions - Private
     private void PlayerIsSpotted()
     {
         hasBeenSpotted = true;
-        crowCaw.enabled = true;
-        crowSwoop.enabled = true;
+
+        if (useCrowSound)
+        {
+            crowCaw.enabled = true;
+            crowSwoop.enabled = true;
+        }
+
+        if (useSnap)
+        {
+            snap.enabled = true;
+        }
 
         playerSystem.DeathTriggered();
 
@@ -75,9 +86,15 @@ public class HazardTrigger : MonoBehaviour
         if (hasBeenSpotted) { resetTimer += Time.deltaTime; }
         if (resetTimer > 1)
         {
+            if (useCrowSound)
+            {
+                crowCaw.enabled = false;
+                crowSwoop.enabled = false;
+            }
+
+            if (useSnap) { snap.enabled = false; }
+
             hasBeenSpotted = false;
-            crowCaw.enabled = false;
-            crowSwoop.enabled = false;
             resetTimer = 0;
         }
     }

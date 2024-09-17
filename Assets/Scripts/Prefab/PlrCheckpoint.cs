@@ -6,6 +6,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
     [field: SerializeField] public bool Enabled { get; set; } = true;
 
     [field: Header("Trigger Specific")]
+    [field: SerializeField] private bool UseSceneName = true;
     [field: SerializeField] private string OverrideName;
     [field: SerializeField] private Transform OverrideTranform;
 
@@ -18,6 +19,8 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
             Debug.LogWarning(name + " | You've already registered a Checkpoint with the name: " + gameObject.name + "! Please use a different Checkpoint to save!");
             return;
         }
+
+        if (UseSceneName && GameSystem.Instance.IsCurrentSceneAValidLevel()) data.levelName = GameSystem.Instance.GetLevelNameWithIndex();
 
         data.checkpointName = (!string.IsNullOrWhiteSpace(OverrideName)) ? OverrideName : gameObject.name;
 
