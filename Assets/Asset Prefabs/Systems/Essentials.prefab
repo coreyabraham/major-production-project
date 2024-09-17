@@ -106,7 +106,10 @@ MonoBehaviour:
   Player: {fileID: 0}
   Camera: {fileID: 0}
   GameplayPaused: 0
-  LevelNames: []
+  LevelNames:
+  - Level_Alleyway
+  - Level_Kitchen
+  - Level_Burrow
   BlacklistedPauseScenes:
   - Title Screen
   Events:
@@ -363,6 +366,7 @@ MonoBehaviour:
   SaveFileName: SaveFile
   ValidateDataOnStartup: 1
   CacheDataOnStartup: 0
+  ClearDataOnStartup: 0
   IgnoreSaveRequests: 0
 --- !u!114 &8337814683459291855
 MonoBehaviour:

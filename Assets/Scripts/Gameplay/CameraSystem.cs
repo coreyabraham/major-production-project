@@ -71,6 +71,14 @@ public class CameraSystem : MonoBehaviour
     public void SetCameraType(CameraType Enumeration) => CameraType = Enumeration;
 
     public Transform GetCameraTransform() => main.transform;
+
+    public void SetCameraTransform(Vector3 Position, Quaternion Rotation) => main.transform.SetPositionAndRotation(Position, Rotation);
+    public void SetCameraTransform(CameraTarget Transform) => SetCameraTransform(Transform.position, Transform.rotation);
+    public void SetCameraTransform(Transform Transform) => SetCameraTransform(Transform.position, Transform.rotation);
+    
+    public void SetCameraTransform(Vector3 Position) => main.transform.position = Position;
+    public void SetCameraTransform(Quaternion Rotation) => main.transform.rotation = Rotation;
+
     public CameraTarget GetCameraOffset() => Offset;
 
     public void RevertCameraOffsets() => Offset = PreviousOffset;
@@ -220,7 +228,7 @@ public class CameraSystem : MonoBehaviour
         return target;
     }
 
-    private void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
+    public void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
     {
         float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : Time.fixedDeltaTime * CameraLerpSpeed;
 
@@ -265,9 +273,9 @@ public class CameraSystem : MonoBehaviour
         TrackCutsceneInterval = true;
     }
 
-    private void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
-    private void LerpCameraTransform(Vector3 Position, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Position, PreviousCameraLocation.rotation, CustomLerpSpeed);
-    private void LerpCameraTransform(Quaternion Rotation, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(PreviousCameraLocation.position, Rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(Vector3 Position, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Position, PreviousCameraLocation.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(Quaternion Rotation, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(PreviousCameraLocation.position, Rotation, CustomLerpSpeed);
 
     private void Update()
     {

@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -47,6 +47,7 @@ public class GameSystem : Singleton<GameSystem>
     private float ElapsedPlaytime;
 
     private bool SceneRequested = false;
+    private Dictionary<string, int> BuildSettingsSceneNames = new();
 
     public float GetElapsedPlaytime() => ElapsedPlaytime;
     public void SetPausedState(bool State) => GameplayPaused = State;
@@ -67,6 +68,22 @@ public class GameSystem : Singleton<GameSystem>
         Scene activeScene = SceneManager.GetActiveScene();
         if (Levels.Count < activeScene.buildIndex) return false;
         return Levels[activeScene.buildIndex] == activeScene.name;
+    }
+
+    public bool SceneNameIsInBuildSettings(string SceneName) => BuildSettingsSceneNames.TryGetValue(SceneName, out int _);
+
+    public string[] GetBuildSettingsSceneNames()
+    {
+        string[] array = new string[BuildSettingsSceneNames.Count];
+        int count = 0;
+
+        foreach (var item in BuildSettingsSceneNames)
+        {
+            array[count] = item.Key;
+            count++;
+        }
+
+        return array;
     }
 
     public void PlayerDiedCallback()
@@ -99,6 +116,28 @@ public class GameSystem : Singleton<GameSystem>
 
     public void RequestLoadScene(string SceneName)
     {
+        if (SceneNameIsInBuildSettings(SceneName) != true)
+        {
+            Debug.LogWarning(name + " | Could not find Scene: " + SceneName + " in Build Settings! The following listed below are all the Scens you currently have!");
+
+            string[] array = GetBuildSettingsSceneNames();
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                Debug.Log("( " + i.ToString() + " ) : " + array[i]);
+            }
+
+            Debug.Log("<<< END >>>");
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(TargetSceneName))
+        {
+            Debug.LogWarning(name + " | Could not Load Scene with Name: " + TargetSceneName + "\nMake sure the target Scene you're attempting to load is in the `Build Settings` 'Scenes in Build' list!");
+            return;
+        }
+
         if (SceneRequested) return;
         SceneRequested = true;
 
@@ -151,11 +190,6 @@ public class GameSystem : Singleton<GameSystem>
         Events.SceneChanged?.Invoke(Old, New);
     }
 
-    private void SetupLevelEntries()
-    {
-        for (int i = 0; i < LevelNames.Count; i++) Levels.Add(i, LevelNames[i]);
-    }
-
     private void LoadEvents()
     {
         Events.PlayerDied ??= new();
@@ -175,7 +209,16 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
-        SetupLevelEntries();
+        for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+        {
+            BuildSettingsSceneNames.Add(System.IO.Path.GetFileNameWithoutExtension(EditorBuildSettings.scenes[i].path), i);
+        }
+
+        for (int i = 0; i < LevelNames.Count; i++)
+        {
+            Levels.Add(i, LevelNames[i]);
+        }
+
         LoadEvents();
         RefreshCachedExternals();
 
