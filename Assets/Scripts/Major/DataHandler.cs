@@ -3,20 +3,9 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
-//using UnityEngine.Events;
 
 public class DataHandler : Singleton<DataHandler>
 {
-    //[Serializable]
-    //public class DataEvents
-    //{
-    //    public UnityEvent DataValidated;
-    //    public UnityEvent CreatedFile;
-    //    public UnityEvent SavedToFile;
-    //    public UnityEvent LoadedFromFile;
-    //    public UnityEvent DeletedFile;
-    //}
-
     [field: SerializeField] private string FolderName = "SaveData";
     [field: SerializeField] private string TargetPath = string.Empty;
 
@@ -29,6 +18,8 @@ public class DataHandler : Singleton<DataHandler>
 
     [field: SerializeField] private bool ValidateDataOnStartup = true;
     [field: SerializeField] private bool CacheDataOnStartup = false;
+    [field: SerializeField] private bool ClearDataOnStartup = false;
+    [field: SerializeField] private bool IgnoreSaveRequests = false;
 
     private const int MaxSaveFiles = 3;
     private int CurrentSaveFileIndex = -1;
@@ -149,6 +140,34 @@ public class DataHandler : Singleton<DataHandler>
         return found;
     }
 
+    public bool DestroyFileData(string filename)
+    {
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            Debug.LogWarning(name + " | No Filename was provided! Please provide a Filename when Deleting File Data!");
+            return false;
+        }
+
+        if (!File.Exists(filename))
+        {
+            Debug.LogWarning(name + " | File with Filename: " + filename + " doesn't exist! Please create it first before attempting to delete it!");
+            return false;
+        }
+
+        SaveData ClearData = new()
+        {
+            filename = filename,
+
+            checkpointPosition = new float[3],
+            checkpointRotation = new float[3],
+
+            creationData = DateTime.Now.ToString(),
+            modificationData = string.Empty
+        };
+
+        return SaveFileData(filename, ClearData);
+    }
+
     public bool SaveFileData(string filename, SaveData data)
     {
         if (string.IsNullOrWhiteSpace(filename))
@@ -162,6 +181,14 @@ public class DataHandler : Singleton<DataHandler>
             Debug.LogWarning(name + " | File with Filename: " + filename + " doesn't exist! Please create it first before attempting to save to it!");
             return false;
         }
+
+        if (IgnoreSaveRequests)
+        {
+            Debug.LogWarning(name = " | `IgnoreSaveRequests` is false! Save requests are ignored as such!");
+            return false;
+        }
+
+        data.modificationData = DateTime.Now.ToString();
 
         BinaryFormatter formatter = new();
         FileStream file = File.Create(filename);
@@ -225,7 +252,7 @@ public class DataHandler : Singleton<DataHandler>
             checkpointPosition = new float[3],
             checkpointRotation = new float[3],
             
-            modificationData = DateTime.Now.ToString()
+            creationData = DateTime.Now.ToString()
         };
 
         formatter.Serialize(file, data);
@@ -259,7 +286,7 @@ public class DataHandler : Singleton<DataHandler>
         return data;
     }
 
-    public void ValidateData()
+    private void ValidateData()
     {
         if (!Directory.Exists(GetFilePath())) Directory.CreateDirectory(GetFilePath());
         for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i), true);
@@ -267,7 +294,18 @@ public class DataHandler : Singleton<DataHandler>
 
     protected override void Initialize()
     {
+#if !UNITY_EDITOR
+        IgnoreSaveRequests = false;
+#endif
+
         if (string.IsNullOrWhiteSpace(TargetPath)) TargetPath = Application.persistentDataPath;
+
+        if (ClearDataOnStartup)
+        {
+            for (int i = 0; i < MaxSaveFiles; i++) DestroyFileData(GetFileName(i));
+            return;
+        }
+
         if (CacheDataOnStartup) RefreshCachedData();
         if (ValidateDataOnStartup) ValidateData();
     }

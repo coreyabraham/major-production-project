@@ -41,7 +41,12 @@ public class SaveData
     public float[] checkpointRotation;
 
     /// <summary>
-    /// The exact Time and Date when the data was saved.
+    /// The exact Time and Date when the file was first created.
+    /// </summary>
+    public string creationData;
+
+    /// <summary>
+    /// The exact Time and Date when the data was most recently modified.
     /// </summary>
     public string modificationData;
 }
