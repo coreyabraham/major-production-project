@@ -19,6 +19,7 @@ public class MopHandleLaunch : MonoBehaviour
     #region Private Variables
     Transform parentOfThis;
     PlayerSystem playSys;
+    CharacterController Character;
     bool hasAttachedOnce = false;
     float rotateTimer = 0;
     #endregion
@@ -46,6 +47,9 @@ public class MopHandleLaunch : MonoBehaviour
 
             playSys.Warp(mopPoint.transform.position);
             playSys.gameObject.transform.parent = mopPoint.transform;
+
+            // Using reference to playSys, call ToggleCharCont(false).
+            // Re-enable it on jump from the mop head.
 
             hasAttachedOnce = true;
         }
