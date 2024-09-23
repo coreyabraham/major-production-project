@@ -56,14 +56,14 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     {
         if (IgnoreAnticipationOffset)
         {
-            PreviousIAO = IgnoreAnticipationOffset;
-            GameSystem.Instance.Camera.IgnoreAnticipationOffset = false;
+            PreviousIAO = GameSystem.Instance.Camera.IgnoreAnticipationOffset;
+            GameSystem.Instance.Camera.IgnoreAnticipationOffset = true;
         }
 
         if (IgnoreCurrentOffset)
         {
-            PreviousICO = IgnoreCurrentOffset;
-            GameSystem.Instance.Camera.IgnoreCurrentOffset = false;
+            PreviousICO = GameSystem.Instance.Camera.IgnoreCurrentOffset;
+            GameSystem.Instance.Camera.IgnoreCurrentOffset = true;
         }
 
         if (ZoneBlending) GameSystem.Instance.Camera.SetActiveTriggerZone(this);
@@ -91,11 +91,14 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     {
         if (TargetOffsetObject != null)
         {
-            switch (BlendType)
+            if (ZoneBlending)
             {
-                //Get offsets between target and TriggerZone 
-                case ZoneBlendType.OffsetState: TargetPosition = TargetOffsetObject.transform.position - transform.position; break;
-                case ZoneBlendType.TargetState: TargetPosition = TargetOffsetObject.transform.position; break;
+                switch (BlendType)
+                {
+                    //Get offsets between target and TriggerZone 
+                    case ZoneBlendType.OffsetState: TargetPosition = TargetOffsetObject.transform.position - transform.position; break;
+                    case ZoneBlendType.TargetState: TargetPosition = TargetOffsetObject.transform.position; break;
+                }
             }
 
             //Get rotation of target and set in newRotOffset
