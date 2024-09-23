@@ -292,12 +292,13 @@ public class DataHandler : Singleton<DataHandler>
         for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i), true);
     }
 
+    private void Start()
+    {
+        if (!GameSystem.Instance.RunningInEditor && IgnoreSaveRequests) IgnoreSaveRequests = false;
+    }
+
     protected override void Initialize()
     {
-#if !UNITY_EDITOR
-        IgnoreSaveRequests = false;
-#endif
-
         if (string.IsNullOrWhiteSpace(TargetPath)) TargetPath = Application.persistentDataPath;
 
         if (ClearDataOnStartup)

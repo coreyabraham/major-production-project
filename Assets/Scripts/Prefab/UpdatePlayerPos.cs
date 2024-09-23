@@ -15,4 +15,6 @@ public class UpdatePlayerPos : MonoBehaviour, ITouchable
 
         GameSystem.Instance.Player.Warp(TargetTransform.position);
     }
+
+    public void Left(Collider other) { }
 }

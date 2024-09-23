@@ -426,15 +426,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d154ed2c02a074f48bb7d074fde93dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HideOnStartup: 0
-  UseDampening: 1
-  RevertOnExit: 1
-  Goal: {fileID: 778702672}
-  Type: 0
-  Value: 0
-  Target:
-    position: {x: 0, y: 0.15, z: -1}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!1 &315815622
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,8 +475,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Enabled>k__BackingField: 1
   LocalScaleType: 0
+  TransformModifier: 0.5
   UsePositionOffset: 1
-  UseRotationOffset: 1
+  UseRotationOffset: 0
   UseFOVAdjustment: 0
   OverridePreviousPosition: 0
   OverridePreviousRotation: 0
@@ -522,6 +514,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   BlendType: 0
   HideOnStartup: 0
+  TriggerWidth: 0
 --- !u!64 &315815625
 MeshCollider:
   m_ObjectHideFlags: 0

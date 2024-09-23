@@ -207,9 +207,7 @@ public class PlayerSystem : MonoBehaviour
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
 
-#if !UNITY_EDITOR
-        IgnoreCheckpointData = false;
-#endif
+        if (GameSystem.Instance.RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
 
         if (string.IsNullOrWhiteSpace(data.checkpointName) || IgnoreCheckpointData == true)
         {

@@ -34,4 +34,6 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
         else Debug.LogWarning(name + "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
+
+    public void Left(Collider other) { }
 }

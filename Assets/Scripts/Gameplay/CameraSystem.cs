@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering.HighDefinition;
-using static UnityEngine.GraphicsBuffer;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -12,13 +11,15 @@ public class CameraSystem : MonoBehaviour
         public UnityEvent CutsceneFinished;
     }
 
+    #region Public / Serialized Private Variables
     [field: Header("Booleans")]
     [field: SerializeField] private bool IgnorePlayerJumps = false;
+    [field: SerializeField] private bool AutomateStartCameraOffset = false;
     public bool IgnoreAnticipationOffset = false;
-    public bool SeparateOffsets = false;
+    public bool IgnoreCurrentOffset = false;
 
     [field: Header("Angles and Offsets")]
-    [field: SerializeField] private CameraTarget Offset;
+    [field: SerializeField] private CameraTarget CurrentOffset;
     [field: SerializeField] private float AnticipationOffset = 0.0f;
 
     [field: Header("View Fields")]
@@ -38,14 +39,18 @@ public class CameraSystem : MonoBehaviour
 
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
-    public PlayerSystem Player;
+    //public PlayerSystem Player;
     [HideInInspector] public Camera main;
 
     [field: Space(2.5f)]
     [field: SerializeField] private CameraEvents Events;
+    #endregion
 
-    [HideInInspector] private CameraTarget PreviousOffset;
-    [HideInInspector] private CameraTarget DefaultOffset;
+    #region Private Variables
+    private CameraState CurrentState;
+
+    private CameraTarget PreviousOffset;
+    private CameraTarget DefaultOffset;
 
     private CameraTarget PreviousCameraLocation;
     private Vector3 GroundCameraPosition;
@@ -63,40 +68,112 @@ public class CameraSystem : MonoBehaviour
     private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
 
+    private float DefaultFOV;
+
+    private ZoneCamera ActiveZoneTrigger;
+
+    private PlayerSystem ActivePlayer = null;
+    private GameObject PreviousCameraSubject = null;
+
     private DepthOfField DOF;
+    #endregion
 
-    public bool IsCutsceneActive() => CutsceneRunning;
+    public CameraState GetCameraState() => CurrentState;
 
-    public CameraType GetCameraType() => CameraType;
-    public void SetCameraType(CameraType Enumeration) => CameraType = Enumeration;
+    public CameraTarget GetCameraOffset() => CurrentOffset;
 
-    public Transform GetCameraTransform() => main.transform;
-
-    public void SetCameraTransform(Vector3 Position, Quaternion Rotation) => main.transform.SetPositionAndRotation(Position, Rotation);
-    public void SetCameraTransform(CameraTarget Transform) => SetCameraTransform(Transform.position, Transform.rotation);
-    public void SetCameraTransform(Transform Transform) => SetCameraTransform(Transform.position, Transform.rotation);
-    
-    public void SetCameraTransform(Vector3 Position) => main.transform.position = Position;
-    public void SetCameraTransform(Quaternion Rotation) => main.transform.rotation = Rotation;
-
-    public CameraTarget GetCameraOffset() => Offset;
-
-    public void RevertCameraOffsets() => Offset = PreviousOffset;
-    public void SetToDefaultOffsets() => Offset = DefaultOffset;
-
-    public void SetCameraOffset(Vector3 Position, Quaternion Rotation)
+    // TODO: Fix incorrect naming term, it's used temporarily here!
+    public CameraTarget GetCameraDelta()
     {
-        PreviousOffset = Offset;
-        Offset = new()
+        Vector3 posModifier = (!IgnoreCurrentOffset) ? CurrentOffset.position : Vector3.zero;
+
+        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : PreviousCameraLocation.position;
+        Vector3 newPos = tarPos + posModifier;
+
+        Vector3 rotReference = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
+        Vector3 rotModifier = (!IgnoreCurrentOffset) ? CurrentOffset.rotation.eulerAngles : Vector3.zero;
+        Quaternion newRot = Quaternion.Euler(rotReference + rotModifier);
+
+        return new()
         {
-            position = Position,
-            rotation = Rotation
+            position = newPos,
+            rotation = newRot
         };
     }
-    public void SetCameraOffset(CameraTarget Target) => SetCameraOffset(Target.position, Target.rotation);
-    public void SetCameraOffset(Transform Target) => SetCameraOffset(Target.position, Target.rotation);
-    public void SetCameraOffset(Vector3 Target) => SetCameraOffset(Target, PreviousOffset.rotation);
-    public void SetCameraOffset(Quaternion Target) => SetCameraOffset(PreviousOffset.position, Target);
+
+    public void SetCameraType(CameraType Enumeration) => CameraType = Enumeration;
+    public void RevertCameraType() => CameraType = PreviousCameraType;
+
+    public void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
+    {
+        float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : Time.fixedDeltaTime * CameraLerpSpeed;
+
+        if (EasingStyle != EasingStyle.None)
+        {
+            switch (EasingStyle)
+            {
+                case EasingStyle.Basic:
+                    {
+                        Position = Vector3.MoveTowards(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, LerpValue);
+                    }
+                    break;
+
+                case EasingStyle.Lerp:
+                    {
+                        Position = Vector3.Lerp(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, LerpValue);
+                    }
+                    break;
+
+                case EasingStyle.Slerp:
+                    {
+                        Position = Vector3.Slerp(main.transform.position, Position, LerpValue);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, LerpValue);
+                    }
+                    break;
+            }
+        }
+
+        PreviousCameraLocation = new()
+        {
+            position = main.transform.position,
+            rotation = main.transform.rotation
+        };
+
+        main.transform.SetPositionAndRotation(Position, Rotation);
+
+        if (!CutsceneRunning || TrackCutsceneInterval) return;
+        if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
+
+        TrackCutsceneInterval = true;
+    }
+
+    public void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(Vector3 Position, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Position, PreviousCameraLocation.rotation, CustomLerpSpeed);
+    public void LerpCameraTransform(Quaternion Rotation, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(PreviousCameraLocation.position, Rotation, CustomLerpSpeed);
+
+    public void SetActiveTriggerZone(ZoneCamera Zone) => ActiveZoneTrigger = Zone;
+
+    public void GetNewZoneCameraOffsets(ZoneCamera Zone)
+    {
+        CurrentOffset = new()
+        {
+            position = Zone.TargetPosition,
+            rotation = Zone.TargetRotation
+        };
+
+        FieldOfView = Zone.TargetFOV;
+
+        if (Zone.OverridePreviousPosition) { PreviousOffset.position = Zone.TargetPosition; }
+        if (Zone.OverridePreviousRotation) { PreviousOffset.rotation = Zone.TargetRotation; }
+    }
+
+    public void ResetZoneCamOffset()
+    {
+        CurrentOffset = PreviousOffset;
+        FieldOfView = DefaultFOV;
+    }
 
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
@@ -106,8 +183,11 @@ public class CameraSystem : MonoBehaviour
             return;
         }
 
-        PreviousMoveType = Player.GetMoveType();
-        Player.SetMoveType(MoveType.None, true);
+        if (ActivePlayer)
+        {
+            PreviousMoveType = ActivePlayer.GetMoveType();
+            ActivePlayer.SetMoveType(MoveType.None, true);
+        }
 
         CameraType = CameraType.Scriptable;
 
@@ -176,14 +256,30 @@ public class CameraSystem : MonoBehaviour
         CutsceneIndex = 0;
         CutscenePoints = null;
 
-        Player.SetMoveType(PreviousMoveType, true);
+        if (ActivePlayer) ActivePlayer.SetMoveType(PreviousMoveType, true);
+        
         Events.CutsceneFinished?.Invoke();
+    }
+
+    private float GetAnticipationOffset()
+    {
+        if (!ActivePlayer) return 0.0f;
+
+        float anticipation = 0.0f;
+        Vector2 moveInput = ActivePlayer.GetMoveInput();
+
+        if (moveInput.x > 0) anticipation += !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
+        else if (moveInput.x < 0) anticipation -= !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
+
+        return anticipation;
     }
 
     private CameraTarget GetPanningTransformation()
     {
-        Vector3 targetDirection = CameraSubject.transform.position - PreviousCameraLocation.position;
-        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * Offset.rotation;
+        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : PreviousCameraLocation.position;
+
+        Vector3 targetDirection = tarPos - PreviousCameraLocation.position;
+        Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * CurrentOffset.rotation;
 
         CameraTarget Target = new()
         {
@@ -196,86 +292,118 @@ public class CameraSystem : MonoBehaviour
 
     private CameraTarget GetFollowTransformation()
     {
-        Vector3 posModifier = (!SeparateOffsets) ? Offset.position : Vector3.zero;
-        Vector3 newPos = CameraSubject.transform.position + posModifier;
+        CameraTarget cameraDelta = GetCameraDelta();
+        if (!ActivePlayer) return cameraDelta;
 
         // TODO: This needs to be improved!
-        if (IgnorePlayerJumps && !Player.IsPlayerGrounded() && !Player.IsClimbing && !Player.IsJumpingFromClimb && !Player.FallingFromClimb)
+        if (IgnorePlayerJumps && !ActivePlayer.IsPlayerGrounded() && !ActivePlayer.IsClimbing && !ActivePlayer.IsJumpingFromClimb && !ActivePlayer.FallingFromClimb)
         {
-            newPos.y = (newPos.y >= GroundCameraPosition.y) ? GroundCameraPosition.y : newPos.y;
+            cameraDelta.position.y = (cameraDelta.position.y >= GroundCameraPosition.y) ? GroundCameraPosition.y : cameraDelta.position.y;
         }
 
-        if (Player.IsPlayerMoving() && CameraSubject == Player.gameObject)
+        if (ActivePlayer)
         {
-            Vector2 moveInput = Player.GetMoveInput();
-            if (moveInput.x > 0) newPos.x += !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
-            else if (moveInput.x < 0) newPos.x -= !IgnoreAnticipationOffset ? AnticipationOffset : 0.0f;
-        }
-
-        Vector3 rotReference = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
-        Vector3 rotModifier = (!SeparateOffsets) ? Offset.rotation.eulerAngles : Vector3.zero;
-
-        Quaternion newRot = Quaternion.Euler(rotReference + rotModifier);
-
-        CameraTarget target = new()
-        {
-            position = newPos,
-            rotation = newRot
-        };
-
-        if (Player.IsPlayerGrounded()) GroundCameraPosition = target.position;
-
-        return target;
-    }
-
-    public void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
-    {
-        float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : Time.fixedDeltaTime * CameraLerpSpeed;
-
-        if (EasingStyle != EasingStyle.None)
-        {
-            switch (EasingStyle)
+            if (ActivePlayer.IsPlayerMoving() && CameraSubject == ActivePlayer.gameObject)
             {
-                case EasingStyle.Basic:
-                    {
-                        Position = Vector3.MoveTowards(main.transform.position, Position, LerpValue);
-                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, LerpValue);
-                    }
-                    break;
-                
-                case EasingStyle.Lerp:
-                    {
-                        Position = Vector3.Lerp(main.transform.position, Position, LerpValue);
-                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, LerpValue);
-                    }
-                    break;
-
-                case EasingStyle.Slerp:
-                    {
-                        Position = Vector3.Slerp(main.transform.position, Position, LerpValue);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, LerpValue);
-                    }
-                    break;
+                cameraDelta.position.x += GetAnticipationOffset();
             }
+
+            if (ActivePlayer.IsPlayerGrounded()) GroundCameraPosition = cameraDelta.position;
         }
 
-        PreviousCameraLocation = new()
-        {
-            position = main.transform.position,
-            rotation = main.transform.rotation
-        };
-
-        main.transform.SetPositionAndRotation(Position, Rotation);
-
-        if (!CutsceneRunning || TrackCutsceneInterval) return;
-        if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
-
-        TrackCutsceneInterval = true;
+        return cameraDelta;
     }
 
-    public void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
-    public void LerpCameraTransform(Vector3 Position, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Position, PreviousCameraLocation.rotation, CustomLerpSpeed);
-    public void LerpCameraTransform(Quaternion Rotation, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(PreviousCameraLocation.position, Rotation, CustomLerpSpeed);
+    private float GetOffsetAndTargetEvaluation()
+    {
+        // Get distance between triggerzone and player
+
+        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : PreviousCameraLocation.position;
+
+        // (Might have to replace `ActiveZoneTrigger.transform.position.x` with respective LocalScale#!)
+        float distanceFromTriggerCentre = Mathf.Abs(ActiveZoneTrigger.transform.position.x - tarPos.x);
+
+        // Get blend amount
+        float blendAmount = 1 - distanceFromTriggerCentre / ActiveZoneTrigger.TriggerWidth;
+        float curveEvaluation = ActiveZoneTrigger.LerpCurve.Evaluate(blendAmount);
+
+        // Return blend amount
+        return curveEvaluation;
+    }
+
+    private CameraTarget GetOffsetTransformation()
+    {
+        if (!ActiveZoneTrigger || !CameraSubject) return GetFollowTransformation();
+
+        float curveEvaluation = GetOffsetAndTargetEvaluation();
+
+        Vector3 newCamOffset = ActiveZoneTrigger.UsePositionOffset ? Vector3.Lerp(CurrentOffset.position, ActiveZoneTrigger.TargetPosition, curveEvaluation) : CurrentOffset.position;
+
+        Vector3 targetCamPos = new Vector3(
+            CameraSubject.transform.position.x + newCamOffset.x + GetAnticipationOffset(),
+            CameraSubject.transform.position.y + newCamOffset.y,
+            CameraSubject.transform.position.z + newCamOffset.z
+        );
+
+        Quaternion quaternion;
+
+        if (ActiveZoneTrigger.UseRotationOffset)
+        {
+            //HANDLES BLENDED ROTATION
+            Vector3 targetCamRotation = Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation);
+            quaternion = Quaternion.Euler(targetCamRotation.x, targetCamRotation.y, targetCamRotation.z);
+        }
+        else
+        {
+            //HANDLES ROTATION
+            quaternion = Quaternion.Euler(CurrentOffset.rotation.x, CurrentOffset.rotation.y, CurrentOffset.rotation.z);
+        }
+
+        FieldOfView = ActiveZoneTrigger.UseFOVAdjustment ? Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation) : FieldOfView;
+
+        // TODO: INTERGRATE `GetFollowTransformation()` INTO THIS RESULT!
+        return new()
+        {
+            position = targetCamPos,
+            rotation = quaternion
+        };
+    }
+
+    // TODO: IMPLEMENT!
+    private CameraTarget GetTargetTransformation()
+    {
+        if (!ActiveZoneTrigger || !CameraSubject) return GetFollowTransformation();
+
+        float curveEvaluation = GetOffsetAndTargetEvaluation();
+
+        Vector3 targetCamPos = new Vector3(
+            CameraSubject.transform.position.x + CurrentOffset.position.x + GetAnticipationOffset(),
+            CameraSubject.transform.position.y + CurrentOffset.position.y,
+            CameraSubject.transform.position.z + CurrentOffset.position.z
+        );
+
+        Quaternion quaternion;
+
+        if (ActiveZoneTrigger.UseRotationOffset)
+        {
+            //HANDLES BLENDED ROTATION
+            Vector3 targetCamRotation = Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation);
+            quaternion = Quaternion.Euler(targetCamRotation.x, targetCamRotation.y, targetCamRotation.z);
+        }
+        else
+        {
+            //HANDLES ROTATION
+            quaternion = Quaternion.Euler(CurrentOffset.rotation.x, CurrentOffset.rotation.y, CurrentOffset.rotation.z);
+        }
+
+        FieldOfView = ActiveZoneTrigger.UseFOVAdjustment ? Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation) : FieldOfView;
+
+        return new()
+        {
+            position = targetCamPos,
+            rotation = quaternion
+        };
+    }
 
     private void Update()
     {
@@ -295,6 +423,16 @@ public class CameraSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (PreviousCameraSubject != CameraSubject)
+        {
+            bool result = false;
+            if (CameraSubject != null) result = CameraSubject.TryGetComponent(out ActivePlayer);
+
+            if (!result) ActivePlayer = null;
+            PreviousCameraSubject = CameraSubject;
+        }
+
+        // TODO: THIS OR SPLIT THIS ENTIRE BIT THAT IS ESSENTIALLY BLOAT!
         #region TEMPORARY_REGION
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
@@ -361,20 +499,32 @@ public class CameraSystem : MonoBehaviour
             {
                 case CameraType.Follow: Target = GetFollowTransformation(); break;
                 case CameraType.Tracking: Target = GetPanningTransformation(); break;
+
+                case CameraType.OffsetState: Target = GetOffsetTransformation(); break;
+                case CameraType.TargetState: Target = GetTargetTransformation(); break;
             }
         }
 
         LerpCameraTransform(Target, CutsceneSpeed);
     }
-    
-    private void Awake()
+
+    private void Start()
     {
-        main = GetComponentInChildren<Camera>();
-        
-        DefaultOffset = Offset;
+        PreviousCameraSubject = CameraSubject;
+
+        if (!CameraSubject) CameraSubject = GameSystem.Instance.Player.gameObject;
+        if (AutomateStartCameraOffset) CurrentOffset.position = transform.position - CameraSubject.transform.position;
+
+        DefaultOffset = CurrentOffset;
         PreviousCameraType = CameraType;
 
-        if (!CameraSubject) CameraSubject = Player.gameObject;
+        DefaultFOV = FieldOfView;
+
+        //DefaultRotation = main.transform.localRotation;
+        //CurrentRotation = DefaultRotation;
+
+        //DefaultPosOffset = CurrentPosOffset;
+
         if (!DepthOfFieldData.Volume) return;
 
         bool result = DepthOfFieldData.Volume.profile.TryGet(out DepthOfField component);
@@ -387,4 +537,6 @@ public class CameraSystem : MonoBehaviour
 
         DOF = component;
     }
+
+    private void Awake() => main = GetComponentInChildren<Camera>();
 }
