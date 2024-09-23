@@ -426,15 +426,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d154ed2c02a074f48bb7d074fde93dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HideOnStartup: 0
-  UseDampening: 1
-  RevertOnExit: 1
-  Goal: {fileID: 778702672}
-  Type: 0
-  Value: 0
-  Target:
-    position: {x: 0, y: 0.15, z: -1}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!1 &315815622
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,9 +474,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Enabled>k__BackingField: 1
+  IgnoreAnticipationOffset: 1
+  IgnoreCurrentOffset: 0
   LocalScaleType: 0
+  TransformModifier: 0.5
   UsePositionOffset: 1
-  UseRotationOffset: 1
+  UseRotationOffset: 0
   UseFOVAdjustment: 0
   OverridePreviousPosition: 0
   OverridePreviousRotation: 0
@@ -522,6 +516,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   BlendType: 0
   HideOnStartup: 0
+  TriggerWidth: 0
 --- !u!64 &315815625
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1756,6 +1751,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 46459992409685840, guid: 99d415ceb363ffc489e63e69a95ba837, type: 3}
   m_PrefabInstance: {fileID: 795149854}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &830974688 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5633115978320600550, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
+  m_PrefabInstance: {fileID: 880735763}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &868333884
 GameObject:
   m_ObjectHideFlags: 0
@@ -1886,13 +1886,52 @@ PrefabInstance:
       propertyPath: m_Name
       value: UpdateCamOffset
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1629669020877400606, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
 --- !u!4 &880735764 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 46459992409685840, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
   m_PrefabInstance: {fileID: 880735763}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &880735769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 830974688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93cb99b740fc27b488ae87992273f39b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  IgnoreAnticipationOffset: 1
+  IgnoreCurrentOffset: 1
+  LocalScaleType: 0
+  TransformModifier: 0.5
+  UsePositionOffset: 1
+  UseRotationOffset: 1
+  UseFOVAdjustment: 0
+  OverridePreviousPosition: 0
+  OverridePreviousRotation: 0
+  OverridePreviousFOV: 0
+  TargetPosition: {x: 0, y: 0, z: 0}
+  TargetRotation: {x: 0, y: 0, z: 0, w: 0}
+  TargetOffsetObject: {fileID: 0}
+  TargetFOV: 0
+  DerivePreviousFOV: 0
+  ZoneBlending: 0
+  LerpCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  BlendType: 0
+  HideOnStartup: 0
+  TriggerWidth: 0
 --- !u!4 &902859484 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3008440021293612330, guid: 3df8d2d5d236de34aa5fb6c179ffbca0, type: 3}
@@ -2985,6 +3024,11 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1640414855 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5633115978320600550, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
+  m_PrefabInstance: {fileID: 1745803867}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1683614635
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3176,13 +3220,52 @@ PrefabInstance:
       propertyPath: m_Name
       value: UpdateCamOffset (1)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1629669020877400606, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
 --- !u!4 &1745803868 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 46459992409685840, guid: 113c66c63bcf8314a82322d2fbf228b8, type: 3}
   m_PrefabInstance: {fileID: 1745803867}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1745803873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640414855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93cb99b740fc27b488ae87992273f39b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  IgnoreAnticipationOffset: 1
+  IgnoreCurrentOffset: 1
+  LocalScaleType: 0
+  TransformModifier: 0.5
+  UsePositionOffset: 1
+  UseRotationOffset: 1
+  UseFOVAdjustment: 0
+  OverridePreviousPosition: 0
+  OverridePreviousRotation: 0
+  OverridePreviousFOV: 0
+  TargetPosition: {x: 0, y: 0, z: 0}
+  TargetRotation: {x: 0, y: 0, z: 0, w: 0}
+  TargetOffsetObject: {fileID: 0}
+  TargetFOV: 0
+  DerivePreviousFOV: 0
+  ZoneBlending: 0
+  LerpCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  BlendType: 0
+  HideOnStartup: 0
+  TriggerWidth: 0
 --- !u!1 &1750464111
 GameObject:
   m_ObjectHideFlags: 0

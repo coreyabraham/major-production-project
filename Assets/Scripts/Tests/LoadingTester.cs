@@ -9,4 +9,6 @@ public class LoadingTester : MonoBehaviour, ITouchable
     [field: SerializeField] private string SceneName = "Josh";
 
     public void Entered(Collider other) => GameSystem.Instance.RequestLoadScene(SceneName);
+
+    public void Left(Collider other) { }
 }
