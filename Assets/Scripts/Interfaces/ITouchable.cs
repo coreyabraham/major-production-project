@@ -16,6 +16,6 @@ public interface ITouchable
         Left(other);
     }
 
-    public virtual void Entered(Collider other) { }
-    public virtual void Left(Collider other) { }
+    public void Entered(Collider other);
+    public void Left(Collider other);
 }

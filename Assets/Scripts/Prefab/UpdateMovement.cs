@@ -14,4 +14,6 @@ public class UpdateMovement : MonoBehaviour, ITouchable
         if (!GameSystem.Instance.Player) return;
         GameSystem.Instance.Player.SetMoveType(TargetMoveType, ResetVelocity);
     }
+
+    public void Left(Collider other) { }
 }

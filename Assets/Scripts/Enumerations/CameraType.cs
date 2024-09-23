@@ -21,5 +21,15 @@ public enum CameraType
     /// <summary>
     /// Allow the `CameraSystem.cs` script to be manipulated by other scripts that choose to do so, mainly for cutscenes.
     /// </summary>
-    Scriptable
+    Scriptable,
+
+    /// <summary>
+    /// `CameraSystem.cs` will adapt the Target Offset Transformation of the current `ZoneCamera.cs` Instance.
+    /// </summary>
+    OffsetState,
+
+    /// <summary>
+    /// `CameraSystem.cs` will override the Target Offset Trasnformation with a target GameObject's Transformation with the current `ZoneCamera.cs` Instance.
+    /// </summary>
+    TargetState
 }

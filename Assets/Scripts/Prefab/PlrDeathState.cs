@@ -10,4 +10,6 @@ public class PlrDeathState : MonoBehaviour, ITouchable
         if (!GameSystem.Instance.Player) return;
         GameSystem.Instance.Player.DeathTriggered();
     }
+
+    public void Left(Collider other) { }
 }
