@@ -3,7 +3,7 @@ using UnityEngine;
 public class TEMP_chewThroughWire : MonoBehaviour
 {
     [field: SerializeField] GameObject destroyThis;
-    [field: SerializeField] TEMP_ACfanblade fanblade;
+    [field: SerializeField] AnimatedFanblade fanblade;
     public AudioSource FanOn;
     public AudioSource FanOff;
 
@@ -14,7 +14,7 @@ public class TEMP_chewThroughWire : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.E))
             {
                 Destroy(destroyThis);
-                fanblade.poweredOn = false;
+                fanblade.powered = false;
                 FanOn.enabled = false;
                 FanOff.enabled = true;
                 Destroy(gameObject);
