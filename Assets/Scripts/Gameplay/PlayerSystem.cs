@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +9,9 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The speed that the player moves when on the ground.")]
     [field: SerializeField] private float MoveSpeed;
 
+    [field: Tooltip("The speed that the player moves when climbing.")]
+    [field: SerializeField] private float ClimbSpeed;
+
     [field: Tooltip("The speed that the player moves when scurrying on the ground.")]
     [field: SerializeField] private float ScurrySpeed;
 
@@ -18,6 +20,9 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("The amount of time (in seconds) it takes for the player to recover their scurry ability")]
     [field: SerializeField] private float ScurryRecoveryTime;
+
+    [field: Tooltip("The multiplier for how much the player's speed should be inhibited while pulling an object.\n\nNote that negative values will be flipped to be positive, should they be provided.")]
+    [field: SerializeField] private float PullInhibitMultiplier;
 
     [field: Tooltip("The acceleration that will be applied to the player when they begin moving. Likewise, the time it takes for them to stop moving.")]
     [field: SerializeField] private float MoveEasing;
@@ -88,6 +93,7 @@ public class PlayerSystem : MonoBehaviour
     private Vector3 HitDirection;
     private Vector3 LastFrameVelocity;
     private Vector3 MoveDelta;
+    private Vector3 PullObjPos;
 
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
@@ -104,7 +110,7 @@ public class PlayerSystem : MonoBehaviour
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
 
-    private bool IsJumping, IsScurrying, IsGrounded, IsMoving;
+    private bool IsJumping, IsScurrying, IsGrounded, IsMoving, IsPulling;
 
     private List<GameObject> CachedInteractables = new();
     private Dictionary<GameObject, ITouchable> CachedTouchables = new();
@@ -125,7 +131,7 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnScurry(InputAction.CallbackContext ctx)
     {
-        if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed) return;
+        if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed || IsClimbing || IsPulling) return;
         IsScurrying = !IsScurrying;
 
         Events.Scurrying.Invoke(IsScurrying);
@@ -162,6 +168,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerMoving() => IsMoving;
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
+    public bool TogglePullState(bool input) => IsPulling = input;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
@@ -232,8 +239,32 @@ public class PlayerSystem : MonoBehaviour
         touchable.TriggerEnter(other);
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (!other.transform.root.CompareTag("Grabbable")) { return; }
+        if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
+
+        PullObjPos = other.transform.root.transform.position;
+        float grabX;
+
+        // I know this is an atrocious way of checking which side of the object the player is on...
+        if (transform.position.x < other.transform.root.transform.position.x)
+        {
+            // On the left of the object.
+            grabX = transform.position.x - 0.1f;
+        }
+        else
+        {
+            // On the right of the object.
+            grabX = transform.position.x + 0.1f;
+        }
+
+        other.transform.root.transform.position = new(grabX - other.transform.localPosition.x, other.transform.root.transform.position.y, other.transform.root.transform.position.z);
+    }
+
     private void OnTriggerExit(Collider other)
     {
+        if (other.transform.root.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
@@ -284,7 +315,10 @@ public class PlayerSystem : MonoBehaviour
             }
         }
 
-        SetMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
+        //SetMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
+        if (!IsJumpingFromClimb && !IsScurrying && !IsClimbing) { SetMoveSpeed = MoveSpeed; }
+        else if (!IsJumpingFromClimb && !IsScurrying && IsClimbing) { SetMoveSpeed = ClimbSpeed; }
+        else { SetMoveSpeed = ScurrySpeed; }
 
         Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
         Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
@@ -300,10 +334,10 @@ public class PlayerSystem : MonoBehaviour
 
         if (IsClimbing)
         {
-            if (!IsJumping && JumpButtonIsHeld) 
-            { 
-                JumpButtonIsHeld = false; 
-                TimeUntilJumpButtonIsDisabled = 0; 
+            if (!IsJumping && JumpButtonIsHeld)
+            {
+                JumpButtonIsHeld = false;
+                TimeUntilJumpButtonIsDisabled = 0;
             }
 
             if (IsJumping && !JumpButtonIsHeld)
@@ -355,7 +389,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
-        Character.Move(actualVelocity * Time.fixedDeltaTime);
+        if (!IsPulling) { Character.Move(actualVelocity * Time.fixedDeltaTime); }
+        else { Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime); }
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
@@ -379,15 +414,24 @@ public class PlayerSystem : MonoBehaviour
             return;
         }
 
+
         float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
-        CharacterRotation = Quaternion.Euler(
-            0.0f, 
-            IsMoving ? rotation + 90.0f : 90.0f, 
-            0.0f
-        );
+        if (!IsPulling)
+        {
+            CharacterRotation = Quaternion.Euler(
+                0.0f,
+                IsMoving ? rotation + 90.0f : 90.0f,
+                0.0f
+            );
+        }
+        else
+        {
+            if (transform.position.x > PullObjPos.x) { CharacterRotation = Quaternion.Euler(0, PullObjPos.y + 90, 0); }
+            else { CharacterRotation = Quaternion.Euler(0, PullObjPos.y - 90, 0); }
+        }
 
         switch (LerpStyle)
         {
@@ -413,7 +457,7 @@ public class PlayerSystem : MonoBehaviour
 
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
-        
+
         // TODO: This may have to be improved in the future!
         if (Animator != null)
         {
@@ -567,5 +611,5 @@ public class PlayerSystem : MonoBehaviour
         Events.Climbing ??= new();
         Events.Interacting ??= new();
     }
-#endregion
+    #endregion
 }
