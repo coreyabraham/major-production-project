@@ -462,7 +462,7 @@ public class CameraSystem : MonoBehaviour
             PreviousCameraSubject = CameraSubject;
         }
 
-        // TODO: THIS OR SPLIT THIS ENTIRE BIT THAT IS ESSENTIALLY BLOAT!
+        // TODO: MOVE OR SPLIT THIS ENTIRE BIT, IT'S ESSENTIALLY BLOAT!
         #region TEMPORARY_REGION
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
