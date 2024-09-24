@@ -4,6 +4,7 @@ public class UpdateMovement : MonoBehaviour, ITouchable
 {
     [field: Header("Inherited from `ITouchable`")]
     [field: SerializeField] public bool Enabled { get; set; } = true;
+    [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("Trigger Specific")]
     [field: SerializeField] private MoveType TargetMoveType;
@@ -16,4 +17,6 @@ public class UpdateMovement : MonoBehaviour, ITouchable
     }
 
     public void Left(Collider other) { }
+
+    private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }
