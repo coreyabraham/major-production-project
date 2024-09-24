@@ -11,6 +11,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     [field: Header("ITouchable Inheritance")]
     [field: SerializeField] public bool Enabled { get; set; }
+    [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("CameraSystem Settings")]
     [field: SerializeField] private bool IgnoreAnticipationOffset;
@@ -37,15 +38,13 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     [field: Header("FOV Adjustments")]
     public float TargetFOV;
-    [field: SerializeField] private bool DerivePreviousFOV;
+    [field: SerializeField] private bool DeriveStartFOV;
+    [field: SerializeField] private bool SumDerivedFOV;
 
     [field: Header("Camera Animations")]
     public bool ZoneBlending = false;
     public AnimationCurve LerpCurve;
     [field: SerializeField] private ZoneBlendType BlendType = ZoneBlendType.OffsetState;
-
-    [field: Header("Miscellaneous")]
-    [field: SerializeField] private bool HideOnStartup = false;
 
     [HideInInspector] public float TriggerSize;
 
@@ -87,7 +86,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
         GameSystem.Instance.Camera.RevertCameraType();
     }
 
-    private void Awake()
+    private void Start()
     {
         if (TargetObject != null)
         {
@@ -116,13 +115,12 @@ public class ZoneCamera : MonoBehaviour, ITouchable
             case LocalScaleUsage.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
 
-        if (DerivePreviousFOV) TargetFOV = GameSystem.Instance.Camera.main.fieldOfView;
+        if (!DeriveStartFOV) return;
 
-        if (!HideOnStartup) return;
-
-        bool result = gameObject.TryGetComponent(out MeshRenderer renderer);
-        if (!result) return;
-
-        renderer.enabled = false;
+        float originalTargetFOV = TargetFOV;
+        TargetFOV = GameSystem.Instance.Camera.main.fieldOfView;
+        if (SumDerivedFOV) TargetFOV += originalTargetFOV;
     }
+
+    private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

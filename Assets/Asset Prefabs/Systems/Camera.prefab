@@ -46,16 +46,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IgnorePlayerJumps: 1
+  AutomateStartCameraOffset: 0
   IgnoreAnticipationOffset: 0
-  SeparateOffsets: 0
+  IgnoreCurrentOffset: 0
   CurrentOffset:
     position: {x: 0, y: 0.4, z: -2}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  AnticipationOffset: 1
+  AnticipationOffset: 10
   FieldOfViewClamp: {x: 0, y: 180}
   FieldOfView: 80
   CameraLerpSpeed: 5
   VFXLerpSpeed: 4
+  AnticipationSpeed: 3
   EasingStyle: 2
   CameraType: 1
   DepthOfFieldData:
@@ -84,7 +86,6 @@ MonoBehaviour:
     NearMaxBlur: 14
     FarMaxBlur: 13
   CameraSubject: {fileID: 0}
-  Player: {fileID: 0}
   main: {fileID: 0}
   Events:
     CutsceneStarted:

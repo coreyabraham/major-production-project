@@ -362,21 +362,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   IgnoreAnticipationOffset: 1
   IgnoreCurrentOffset: 0
   LocalScaleType: 0
   TransformModifier: 0.5
   UsePositionOffset: 1
-  UseRotationOffset: 0
-  UseFOVAdjustment: 0
+  UseRotationOffset: 1
+  UseFOVAdjustment: 1
   OverridePreviousPosition: 0
   OverridePreviousRotation: 0
   OverridePreviousFOV: 0
   TargetPosition: {x: 0, y: 0.5, z: -4}
   TargetRotation: {x: 0.21643962, y: 0, z: 0, w: 0.976296}
   TargetObject: {fileID: 0}
-  TargetFOV: 0
-  DerivePreviousFOV: 0
+  TargetFOV: 20
+  DeriveStartFOV: 1
+  SumDerivedFOV: 1
   ZoneBlending: 1
   LerpCurve:
     serializedVersion: 2
@@ -403,8 +405,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   BlendType: 0
-  HideOnStartup: 0
-  TriggerWidth: 0
+  TriggerSize: 0
 --- !u!64 &315815625
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -551,7 +552,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 228935026645812749, guid: 0bb8d546ddbd8294da7594d763fc91f4, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 228935026645812749, guid: 0bb8d546ddbd8294da7594d763fc91f4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1763,6 +1764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   IgnoreAnticipationOffset: 1
   IgnoreCurrentOffset: 1
   LocalScaleType: 0
@@ -1777,7 +1779,8 @@ MonoBehaviour:
   TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   TargetObject: {fileID: 0}
   TargetFOV: 0
-  DerivePreviousFOV: 0
+  DeriveStartFOV: 0
+  SumDerivedFOV: 0
   ZoneBlending: 0
   LerpCurve:
     serializedVersion: 2
@@ -1786,8 +1789,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   BlendType: 0
-  HideOnStartup: 0
-  TriggerWidth: 0
+  TriggerSize: 0
 --- !u!4 &902859484 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3008440021293612330, guid: 3df8d2d5d236de34aa5fb6c179ffbca0, type: 3}
@@ -3097,6 +3099,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   IgnoreAnticipationOffset: 1
   IgnoreCurrentOffset: 1
   LocalScaleType: 0
@@ -3111,7 +3114,8 @@ MonoBehaviour:
   TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   TargetObject: {fileID: 0}
   TargetFOV: 0
-  DerivePreviousFOV: 0
+  DeriveStartFOV: 0
+  SumDerivedFOV: 0
   ZoneBlending: 0
   LerpCurve:
     serializedVersion: 2
@@ -3120,8 +3124,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   BlendType: 0
-  HideOnStartup: 0
-  TriggerWidth: 0
+  TriggerSize: 0
 --- !u!1 &1750464111
 GameObject:
   m_ObjectHideFlags: 0

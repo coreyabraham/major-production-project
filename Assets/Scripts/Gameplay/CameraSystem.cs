@@ -29,6 +29,7 @@ public class CameraSystem : MonoBehaviour
     [field: Header("Lerping Speeds")]
     [field: SerializeField] private float CameraLerpSpeed;
     [field: SerializeField] private float VFXLerpSpeed;
+    [field: SerializeField] private float AnticipationSpeed;
 
     [field: Header("Enumerations")]
     [field: SerializeField] private EasingStyle EasingStyle = EasingStyle.Lerp;
@@ -68,7 +69,7 @@ public class CameraSystem : MonoBehaviour
     private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
 
-    private float DefaultFOV;
+    private float PreviousFOV;
 
     private ZoneCamera ActiveZoneTrigger;
 
@@ -196,14 +197,15 @@ public class CameraSystem : MonoBehaviour
 
         FieldOfView = Zone.TargetFOV;
 
-        if (Zone.OverridePreviousPosition) { PreviousOffset.position = Zone.TargetPosition; }
-        if (Zone.OverridePreviousRotation) { PreviousOffset.rotation = Zone.TargetRotation; }
+        if (Zone.OverridePreviousPosition) PreviousOffset.position = Zone.TargetPosition;
+        if (Zone.OverridePreviousRotation) PreviousOffset.rotation = Zone.TargetRotation;
+        if (Zone.OverridePreviousFOV) PreviousFOV = Zone.TargetFOV;
     }
 
     public void ResetZoneCamOffset()
     {
         CurrentOffset = PreviousOffset;
-        FieldOfView = DefaultFOV;
+        FieldOfView = PreviousFOV;
     }
     #endregion
 
@@ -339,7 +341,8 @@ public class CameraSystem : MonoBehaviour
         {
             if (ActivePlayer.IsPlayerMoving() && CameraSubject == ActivePlayer.gameObject)
             {
-                cameraDelta.position.x += GetAnticipationOffset();
+                //cameraDelta.position.x += GetAnticipationOffset();
+                cameraDelta.position.x = Mathf.Lerp(cameraDelta.position.x, cameraDelta.position.x + GetAnticipationOffset(), Time.fixedDeltaTime * AnticipationSpeed);
             }
 
             if (ActivePlayer.IsPlayerGrounded()) GroundCameraPosition = cameraDelta.position;
@@ -373,11 +376,8 @@ public class CameraSystem : MonoBehaviour
 
         Vector3 newCamOffset = ActiveZoneTrigger.UsePositionOffset ? Vector3.Lerp(CurrentOffset.position, ActiveZoneTrigger.TargetPosition, curveEvaluation) : CurrentOffset.position;
 
-        Vector3 targetCamPos = new Vector3(
-            CameraSubject.transform.position.x + newCamOffset.x + GetAnticipationOffset(),
-            CameraSubject.transform.position.y + newCamOffset.y,
-            CameraSubject.transform.position.z + newCamOffset.z
-        );
+        Vector3 targetCamPos = CameraSubject.transform.position + newCamOffset;
+        targetCamPos.x += GetAnticipationOffset();
 
         Quaternion quaternion;
 
@@ -393,9 +393,8 @@ public class CameraSystem : MonoBehaviour
             quaternion = Quaternion.Euler(CurrentOffset.rotation.x, CurrentOffset.rotation.y, CurrentOffset.rotation.z);
         }
 
-        FieldOfView = ActiveZoneTrigger.UseFOVAdjustment ? Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation) : FieldOfView;
+        if (ActiveZoneTrigger.UseFOVAdjustment) FieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
-        // TODO: INTERGRATE `GetFollowTransformation()` INTO THIS RESULT!
         return new()
         {
             position = targetCamPos,
@@ -403,18 +402,14 @@ public class CameraSystem : MonoBehaviour
         };
     }
 
-    // TODO: IMPLEMENT!
     private CameraTarget GetTargetTransformation()
     {
         if (!ActiveZoneTrigger || !CameraSubject) return GetFollowTransformation();
 
         float curveEvaluation = GetOffsetAndTargetEvaluation();
 
-        Vector3 targetCamPos = new Vector3(
-            CameraSubject.transform.position.x + CurrentOffset.position.x + GetAnticipationOffset(),
-            CameraSubject.transform.position.y + CurrentOffset.position.y,
-            CameraSubject.transform.position.z + CurrentOffset.position.z
-        );
+        Vector3 targetCamPos = CameraSubject.transform.position + CurrentOffset.position;
+        targetCamPos.x += GetAnticipationOffset();
 
         Quaternion quaternion;
 
@@ -430,7 +425,7 @@ public class CameraSystem : MonoBehaviour
             quaternion = Quaternion.Euler(CurrentOffset.rotation.x, CurrentOffset.rotation.y, CurrentOffset.rotation.z);
         }
 
-        FieldOfView = ActiveZoneTrigger.UseFOVAdjustment ? Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation) : FieldOfView;
+        if (ActiveZoneTrigger.UseFOVAdjustment) FieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -467,7 +462,7 @@ public class CameraSystem : MonoBehaviour
             PreviousCameraSubject = CameraSubject;
         }
 
-        // TODO: THIS OR SPLIT THIS ENTIRE BIT THAT IS ESSENTIALLY BLOAT!
+        // TODO: MOVE OR SPLIT THIS ENTIRE BIT, IT'S ESSENTIALLY BLOAT!
         #region TEMPORARY_REGION
         float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
 
@@ -551,9 +546,10 @@ public class CameraSystem : MonoBehaviour
         if (AutomateStartCameraOffset) CurrentOffset.position = transform.position - CameraSubject.transform.position;
 
         DefaultOffset = CurrentOffset;
-        PreviousCameraType = CameraType;
+        PreviousOffset = DefaultOffset;
 
-        DefaultFOV = FieldOfView;
+        PreviousCameraType = CameraType;
+        PreviousFOV = FieldOfView;
 
         //DefaultRotation = main.transform.localRotation;
         //CurrentRotation = DefaultRotation;
