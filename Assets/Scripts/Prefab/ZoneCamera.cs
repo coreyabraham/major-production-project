@@ -18,7 +18,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: SerializeField] private bool IgnoreCurrentOffset;
 
     [field: Header("Scaling Options")]
-    [field: SerializeField] private LocalScaleUsage LocalScaleType = LocalScaleUsage.X;
+    public LocalScaleUsage LocalScaleType = LocalScaleUsage.X;
     [field: SerializeField] private float TransformModifier = 0.5f;
     
     [field: Header("Utilization Options")]
