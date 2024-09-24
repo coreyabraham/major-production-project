@@ -131,7 +131,8 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnScurry(InputAction.CallbackContext ctx)
     {
-        if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed || IsClimbing || IsPulling) return;
+        if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
+            IsClimbing || IsPulling || IsJumpingFromClimb) return;
         IsScurrying = !IsScurrying;
 
         Events.Scurrying.Invoke(IsScurrying);
@@ -141,8 +142,7 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnJumping(InputAction.CallbackContext ctx)
     {
-        // Prevent holding the button from continuously firing inputs. Only fire once.
-        if (MoveType == MoveType.None) return;
+        if (MoveType == MoveType.None || (IsClimbing && MoveInput.x == 0)) return;
         IsJumping = ctx.ReadValueAsButton();
         Events.Jumping.Invoke(IsJumping);
     }
@@ -316,7 +316,8 @@ public class PlayerSystem : MonoBehaviour
         }
 
         //SetMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
-        if (!IsJumpingFromClimb && !IsScurrying && !IsClimbing) { SetMoveSpeed = MoveSpeed; }
+        if ((!IsJumpingFromClimb && !IsScurrying && !IsClimbing)) { SetMoveSpeed = MoveSpeed; }
+        else if (IsJumpingFromClimb) { SetMoveSpeed = MoveSpeed + 0.4f; }
         else if (!IsJumpingFromClimb && !IsScurrying && IsClimbing) { SetMoveSpeed = ClimbSpeed; }
         else { SetMoveSpeed = ScurrySpeed; }
 
@@ -334,6 +335,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (IsClimbing)
         {
+            if (IsScurrying) { IsScurrying = false; }
+
             if (!IsJumping && JumpButtonIsHeld)
             {
                 JumpButtonIsHeld = false;
