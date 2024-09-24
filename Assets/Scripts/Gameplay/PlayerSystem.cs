@@ -598,6 +598,8 @@ public class PlayerSystem : MonoBehaviour
             CachedTouchables.Add(obj, touchable);
         }
 
+        if (PullInhibitMultiplier < 0) { PullInhibitMultiplier = -PullInhibitMultiplier; }
+
         SpawnAtCheckpoint();
     }
 
