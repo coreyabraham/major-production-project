@@ -25,7 +25,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     public bool UseRotationOffset;
     public bool UseFOVAdjustment;
 
-    [field: Header("Overwriting Options")]
+    [field: Header("Overriding Options")]
     public bool OverridePreviousPosition;
     public bool OverridePreviousRotation;
     public bool OverridePreviousFOV;
@@ -33,7 +33,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: Header("Transformations")]
     public Vector3 TargetPosition;
     public Quaternion TargetRotation;
-    [field: SerializeField] private Transform TargetOffsetObject;
+    [field: SerializeField] private Transform TargetObject;
 
     [field: Header("FOV Adjustments")]
     public float TargetFOV;
@@ -47,7 +47,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: Header("Miscellaneous")]
     [field: SerializeField] private bool HideOnStartup = false;
 
-    [HideInInspector] public float TriggerWidth;
+    [HideInInspector] public float TriggerSize;
 
     private bool PreviousIAO;
     private bool PreviousICO;
@@ -89,20 +89,20 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     private void Awake()
     {
-        if (TargetOffsetObject != null)
+        if (TargetObject != null)
         {
             if (ZoneBlending)
             {
                 switch (BlendType)
                 {
                     //Get offsets between target and TriggerZone 
-                    case ZoneBlendType.OffsetState: TargetPosition = TargetOffsetObject.transform.position - transform.position; break;
-                    case ZoneBlendType.TargetState: TargetPosition = TargetOffsetObject.transform.position; break;
+                    case ZoneBlendType.OffsetState: TargetPosition = TargetObject.transform.position - transform.position; break;
+                    case ZoneBlendType.TargetState: TargetPosition = TargetObject.transform.position; break;
                 }
             }
 
             //Get rotation of target and set in newRotOffset
-            TargetRotation = TargetOffsetObject.transform.rotation;
+            TargetRotation = TargetObject.transform.rotation;
         }
 
         if (TargetRotation.x > 180) { TargetRotation.x -= 360; }
@@ -111,9 +111,9 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
         switch (LocalScaleType)
         {
-            case LocalScaleUsage.X: TriggerWidth = transform.localScale.x * TransformModifier; break;
-            case LocalScaleUsage.Y: TriggerWidth = transform.localScale.y * TransformModifier; break;
-            case LocalScaleUsage.Z: TriggerWidth = transform.localScale.z * TransformModifier; break;
+            case LocalScaleUsage.X: TriggerSize = transform.localScale.x * TransformModifier; break;
+            case LocalScaleUsage.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
+            case LocalScaleUsage.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
 
         if (DerivePreviousFOV) TargetFOV = GameSystem.Instance.Camera.main.fieldOfView;

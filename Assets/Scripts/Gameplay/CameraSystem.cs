@@ -78,11 +78,42 @@ public class CameraSystem : MonoBehaviour
     private DepthOfField DOF;
     #endregion
 
+    #region Getter and Setter Methods
     public CameraState GetCameraState() => CurrentState;
 
-    public CameraTarget GetCameraOffset() => CurrentOffset;
+    public void OverrideCameraOffset(CameraTarget Offset) => CurrentOffset = Offset;
+    public void OverrideCameraOffset(Vector3 Position, Quaternion Rotation)
+    {
+        CameraTarget target = new()
+        {
+            position = Position,
+            rotation = Rotation
+        };
 
-    // TODO: Fix incorrect naming term, it's used temporarily here!
+        OverrideCameraOffset(target);
+    }
+    public void OverrideCameraOffset(Vector3 Position)
+    {
+        CameraTarget target = new()
+        {
+            position = Position
+        };
+
+        OverrideCameraOffset(target);
+    }
+    public void OverrideCameraOffset(Quaternion Rotation)
+    {
+        CameraTarget target = new()
+        {
+            rotation = Rotation
+        };
+
+        OverrideCameraOffset(target);
+    }
+
+    public CameraTarget GetCameraOffset() => CurrentOffset;
+    public CameraTarget ResetCameraOffset() => CurrentOffset = DefaultOffset;
+
     public CameraTarget GetCameraDelta()
     {
         Vector3 posModifier = (!IgnoreCurrentOffset) ? CurrentOffset.position : Vector3.zero;
@@ -174,7 +205,9 @@ public class CameraSystem : MonoBehaviour
         CurrentOffset = PreviousOffset;
         FieldOfView = DefaultFOV;
     }
+    #endregion
 
+    #region Cutscene Methods
     public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
     {
         if (CutsceneRunning)
@@ -190,6 +223,7 @@ public class CameraSystem : MonoBehaviour
         }
 
         CameraType = CameraType.Scriptable;
+        CurrentState = CameraState.Cutscene;
 
         CurrentInterval = 0.0f;
         MaxInterval = TimeInterval;
@@ -236,12 +270,8 @@ public class CameraSystem : MonoBehaviour
     private void UpdateCutsceneIndex()
     {
         CutsceneIndex++;
-
-        if (CutsceneIndex >= CutscenePoints.Length)
-        {
-            CutsceneFinished();
-            return;
-        }
+        if (CutsceneIndex < CutscenePoints.Length) return;
+        CutsceneFinished();
     }
 
     private void CutsceneFinished()
@@ -256,11 +286,15 @@ public class CameraSystem : MonoBehaviour
         CutsceneIndex = 0;
         CutscenePoints = null;
 
+        CurrentState = CameraState.Generic;
+
         if (ActivePlayer) ActivePlayer.SetMoveType(PreviousMoveType, true);
         
         Events.CutsceneFinished?.Invoke();
     }
+    #endregion
 
+    #region Get Camera Transformations
     private float GetAnticipationOffset()
     {
         if (!ActivePlayer) return 0.0f;
@@ -324,7 +358,7 @@ public class CameraSystem : MonoBehaviour
         float distanceFromTriggerCentre = Mathf.Abs(ActiveZoneTrigger.transform.position.x - tarPos.x);
 
         // Get blend amount
-        float blendAmount = 1 - distanceFromTriggerCentre / ActiveZoneTrigger.TriggerWidth;
+        float blendAmount = 1 - distanceFromTriggerCentre / ActiveZoneTrigger.TriggerSize;
         float curveEvaluation = ActiveZoneTrigger.LerpCurve.Evaluate(blendAmount);
 
         // Return blend amount
@@ -404,6 +438,7 @@ public class CameraSystem : MonoBehaviour
             rotation = quaternion
         };
     }
+    #endregion
 
     private void Update()
     {
