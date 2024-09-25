@@ -1,3 +1,11 @@
+/*
+ CameraSystem / ZoneCamera TO DO's
+    - Properly test ALL ZoneCamera.cs options to make sure they all work individually
+    - Implement "Overriding Options" so that they actually have an effect on the CameraSystem.cs
+    - Fix Inconsistent Field Of View Settings
+    - Make sure Blending Types and `Target Offset Object` are independant
+ */
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering.HighDefinition;
@@ -119,7 +127,7 @@ public class CameraSystem : MonoBehaviour
     {
         Vector3 posModifier = (!IgnoreCurrentOffset) ? CurrentOffset.position : Vector3.zero;
 
-        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : PreviousCameraLocation.position;
+        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
         Vector3 newPos = tarPos + posModifier;
 
         Vector3 rotReference = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
@@ -312,7 +320,7 @@ public class CameraSystem : MonoBehaviour
 
     private CameraTarget GetPanningTransformation()
     {
-        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : PreviousCameraLocation.position;
+        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
 
         Vector3 targetDirection = tarPos - PreviousCameraLocation.position;
         Quaternion targetRot = Quaternion.LookRotation(targetDirection, Vector3.up) * CurrentOffset.rotation;
@@ -354,11 +362,17 @@ public class CameraSystem : MonoBehaviour
     private float GetOffsetAndTargetEvaluation()
     {
         // Get distance between triggerzone and player
+        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
+        float selection = 0.0f;
 
-        Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : PreviousCameraLocation.position;
+        switch (ActiveZoneTrigger.LocalScaleType)
+        {
+            case ZoneCamera.LocalScaleUsage.X: selection = ActiveZoneTrigger.transform.position.x - tarPos.x; break;
+            case ZoneCamera.LocalScaleUsage.Y: selection = ActiveZoneTrigger.transform.position.y - tarPos.y; break;
+            case ZoneCamera.LocalScaleUsage.Z: selection = ActiveZoneTrigger.transform.position.z - tarPos.z; break;
+        }
 
-        // (Might have to replace `ActiveZoneTrigger.transform.position.x` with respective LocalScale#!)
-        float distanceFromTriggerCentre = Mathf.Abs(ActiveZoneTrigger.transform.position.x - tarPos.x);
+        float distanceFromTriggerCentre = Mathf.Abs(selection);
 
         // Get blend amount
         float blendAmount = 1 - distanceFromTriggerCentre / ActiveZoneTrigger.TriggerSize;
