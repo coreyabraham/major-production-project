@@ -48,22 +48,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1f4e7cfbff3302418f5b744056710cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 1.8
-  ScurrySpeed: 3.7
-  ScurryLimit: 4
-  ScurryRecoveryTime: 4
-  MoveEasing: 24
+  MoveSpeed: 1.7
+  ScurrySpeed: 9
+  ScurryLimit: 0.07
+  ScurryRecoveryTime: 1
+  MoveEasing: 12
   MoveType: 3
   UnhookMovement: 1
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
   FallingFromClimb: 0
-  JumpForce: 3.8
-  GravityMultiplier: 1.15
-  VelocityYIdle: -3.2
-  LerpStyle: 3
-  LerpSpeed: 20
+  JumpForce: 3.4
+  GravityMultiplier: 1.1
+  VelocityYIdle: -1.4
+  LerpStyle: 2
+  LerpSpeed: 9
   PushForce: 1
   PlayerAnimations:
   - ValueName: Speed
@@ -76,7 +76,11 @@ MonoBehaviour:
     AnimationValueType: 2
   - ValueName: Climb
     InputValue: 
-    AnimationType: 2
+    AnimationType: 3
+    AnimationValueType: 2
+  - ValueName: Slide
+    InputValue: 
+    AnimationType: 4
     AnimationValueType: 2
   Camera: {fileID: 0}
   Animator: {fileID: 4095228785318712889}
@@ -84,6 +88,7 @@ MonoBehaviour:
   TouchTag: Touchable
   Character: {fileID: 0}
   IsHidden: 0
+  IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
 --- !u!143 &1886212965

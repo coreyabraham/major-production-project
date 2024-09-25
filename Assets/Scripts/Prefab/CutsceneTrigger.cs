@@ -4,6 +4,7 @@ public class CutsceneTrigger : MonoBehaviour, ITouchable
 {
     [field: Header("Inherited from `ITouchable`")]
     [field: SerializeField] public bool Enabled { get; set; }
+    [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("Trigger Specific")]
     [field: SerializeField] private GameObject[] CutscenePoints;
@@ -23,4 +24,8 @@ public class CutsceneTrigger : MonoBehaviour, ITouchable
         if (!Camera) return;
         Camera.BeginCutscene(CutscenePoints, TimeInterval, !UseDefaultSpeed ? CameraSpeed : -1.0f);
     }
+
+    public void Left(Collider other) { }
+
+    private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

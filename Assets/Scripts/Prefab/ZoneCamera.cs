@@ -2,167 +2,125 @@ using UnityEngine;
 
 public class ZoneCamera : MonoBehaviour, ITouchable
 {
-    // Offset State = Use Target Position and Rotation mixed with the "Target Offset Object" (Use `GetCameraOffset() and `SetCameraOffset()`)
-    // Target State = Directly use "Target Offset Object" Transform(Manually set Camera Transform)
-
     // TODO: MOVE THIS ENUMERATION LATER!
     [System.Serializable]
     public enum LocalScaleUsage
     {
-        LocalScaleX,
-        LocalScaleY,
-        LocalScaleZ
+        X, Y, Z
     }
 
     [field: Header("ITouchable Inheritance")]
     [field: SerializeField] public bool Enabled { get; set; }
+    [field: SerializeField] public bool HideOnStartup { get; set; }
+
+    [field: Header("CameraSystem Settings")]
+    [field: SerializeField] private bool IgnoreAnticipationOffset;
+    [field: SerializeField] private bool IgnoreCurrentOffset;
 
     [field: Header("Scaling Options")]
-    [field: SerializeField] private LocalScaleUsage LocalScaleType;
+    [field: SerializeField] private LocalScaleUsage LocalScaleType = LocalScaleUsage.X;
+    [field: SerializeField] private float TransformModifier = 0.5f;
     
     [field: Header("Utilization Options")]
-    [field: SerializeField] private bool UsePositionOffset;
-    [field: SerializeField] private bool UseRotationOffset;
-    [field: SerializeField] private bool UseFOVAdjustment;
+    public bool UsePositionOffset;
+    public bool UseRotationOffset;
+    public bool UseFOVAdjustment;
 
-    [field: Header("Overwriting Options")]
-    [field: SerializeField] private bool OverridePreviousPosition;
-    [field: SerializeField] private bool OverridePreviousRotation;
-    [field: SerializeField] private bool OverridePreviousFOV;
+    [field: Header("Overriding Options")]
+    public bool OverridePreviousPosition;
+    public bool OverridePreviousRotation;
+    public bool OverridePreviousFOV;
 
     [field: Header("Transformations")]
-    [field: SerializeField] private Vector3 TargetPosition;
-    [field: SerializeField] private Quaternion TargetRotation;
-    [field: SerializeField] private Transform TargetOffsetObject;
+    public Vector3 TargetPosition;
+    public Quaternion TargetRotation;
+    [field: SerializeField] private Transform TargetObject;
 
     [field: Header("FOV Adjustments")]
-    [field: SerializeField] private float TargetFOV;
-    [field: SerializeField] private bool DerivePreviousFOV;
+    public float TargetFOV;
+    [field: SerializeField] private bool DeriveStartFOV;
+    [field: SerializeField] private bool SumDerivedFOV;
 
     [field: Header("Camera Animations")]
-    [field: SerializeField] private bool ZoneBlending = false;
-    [field: SerializeField] private AnimationCurve LerpCurve;
+    public bool ZoneBlending = false;
+    public AnimationCurve LerpCurve;
     [field: SerializeField] private ZoneBlendType BlendType = ZoneBlendType.OffsetState;
 
-    [field: Header("Miscellaneous")]
-    [field: SerializeField] private bool HideOnStartup = false;
+    [HideInInspector] public float TriggerSize;
 
-    private bool PlayerIsInTrigger = false;
-
-    private bool PreviousSeparateOffsets;
-    private bool PreviousPreviousAnticipationOffset;
-    private CameraType PreviousCameraType;
-
-    private CameraTarget PreviousOffset;
-
-    private PlayerSystem Player;
-    private CameraSystem Camera;
+    private bool PreviousIAO;
+    private bool PreviousICO;
 
     public void Entered(Collider other)
     {
-        PlayerIsInTrigger = true;
+        if (IgnoreAnticipationOffset)
+        {
+            PreviousIAO = GameSystem.Instance.Camera.IgnoreAnticipationOffset;
+            GameSystem.Instance.Camera.IgnoreAnticipationOffset = true;
+        }
 
-        PreviousSeparateOffsets = Camera.SeparateOffsets;
-        PreviousPreviousAnticipationOffset = Camera.IgnoreAnticipationOffset;
-        PreviousCameraType = Camera.GetCameraType();
+        if (IgnoreCurrentOffset)
+        {
+            PreviousICO = GameSystem.Instance.Camera.IgnoreCurrentOffset;
+            GameSystem.Instance.Camera.IgnoreCurrentOffset = true;
+        }
 
-        Camera.SeparateOffsets = TargetOffsetObject != null;
-        Camera.IgnoreAnticipationOffset = true;
-        Camera.SetCameraType(CameraType.Scriptable);
+        if (ZoneBlending) GameSystem.Instance.Camera.SetActiveTriggerZone(this);
+        else GameSystem.Instance.Camera.GetNewZoneCameraOffsets(this);
 
-        PreviousOffset = Camera.GetCameraOffset();
-
-        NoBlendingSet();
+        switch (BlendType)
+        {
+            case ZoneBlendType.OffsetState: GameSystem.Instance.Camera.SetCameraType(CameraType.OffsetState); break;
+            case ZoneBlendType.TargetState: GameSystem.Instance.Camera.SetCameraType(CameraType.TargetState); break;
+        }
     }
 
     public void Left(Collider other)
     {
-        PlayerIsInTrigger = false;
+        if (IgnoreAnticipationOffset) GameSystem.Instance.Camera.IgnoreAnticipationOffset = PreviousIAO;
+        if (IgnoreCurrentOffset) GameSystem.Instance.Camera.IgnoreCurrentOffset = PreviousICO;
 
-        Camera.SetCameraType(PreviousCameraType);
+        if (ZoneBlending) GameSystem.Instance.Camera.SetActiveTriggerZone(null);
+        else GameSystem.Instance.Camera.ResetZoneCamOffset();
 
-        Camera.SeparateOffsets = PreviousSeparateOffsets;
-        Camera.IgnoreAnticipationOffset = PreviousPreviousAnticipationOffset;
-
-        Camera.SetCameraOffset(
-            !OverridePreviousPosition ? PreviousOffset.position : TargetPosition,
-            !OverridePreviousRotation ? PreviousOffset.rotation : TargetRotation
-        );
-    }
-
-    private void OnEnable()
-    {
-        if (!TargetOffsetObject) return;
-        TargetPosition = transform.position - TargetOffsetObject.transform.position;
-        TargetRotation = TargetOffsetObject.transform.rotation;
-    }
-
-    private void NoBlendingSet()
-    {
-        // This may need to be optimized in the future, for now, this should do for non-zone blending functionality!
-        // I'm not trying to become the next Yandare Dev, we should all take a note out of that for what NOT to do during C# scripting.
-
-        if (TargetOffsetObject != null)
-        {
-            Camera.SetCameraOffset(TargetOffsetObject.transform);
-            return;
-        }
-
-        if (UsePositionOffset && !UseRotationOffset) Camera.SetCameraOffset(TargetPosition);
-        else if (!UsePositionOffset && UseRotationOffset) Camera.SetCameraOffset(TargetRotation);
-        else if (UsePositionOffset && UseRotationOffset) Camera.SetCameraOffset(TargetPosition, TargetRotation);
-    }
-
-    private void FixedUpdate()
-    {
-        if (!PlayerIsInTrigger) return;
-        if (!ZoneBlending) return;
-
-        // Add "Use X" and "Use Y" Localscale options in FixedUpdate() at runtime specifically
-        float distance = Mathf.Abs(Player.gameObject.transform.position.x - transform.position.x);
-
-        float clamp = distance / (transform.localScale.x / 2);
-        float value = LerpCurve.Evaluate(clamp);
-
-        print(value);
-
-        Transform current = Camera.GetCameraTransform();
-
-        //Camera.LerpCameraTransform(
-        //    TargetOffsetObject.transform.position, 
-        //    Time.fixedDeltaTime * value
-        //);
-
-        Camera.transform.position = Vector3.Lerp(current.position, TargetOffsetObject.transform.position, value);
+        GameSystem.Instance.Camera.RevertCameraType();
     }
 
     private void Start()
     {
-        Camera = GameSystem.Instance.Camera;
-        Player = GameSystem.Instance.Player;
-    }
-
-    private void Awake()
-    {
-        for (int i = 0; i < LerpCurve.keys.Length; i++)
+        if (TargetObject != null)
         {
-            var key = LerpCurve.keys[i];
+            if (ZoneBlending)
+            {
+                switch (BlendType)
+                {
+                    //Get offsets between target and TriggerZone 
+                    case ZoneBlendType.OffsetState: TargetPosition = TargetObject.transform.position - transform.position; break;
+                    case ZoneBlendType.TargetState: TargetPosition = TargetObject.transform.position; break;
+                }
+            }
 
-            print("Tangent: " + key.inTangent.ToString());
-            print("InWeight: " + key.inWeight.ToString());
-            print("OutTangent: " + key.outTangent.ToString());
-            print("OutWeight: " + key.outWeight.ToString());
-            print("Time: " + key.time.ToString());
-            print("Value: " + key.value.ToString());
-            print("Weighted Mode: " + key.weightedMode.ToString());
-            print("=======================");
+            //Get rotation of target and set in newRotOffset
+            TargetRotation = TargetObject.transform.rotation;
         }
 
-        if (!HideOnStartup) return;
+        if (TargetRotation.x > 180) { TargetRotation.x -= 360; }
+        if (TargetRotation.y > 180) { TargetRotation.y -= 360; }
+        if (TargetRotation.z > 180) { TargetRotation.z -= 360; }
 
-        bool result = gameObject.TryGetComponent(out MeshRenderer renderer);
-        if (!result) return;
+        switch (LocalScaleType)
+        {
+            case LocalScaleUsage.X: TriggerSize = transform.localScale.x * TransformModifier; break;
+            case LocalScaleUsage.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
+            case LocalScaleUsage.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
+        }
 
-        renderer.enabled = false;
+        if (!DeriveStartFOV) return;
+
+        float originalTargetFOV = TargetFOV;
+        TargetFOV = GameSystem.Instance.Camera.main.fieldOfView;
+        if (SumDerivedFOV) TargetFOV += originalTargetFOV;
     }
+
+    private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

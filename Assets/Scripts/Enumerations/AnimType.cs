@@ -7,5 +7,6 @@ public enum AnimType
     Custom = 0,
     Moving,
     Jumping,
-    Climbing
+    Climbing,
+    Scurrying
 }

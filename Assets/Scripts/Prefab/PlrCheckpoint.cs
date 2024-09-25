@@ -4,6 +4,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
 {
     [field: Header("Inherited from `ITouchable`")]
     [field: SerializeField] public bool Enabled { get; set; } = true;
+    [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("Trigger Specific")]
     [field: SerializeField] private bool UseSceneName = true;
@@ -34,4 +35,8 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
         else Debug.LogWarning(name + "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
+
+    public void Left(Collider other) { }
+
+    private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }
