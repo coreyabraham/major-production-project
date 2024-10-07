@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -32,6 +33,12 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("Unhook the player's movement from the camera.")]
     [field: SerializeField] private bool UnhookMovement = true;
+
+    [field: Tooltip("Allows the player to jump for a short period of time after falling from a ledge.")]
+    [field: SerializeField] private bool EnableCoyoteJump = true;
+    
+    [field: Tooltip("The duration of time that the player can fall for and coyote jump.")]
+    [field: SerializeField] private float CoyoteTimer = 1.0f;
 
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
@@ -97,6 +104,9 @@ public class PlayerSystem : MonoBehaviour
 
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
+
+    private bool UsedCoyoteJump;
+    private float CurrentCoyoteTime;
 
     private float CurrentScurryTime;
     private float CurrentRecoveryTime;
@@ -374,6 +384,23 @@ public class PlayerSystem : MonoBehaviour
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
+            else
+            {
+                if (EnableCoyoteJump && !UsedCoyoteJump)
+                {
+                    if (CurrentCoyoteTime < CoyoteTimer)
+                    {
+                        CurrentCoyoteTime += Time.fixedDeltaTime;
+
+                        if (IsJumping)
+                        {
+                            Velocity.y = JumpForce;
+                            UsedCoyoteJump = true;
+                        }
+                    }
+                }
+            }
+
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
             actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
         }
@@ -397,6 +424,11 @@ public class PlayerSystem : MonoBehaviour
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
+        else
+        {
+            UsedCoyoteJump = false;
+            CurrentCoyoteTime = 0.0f;
+        }
 
         if (!IsMoving)
         {
