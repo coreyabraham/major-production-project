@@ -91,7 +91,7 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Private Variables
-    private Vector3 WarpPosition;
+    [HideInInspector] public Vector3 WarpPosition;
     private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
 
@@ -120,7 +120,8 @@ public class PlayerSystem : MonoBehaviour
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
 
-    private bool IsJumping, IsScurrying, IsGrounded, IsMoving, IsPulling;
+    [HideInInspector] public bool IsJumping;
+    private bool IsScurrying, IsGrounded, IsMoving, IsPulling, IsBeingLaunched;
 
     private List<GameObject> CachedInteractables = new();
     private Dictionary<GameObject, ITouchable> CachedTouchables = new();
@@ -179,6 +180,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
     public bool TogglePullState(bool input) => IsPulling = input;
+    public bool ToggleCharCont(bool enable) => Character.enabled = enable;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
@@ -192,6 +194,12 @@ public class PlayerSystem : MonoBehaviour
         MoveType = Type;
         if (!ResetVelocity) return;
         SetVelocity(Vector3.zero);
+    }
+    public void ForcePlayerToJump(float forceToApply) => Velocity.y = forceToApply;
+    public void ApplyImpulseToPlayer(float accuracy)
+    {
+        IsBeingLaunched = true;
+        Velocity.x = 7 * accuracy;
     }
     public void DeathTriggered()
     {
@@ -370,13 +378,17 @@ public class PlayerSystem : MonoBehaviour
 
         if (!IsClimbing)
         {
-            Velocity.z = MoveDelta.z;
-            Velocity.x = MoveDelta.x;
+            if (!IsBeingLaunched)
+            {
+                Velocity.x = MoveDelta.x;
+                Velocity.z = MoveDelta.z;
+            }
 
             if (IsGrounded)
             {
                 IsJumpingFromClimb = false;
                 FallingFromClimb = false;
+                IsBeingLaunched = false;
 
                 if (!IsJumping && JumpButtonIsHeld) { JumpButtonIsHeld = false; TimeUntilJumpButtonIsDisabled = 0; }
 
