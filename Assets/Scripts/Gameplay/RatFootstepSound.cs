@@ -10,12 +10,17 @@ public class RatFootstepSound : MonoBehaviour
 
     void Update()
     {
-        if (!(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) && playSys.IsPlayerJumping()) { return; }
+        if (!(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) || !playSys.IsPlayerGrounded())
+        {
+            if (footstepsSound.enabled) { footstepsSound.enabled = false; }
+            return; 
+        }
         footstepsSound.enabled = true;
     }
 
     private void Start()
     {
         playSys = footstepsSound.gameObject.GetComponent<PlayerSystem>();
+        footstepsSound.enabled = false;
     }
 }

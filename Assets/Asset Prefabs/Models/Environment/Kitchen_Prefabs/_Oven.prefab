@@ -11,12 +11,13 @@ GameObject:
   - component: {fileID: 366306326205679320}
   - component: {fileID: 3655438818493385085}
   - component: {fileID: 1539753287923285431}
+  - component: {fileID: 6128447482038627177}
   m_Layer: 0
   m_Name: _Oven
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &366306326205679320
 Transform:
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1035459600159579234}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1, z: 1.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -40,7 +41,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035459600159579234}
-  m_Mesh: {fileID: 3410400018750181399, guid: e47ecc0b9ad03494ea485183acc8eaf4, type: 3}
+  m_Mesh: {fileID: -4974773604307460337, guid: e47ecc0b9ad03494ea485183acc8eaf4, type: 3}
 --- !u!23 &1539753287923285431
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -61,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 4f3fd2f725956664b9955f3b2c50f265, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -83,3 +84,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6128447482038627177
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035459600159579234}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3.2014308, y: 1.1517209, z: 1.1543696}
+  m_Center: {x: 1.9346921e-16, y: 0.7429916, z: -0.044864178}
