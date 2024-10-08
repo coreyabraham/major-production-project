@@ -60,10 +60,6 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The force that the player will push objects.")]
     [field: SerializeField] private float PushForce;
 
-    [field: Header("Animations")]
-    [field: Tooltip("The Value Name that's targeted within the \"Animator\" reference")]
-    [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
-
     [field: Header("Externals")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
@@ -86,21 +82,26 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("All the Surface Types that the Player can interact with")]
     private Dictionary<string, SurfaceMaterial> Surfaces = new();
 
+    [field: Header("Animations")]
+    [field: Tooltip("The Value Name that's targeted within the \"Animator\" reference")]
+    [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
+
     [field: Header("Events")]
-    public PlayerEvents Events = new();
+    [field: SerializeField] public PlayerEvents Events = new();
     #endregion
 
     #region Private Variables
-    private Vector3 WarpPosition;
+    [HideInInspector] public Vector3 WarpPosition;
     private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
 
-    private Vector3 Velocity;
     private Vector2 MoveInput;
-    private Vector3 HitDirection;
-    private Vector3 LastFrameVelocity;
     private Vector3 MoveDelta;
     private Vector3 PullObjPos;
+    private Vector3 HitDirection;
+
+    private Vector3 Velocity;
+    private Vector3 LastFrameVelocity = Vector3.zero;
 
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
@@ -120,10 +121,12 @@ public class PlayerSystem : MonoBehaviour
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
 
-    private bool IsJumping, IsScurrying, IsGrounded, IsMoving, IsPulling;
+    [HideInInspector] public bool IsJumping;
 
-    private List<GameObject> CachedInteractables = new();
-    private Dictionary<GameObject, ITouchable> CachedTouchables = new();
+    private bool IsScurrying, IsGrounded, IsMoving, IsPulling, IsBeingLaunched;
+
+    private readonly List<GameObject> CachedInteractables = new();
+    private readonly Dictionary<GameObject, ITouchable> CachedTouchables = new();
     #endregion
 
     #region Functions - Handlers
@@ -179,6 +182,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
     public bool TogglePullState(bool input) => IsPulling = input;
+    public bool ToggleCharCont(bool enable) => Character.enabled = enable;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
@@ -192,6 +196,12 @@ public class PlayerSystem : MonoBehaviour
         MoveType = Type;
         if (!ResetVelocity) return;
         SetVelocity(Vector3.zero);
+    }
+    public void ForcePlayerToJump(float forceToApply) => Velocity.y = forceToApply;
+    public void ApplyImpulseToPlayer(float accuracy)
+    {
+        IsBeingLaunched = true;
+        Velocity.x = 7 * accuracy;
     }
     public void DeathTriggered()
     {
@@ -355,7 +365,7 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsJumping && !JumpButtonIsHeld)
             {
-                Velocity.y = JumpForce / 2.0f;
+                Velocity.y = JumpForce;
                 IsClimbing = false;
                 IsJumpingFromClimb = true;
             }
@@ -370,13 +380,17 @@ public class PlayerSystem : MonoBehaviour
 
         if (!IsClimbing)
         {
-            Velocity.z = MoveDelta.z;
-            Velocity.x = MoveDelta.x;
+            if (!IsBeingLaunched)
+            {
+                Velocity.z = MoveDelta.z;
+                Velocity.x = MoveDelta.x;
+            }
 
             if (IsGrounded)
             {
                 IsJumpingFromClimb = false;
                 FallingFromClimb = false;
+                IsBeingLaunched = false;
 
                 if (!IsJumping && JumpButtonIsHeld) { JumpButtonIsHeld = false; TimeUntilJumpButtonIsDisabled = 0; }
 
@@ -386,17 +400,14 @@ public class PlayerSystem : MonoBehaviour
 
             else
             {
-                if (EnableCoyoteJump && !UsedCoyoteJump)
+                if (EnableCoyoteJump && !UsedCoyoteJump && CurrentCoyoteTime < CoyoteTimer)
                 {
-                    if (CurrentCoyoteTime < CoyoteTimer)
-                    {
-                        CurrentCoyoteTime += Time.fixedDeltaTime;
+                    CurrentCoyoteTime += Time.fixedDeltaTime;
 
-                        if (IsJumping)
-                        {
-                            Velocity.y = JumpForce;
-                            UsedCoyoteJump = true;
-                        }
+                    if (IsJumping)
+                    {
+                        Velocity.y = JumpForce;
+                        UsedCoyoteJump = true;
                     }
                 }
             }
@@ -419,16 +430,13 @@ public class PlayerSystem : MonoBehaviour
 
         if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
-        if (!IsPulling) { Character.Move(actualVelocity * Time.fixedDeltaTime); }
-        else { Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime); }
+        if (!IsPulling) Character.Move(actualVelocity * Time.fixedDeltaTime);
+        else Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime);
+
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
-        else
-        {
-            UsedCoyoteJump = false;
-            CurrentCoyoteTime = 0.0f;
-        }
+        else { UsedCoyoteJump = false; CurrentCoyoteTime = 0.0f; }
 
         if (!IsMoving)
         {
@@ -449,8 +457,7 @@ public class PlayerSystem : MonoBehaviour
             return;
         }
 
-
-        float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
+        float radian = Mathf.Atan2(MoveInput.y, MoveDelta.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
@@ -458,14 +465,14 @@ public class PlayerSystem : MonoBehaviour
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f,
-                IsMoving ? rotation + 90.0f : 90.0f,
+                rotation + 90.0f,
                 0.0f
             );
         }
         else
         {
-            if (transform.position.x > PullObjPos.x) { CharacterRotation = Quaternion.Euler(0, PullObjPos.y + 90, 0); }
-            else { CharacterRotation = Quaternion.Euler(0, PullObjPos.y - 90, 0); }
+            if (transform.position.x > PullObjPos.x) CharacterRotation = Quaternion.Euler(0, PullObjPos.y + 90, 0);
+            else CharacterRotation = Quaternion.Euler(0, PullObjPos.y - 90, 0);
         }
 
         switch (LerpStyle)
@@ -485,8 +492,6 @@ public class PlayerSystem : MonoBehaviour
             case MoveType.None: MoveInput = Vector2.zero; break;
             case MoveType.LockToLeftRight: MoveInput.y = 0.0f; break;
             case MoveType.LockToForwardBack: MoveInput.x = 0.0f; break;
-
-            // TODO: This may need more work, get everyone to test with this and then decide whether it needs to be improved or not!
             case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing) ? 0.0f : MoveInput.y; break;
         }
 
