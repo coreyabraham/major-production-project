@@ -82,10 +82,6 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("All the Surface Types that the Player can interact with")]
     private Dictionary<string, SurfaceMaterial> Surfaces = new();
 
-    [field: Header("Animations")]
-    [field: Tooltip("The Value Name that's targeted within the \"Animator\" reference")]
-    [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
-
     [field: Header("Events")]
     [field: SerializeField] public PlayerEvents Events = new();
     #endregion
@@ -451,12 +447,6 @@ public class PlayerSystem : MonoBehaviour
             return;
         }
 
-        if (IsClimbing)
-        {
-            // Climbing based rotation goes here!
-            return;
-        }
-
         float radian = Mathf.Atan2(MoveInput.y, MoveDelta.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
@@ -464,9 +454,9 @@ public class PlayerSystem : MonoBehaviour
         if (!IsPulling)
         {
             CharacterRotation = Quaternion.Euler(
-                0.0f,
-                rotation + 90.0f,
-                0.0f
+                !IsClimbing ? 0.0f : 90.0f,
+                !IsClimbing ? rotation + 90.0f : 0.0f,
+                IsClimbing ? 180.0f : 0.0f
             );
         }
         else
@@ -498,69 +488,10 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
-        // TODO: This may have to be improved in the future!
-        if (Animator != null)
-        {
-            foreach (PlayerAnimation PA in PlayerAnimations)
-            {
-                if (PA.AnimationType == AnimType.Custom)
-                {
-                    object value = null;
-
-                    switch (PA.AnimationValueType)
-                    {
-                        case AnimValueType.Integer: value = Animator.GetInteger(PA.ValueName); break;
-                        case AnimValueType.Float: value = Animator.GetFloat(PA.ValueName); break;
-                        case AnimValueType.Boolean: value = Animator.GetBool(PA.ValueName); break;
-                    }
-
-                    if (value == null) continue;
-                }
-
-                switch (PA.AnimationType)
-                {
-                    case AnimType.Custom:
-                        {
-                            switch (PA.AnimationValueType)
-                            {
-                                case AnimValueType.Integer:
-                                    {
-                                        bool result = int.TryParse(PA.InputValue, out int input);
-                                        if (!result) continue;
-                                        Animator.SetInteger(PA.ValueName, input);
-                                    }
-                                    break;
-
-                                case AnimValueType.Float:
-                                    {
-                                        bool result = float.TryParse(PA.InputValue, out float input);
-                                        if (!result) continue;
-                                        Animator.SetFloat(PA.ValueName, input);
-                                    }
-                                    break;
-                                case AnimValueType.Boolean:
-                                    {
-                                        bool result = bool.TryParse(PA.InputValue, out bool input);
-                                        if (!result) continue;
-                                        Animator.SetBool(PA.ValueName, input);
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-
-                    case AnimType.Moving:
-                        {
-                            float value = Mathf.Lerp(PreviousMoveSpeed, CurrentMoveSpeed, Time.deltaTime * LerpSpeed);
-                            Animator.SetFloat(PA.ValueName, IsGrounded ? value : 0.0f);
-                        }
-                        break;
-
-                    case AnimType.Jumping: Animator.SetBool(PA.ValueName, (IsJumping && !IsGrounded)); break;
-                    case AnimType.Climbing: Animator.SetBool(PA.ValueName, IsClimbing); break;
-                }
-            }
-        }
+        Animator.SetFloat("Speed", CurrentMoveSpeed);
+        Animator.SetBool("Jump", IsJumping);
+        Animator.SetBool("Climb", IsClimbing);
+        Animator.SetBool("Slide", IsScurrying);
 
         if (IsScurrying)
         {
