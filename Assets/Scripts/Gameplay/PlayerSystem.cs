@@ -126,7 +126,6 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Handlers
-    // Surely there's an easier way to format all of this... right?
     public void OnMove(InputAction.CallbackContext ctx)
     {
         MoveInput = ctx.ReadValue<Vector2>();
@@ -142,11 +141,12 @@ public class PlayerSystem : MonoBehaviour
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
             IsClimbing || IsPulling || IsJumpingFromClimb) return;
+        
         IsScurrying = !IsScurrying;
 
         Events.Scurrying.Invoke(IsScurrying);
 
-        if (IsScurrying || !CanScurry) return;
+        if (IsScurrying || !CanScurry || !IsMoving) return;
         CanScurry = false;
     }
     public void OnJumping(InputAction.CallbackContext ctx)
@@ -396,6 +396,8 @@ public class PlayerSystem : MonoBehaviour
 
             else
             {
+                CanScurry = false;
+
                 if (EnableCoyoteJump && !UsedCoyoteJump && CurrentCoyoteTime < CoyoteTimer)
                 {
                     CurrentCoyoteTime += Time.fixedDeltaTime;
@@ -413,8 +415,6 @@ public class PlayerSystem : MonoBehaviour
         }
         else
         {
-            // TODO: Properly lerp the movement up and down since it's really jarring moving linearly between movements
-
             Velocity.y = MoveDelta.z;
 
             actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
@@ -489,7 +489,7 @@ public class PlayerSystem : MonoBehaviour
         IsMoving = MoveDelta.magnitude != 0.0f;
 
         Animator.SetFloat("Speed", CurrentMoveSpeed);
-        Animator.SetBool("Jump", IsJumping);
+        Animator.SetBool("Jump", IsJumping && !IsGrounded);
         Animator.SetBool("Climb", IsClimbing);
         Animator.SetBool("Slide", IsScurrying);
 
