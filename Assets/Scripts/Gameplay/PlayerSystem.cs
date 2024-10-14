@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -33,6 +34,12 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Unhook the player's movement from the camera.")]
     [field: SerializeField] private bool UnhookMovement = true;
 
+    [field: Tooltip("Allows the player to jump for a short period of time after falling from a ledge.")]
+    [field: SerializeField] private bool EnableCoyoteJump = true;
+    
+    [field: Tooltip("The duration of time that the player can fall for and coyote jump.")]
+    [field: SerializeField] private float CoyoteTimer = 1.0f;
+
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public bool IsJumpingFromClimb;
@@ -52,10 +59,6 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("The force that the player will push objects.")]
     [field: SerializeField] private float PushForce;
-
-    [field: Header("Animations")]
-    [field: Tooltip("The Value Name that's targeted within the \"Animator\" reference")]
-    [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
 
     [field: Header("Externals")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
@@ -80,23 +83,27 @@ public class PlayerSystem : MonoBehaviour
     private Dictionary<string, SurfaceMaterial> Surfaces = new();
 
     [field: Header("Events")]
-    public PlayerEvents Events = new();
+    [field: SerializeField] public PlayerEvents Events = new();
     #endregion
 
     #region Private Variables
-    private Vector3 WarpPosition;
+    [HideInInspector] public Vector3 WarpPosition;
     private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
 
-    private Vector3 Velocity;
     private Vector2 MoveInput;
-    private Vector3 HitDirection;
-    private Vector3 LastFrameVelocity;
     private Vector3 MoveDelta;
     private Vector3 PullObjPos;
+    private Vector3 HitDirection;
+
+    private Vector3 Velocity;
+    private Vector3 LastFrameVelocity = Vector3.zero;
 
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
+
+    private bool UsedCoyoteJump;
+    private float CurrentCoyoteTime;
 
     private float CurrentScurryTime;
     private float CurrentRecoveryTime;
@@ -110,14 +117,15 @@ public class PlayerSystem : MonoBehaviour
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
 
-    private bool IsJumping, IsScurrying, IsGrounded, IsMoving, IsPulling;
+    [HideInInspector] public bool IsJumping;
 
-    private List<GameObject> CachedInteractables = new();
-    private Dictionary<GameObject, ITouchable> CachedTouchables = new();
+    private bool IsScurrying, IsGrounded, IsMoving, IsPulling, IsBeingLaunched;
+
+    private readonly List<GameObject> CachedInteractables = new();
+    private readonly Dictionary<GameObject, ITouchable> CachedTouchables = new();
     #endregion
 
     #region Functions - Handlers
-    // Surely there's an easier way to format all of this... right?
     public void OnMove(InputAction.CallbackContext ctx)
     {
         MoveInput = ctx.ReadValue<Vector2>();
@@ -133,11 +141,12 @@ public class PlayerSystem : MonoBehaviour
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
             IsClimbing || IsPulling || IsJumpingFromClimb) return;
+        
         IsScurrying = !IsScurrying;
 
         Events.Scurrying.Invoke(IsScurrying);
 
-        if (IsScurrying || !CanScurry) return;
+        if (IsScurrying || !CanScurry || !IsMoving) return;
         CanScurry = false;
     }
     public void OnJumping(InputAction.CallbackContext ctx)
@@ -169,6 +178,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
     public bool TogglePullState(bool input) => IsPulling = input;
+    public bool ToggleCharCont(bool enable) => Character.enabled = enable;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
@@ -182,6 +192,12 @@ public class PlayerSystem : MonoBehaviour
         MoveType = Type;
         if (!ResetVelocity) return;
         SetVelocity(Vector3.zero);
+    }
+    public void ForcePlayerToJump(float forceToApply) => Velocity.y = forceToApply;
+    public void ApplyImpulseToPlayer(float accuracy)
+    {
+        IsBeingLaunched = true;
+        Velocity.x = 7 * accuracy;
     }
     public void DeathTriggered()
     {
@@ -345,7 +361,7 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsJumping && !JumpButtonIsHeld)
             {
-                Velocity.y = JumpForce / 2.0f;
+                Velocity.y = JumpForce;
                 IsClimbing = false;
                 IsJumpingFromClimb = true;
             }
@@ -360,13 +376,17 @@ public class PlayerSystem : MonoBehaviour
 
         if (!IsClimbing)
         {
-            Velocity.z = MoveDelta.z;
-            Velocity.x = MoveDelta.x;
+            if (!IsBeingLaunched)
+            {
+                Velocity.z = MoveDelta.z;
+                Velocity.x = MoveDelta.x;
+            }
 
             if (IsGrounded)
             {
                 IsJumpingFromClimb = false;
                 FallingFromClimb = false;
+                IsBeingLaunched = false;
 
                 if (!IsJumping && JumpButtonIsHeld) { JumpButtonIsHeld = false; TimeUntilJumpButtonIsDisabled = 0; }
 
@@ -374,13 +394,27 @@ public class PlayerSystem : MonoBehaviour
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
             }
 
+            else
+            {
+                CanScurry = false;
+
+                if (EnableCoyoteJump && !UsedCoyoteJump && CurrentCoyoteTime < CoyoteTimer)
+                {
+                    CurrentCoyoteTime += Time.fixedDeltaTime;
+
+                    if (IsJumping)
+                    {
+                        Velocity.y = JumpForce;
+                        UsedCoyoteJump = true;
+                    }
+                }
+            }
+
             Velocity += GravityMultiplier * Time.fixedDeltaTime * Physics.gravity;
             actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
         }
         else
         {
-            // TODO: Properly lerp the movement up and down since it's really jarring moving linearly between movements
-
             Velocity.y = MoveDelta.z;
 
             actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
@@ -392,11 +426,13 @@ public class PlayerSystem : MonoBehaviour
 
         if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
-        if (!IsPulling) { Character.Move(actualVelocity * Time.fixedDeltaTime); }
-        else { Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime); }
+        if (!IsPulling) Character.Move(actualVelocity * Time.fixedDeltaTime);
+        else Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime);
+
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
+        else { UsedCoyoteJump = false; CurrentCoyoteTime = 0.0f; }
 
         if (!IsMoving)
         {
@@ -411,29 +447,22 @@ public class PlayerSystem : MonoBehaviour
             return;
         }
 
-        if (IsClimbing)
-        {
-            // Climbing based rotation goes here!
-            return;
-        }
-
-
-        float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
+        float radian = Mathf.Atan2(MoveInput.y, MoveDelta.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
         if (!IsPulling)
         {
             CharacterRotation = Quaternion.Euler(
-                0.0f,
-                IsMoving ? rotation + 90.0f : 90.0f,
-                0.0f
+                !IsClimbing ? 0.0f : 90.0f,
+                !IsClimbing ? rotation + 90.0f : 0.0f,
+                IsClimbing ? 180.0f : 0.0f
             );
         }
         else
         {
-            if (transform.position.x > PullObjPos.x) { CharacterRotation = Quaternion.Euler(0, PullObjPos.y + 90, 0); }
-            else { CharacterRotation = Quaternion.Euler(0, PullObjPos.y - 90, 0); }
+            if (transform.position.x > PullObjPos.x) CharacterRotation = Quaternion.Euler(0, PullObjPos.y + 90, 0);
+            else CharacterRotation = Quaternion.Euler(0, PullObjPos.y - 90, 0);
         }
 
         switch (LerpStyle)
@@ -453,77 +482,16 @@ public class PlayerSystem : MonoBehaviour
             case MoveType.None: MoveInput = Vector2.zero; break;
             case MoveType.LockToLeftRight: MoveInput.y = 0.0f; break;
             case MoveType.LockToForwardBack: MoveInput.x = 0.0f; break;
-
-            // TODO: This may need more work, get everyone to test with this and then decide whether it needs to be improved or not!
             case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing) ? 0.0f : MoveInput.y; break;
         }
 
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
-        // TODO: This may have to be improved in the future!
-        if (Animator != null)
-        {
-            foreach (PlayerAnimation PA in PlayerAnimations)
-            {
-                if (PA.AnimationType == AnimType.Custom)
-                {
-                    object value = null;
-
-                    switch (PA.AnimationValueType)
-                    {
-                        case AnimValueType.Integer: value = Animator.GetInteger(PA.ValueName); break;
-                        case AnimValueType.Float: value = Animator.GetFloat(PA.ValueName); break;
-                        case AnimValueType.Boolean: value = Animator.GetBool(PA.ValueName); break;
-                    }
-
-                    if (value == null) continue;
-                }
-
-                switch (PA.AnimationType)
-                {
-                    case AnimType.Custom:
-                        {
-                            switch (PA.AnimationValueType)
-                            {
-                                case AnimValueType.Integer:
-                                    {
-                                        bool result = int.TryParse(PA.InputValue, out int input);
-                                        if (!result) continue;
-                                        Animator.SetInteger(PA.ValueName, input);
-                                    }
-                                    break;
-
-                                case AnimValueType.Float:
-                                    {
-                                        bool result = float.TryParse(PA.InputValue, out float input);
-                                        if (!result) continue;
-                                        Animator.SetFloat(PA.ValueName, input);
-                                    }
-                                    break;
-                                case AnimValueType.Boolean:
-                                    {
-                                        bool result = bool.TryParse(PA.InputValue, out bool input);
-                                        if (!result) continue;
-                                        Animator.SetBool(PA.ValueName, input);
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-
-                    case AnimType.Moving:
-                        {
-                            float value = Mathf.Lerp(PreviousMoveSpeed, CurrentMoveSpeed, Time.deltaTime * LerpSpeed);
-                            Animator.SetFloat(PA.ValueName, IsGrounded ? value : 0.0f);
-                        }
-                        break;
-
-                    case AnimType.Jumping: Animator.SetBool(PA.ValueName, (IsJumping && !IsGrounded)); break;
-                    case AnimType.Climbing: Animator.SetBool(PA.ValueName, IsClimbing); break;
-                }
-            }
-        }
+        Animator.SetFloat("Speed", CurrentMoveSpeed);
+        Animator.SetBool("Jump", IsJumping && !IsGrounded);
+        Animator.SetBool("Climb", IsClimbing);
+        Animator.SetBool("Slide", IsScurrying);
 
         if (IsScurrying)
         {
