@@ -2,7 +2,7 @@ using UnityEngine;
 
 
 // Used for lerping object between two points in world space.
-public class LerpingObject : MonoBehaviour
+public class LerpingObject : MonoBehaviour, ITouchable
 {
     #region Public Variables
     [field: Header("World Space Coords")]
@@ -23,36 +23,71 @@ public class LerpingObject : MonoBehaviour
 
     [field: Header("Bools")]
 
-    [field: Tooltip("CURRENTLY DOES NOTHING\n\nDetermine whether or not the Player should become a child of this object when it comes into contact with it. Necessary if this script is applied to moving platforms that the Player will be standing on.")]
+    [field: Tooltip("Determine whether or not the Player should become a child of this object when it comes into contact with it. Necessary if this script is applied to moving platforms that the Player will be standing on.")]
     [field: SerializeField] bool parentToPlayer;
+
+    [field: Tooltip("Use `FixedUpdate()` over regular `Update()` functionality, useful for when you want this object to move in sync with Player Movement.")]
+    [field: SerializeField] bool useFixedUpdate;
+
+    [field: Header("ITouchable Inherited")]
+    [field: SerializeField] public bool Enabled { get; set; } = true;
+    [field: SerializeField] public bool HideOnStartup { get; set; } = false;
     #endregion
 
     #region Private Variables
     bool dir;
     float timeElapsed = 0;
+    Transform previousPlayerParent;
     #endregion
 
-    private void Update()
+    private void Callback(float DeltaTime)
     {
-        timeElapsed += Time.deltaTime;
+        timeElapsed += DeltaTime;
 
         var normalizedProgress = timeElapsed * (moveTimeMultiplier * 0.1f);
         var easing = curve.Evaluate(normalizedProgress);
 
-        if (!dir)
-        {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, endPos, easing);
-            if (timeElapsed > pauseTime) { dir = true; timeElapsed = 0; } 
-        }
-        else
-        {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, startPos, easing);
-            if (timeElapsed > pauseTime) { dir = false; timeElapsed = 0; }
-        }
+        transform.localPosition = Vector3.Lerp(transform.localPosition, dir ? startPos : endPos, easing);
+
+        if (timeElapsed < pauseTime) return;
+
+        dir = !dir;
+        timeElapsed = 0.0f;
+    }
+
+    private void Update()
+    {
+        if (useFixedUpdate) return;
+        Callback(Time.deltaTime);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!useFixedUpdate) return;
+        Callback(Time.fixedDeltaTime);
     }
 
     private void Start()
     {
-        startPos = transform.localPosition;
+        if (startPos == Vector3.zero) 
+            startPos = transform.localPosition;
+        
+        transform.position = startPos;
+    }
+
+    public void Entered(Collider other)
+    {
+        if (!parentToPlayer) return;
+        if (previousPlayerParent != null) return;
+
+        previousPlayerParent = GameSystem.Instance.Player.transform.parent;
+        GameSystem.Instance.Player.transform.SetParent(transform);
+    }
+
+    public void Left(Collider other)
+    {
+        if (!parentToPlayer) return;
+        GameSystem.Instance.Player.transform.SetParent(previousPlayerParent);
+        previousPlayerParent = null;
     }
 }

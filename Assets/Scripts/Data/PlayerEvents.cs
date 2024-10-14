@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+[System.Serializable]
 public struct PlayerEvents
 {
     public UnityEvent<Vector2> Moving;
