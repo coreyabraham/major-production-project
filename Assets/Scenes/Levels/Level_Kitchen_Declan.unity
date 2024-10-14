@@ -8541,7 +8541,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2865864201920655155, guid: 8990419aafdd0f34f95ec48f60396af1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -26.615
+      value: -26.115
       objectReference: {fileID: 0}
     - target: {fileID: 2865864201920655155, guid: 8990419aafdd0f34f95ec48f60396af1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -15915,6 +15915,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   parentToPlayer: 0
+  useFixedUpdate: 0
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!65 &1333545410
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16969,11 +16972,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideMoveType: 0
-  PipePoint: {fileID: 6128447481108125334}
-  usePipePointYPos: 0
-  GroundPoint: {fileID: 1057227428}
-  useGroundPoint: 0
+  sideToAttachTo: 0
+  axis: 0
 --- !u!65 &1428697052
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25947,9 +25947,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mopPoint: {fileID: 0}
-  doMopMove: 0
+  acceleration: 0
+  maxTime: 0
   targetTime: 0
   targetForce: 0
+  attachState: 0
 --- !u!1 &441500699658304541
 GameObject:
   m_ObjectHideFlags: 0
@@ -35707,11 +35709,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideMoveType: 0
-  PipePoint: {fileID: 1532895331}
-  usePipePointYPos: 0
-  GroundPoint: {fileID: 6128447481365727850}
-  useGroundPoint: 0
+  sideToAttachTo: 0
+  axis: 0
 --- !u!1 &6128447481558304555
 GameObject:
   m_ObjectHideFlags: 0
@@ -44804,11 +44803,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideMoveType: 0
-  PipePoint: {fileID: 6128447482304520669}
-  usePipePointYPos: 0
-  GroundPoint: {fileID: 6128447482127268635}
-  useGroundPoint: 1
+  sideToAttachTo: 0
+  axis: 0
 --- !u!1 &6128447482344246787
 GameObject:
   m_ObjectHideFlags: 0
@@ -47066,6 +47062,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   parentToPlayer: 0
+  useFixedUpdate: 0
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!1001 &6128447482628787435
 PrefabInstance:
   m_ObjectHideFlags: 0
