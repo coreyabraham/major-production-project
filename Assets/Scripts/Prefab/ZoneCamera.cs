@@ -80,8 +80,8 @@ public class ZoneCamera : MonoBehaviour, ITouchable
         if (IgnoreAnticipationOffset) GameSystem.Instance.Camera.IgnoreAnticipationOffset = PreviousIAO;
         if (IgnoreCurrentOffset) GameSystem.Instance.Camera.IgnoreCurrentOffset = PreviousICO;
 
-        if (ZoneBlending) GameSystem.Instance.Camera.SetActiveTriggerZone(null);
-        else GameSystem.Instance.Camera.ResetZoneCamOffset();
+        GameSystem.Instance.Camera.SetActiveTriggerZone(null);
+        GameSystem.Instance.Camera.ResetZoneCamOffset();
 
         GameSystem.Instance.Camera.RevertCameraType();
     }

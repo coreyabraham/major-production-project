@@ -49,39 +49,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 1.7
+  ClimbSpeed: 1
   ScurrySpeed: 9
   ScurryLimit: 0.07
   ScurryRecoveryTime: 1
+  PullInhibitMultiplier: 0
   MoveEasing: 12
   MoveType: 3
   UnhookMovement: 1
+  EnableCoyoteJump: 1
+  CoyoteTimer: 0.2
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
   FallingFromClimb: 0
   JumpForce: 3.4
   GravityMultiplier: 1.1
-  VelocityYIdle: -1.4
+  VelocityYIdle: 0
   LerpStyle: 2
   LerpSpeed: 9
   PushForce: 1
-  PlayerAnimations:
-  - ValueName: Speed
-    InputValue: 
-    AnimationType: 1
-    AnimationValueType: 1
-  - ValueName: Jump
-    InputValue: 
-    AnimationType: 2
-    AnimationValueType: 2
-  - ValueName: Climb
-    InputValue: 
-    AnimationType: 3
-    AnimationValueType: 2
-  - ValueName: Slide
-    InputValue: 
-    AnimationType: 4
-    AnimationValueType: 2
   Camera: {fileID: 0}
   Animator: {fileID: 4095228785318712889}
   InteractTag: Interactable
@@ -91,6 +78,8 @@ MonoBehaviour:
   IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
+  WarpPosition: {x: 0, y: 0, z: 0}
+  IsJumping: 0
 --- !u!143 &1886212965
 CharacterController:
   m_ObjectHideFlags: 0
@@ -102,13 +91,13 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 0
-  m_Radius: 0.05
+  m_Height: 0.2
+  m_Radius: 0.1
   m_SlopeLimit: 45
   m_StepOffset: 0.001
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.05, z: 0}
+  m_Center: {x: 0, y: 0.075, z: 0}
 --- !u!114 &1811432823432441354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +325,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32aff4bf4b7782e4390660f602eedc14, type: 3}
       propertyPath: m_LocalPosition.z
