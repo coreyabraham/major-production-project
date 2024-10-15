@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 370.40137, g: 281.32935, b: 224.06665, a: 1}
+  m_IndirectSpecularColor: {r: 370.62158, g: 281.42847, b: 224.03442, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4244,11 +4244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideMoveType: 0
-  PipePoint: {fileID: 1215140972}
-  usePipePointYPos: 0
-  GroundPoint: {fileID: 0}
-  useGroundPoint: 0
+  sideToAttachTo: 1
+  axis: 0
 --- !u!65 &236120176
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6967,6 +6964,9 @@ MonoBehaviour:
   LevelNames: []
   BlacklistedPauseScenes: []
   Events:
+    ExternalsCached:
+      m_PersistentCalls:
+        m_Calls: []
     PlayerDied:
       m_PersistentCalls:
         m_Calls: []
@@ -8311,11 +8311,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideMoveType: 0
-  PipePoint: {fileID: 1561761894}
-  usePipePointYPos: 0
-  GroundPoint: {fileID: 0}
-  useGroundPoint: 0
+  sideToAttachTo: 1
+  axis: 0
 --- !u!1 &568629800
 GameObject:
   m_ObjectHideFlags: 0
@@ -11699,7 +11696,6 @@ MonoBehaviour:
     position: {x: 0.76, y: 0.46, z: -6.1}
     rotation: {x: 0, y: 0, z: 0, w: 0}
   AnticipationOffset: 0.5
-  FieldOfViewClamp: {x: 0, y: 180}
   FieldOfView: 18
   CameraLerpSpeed: 4.5
   VFXLerpSpeed: 4
@@ -22455,29 +22451,20 @@ MonoBehaviour:
   MoveEasing: 8
   MoveType: 3
   UnhookMovement: 1
+  EnableCoyoteJump: 1
+  CoyoteTimer: 1
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
   FallingFromClimb: 0
   JumpForce: 3.5
+  JumpForcePipe: 0
+  EnableScurryInAir: 1
   GravityMultiplier: 1.05
   VelocityYIdle: 0.1
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
-  PlayerAnimations:
-  - ValueName: Speed
-    InputValue: 
-    AnimationType: 1
-    AnimationValueType: 1
-  - ValueName: Jump
-    InputValue: 
-    AnimationType: 2
-    AnimationValueType: 2
-  - ValueName: Climb
-    InputValue: 
-    AnimationType: 3
-    AnimationValueType: 2
   Camera: {fileID: 761082605}
   Animator: {fileID: 584948839}
   InteractTag: Interactable
@@ -22487,6 +22474,28 @@ MonoBehaviour:
   IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
+  Events:
+    Moving:
+      m_PersistentCalls:
+        m_Calls: []
+    Jumping:
+      m_PersistentCalls:
+        m_Calls: []
+    Scurrying:
+      m_PersistentCalls:
+        m_Calls: []
+    Climbing:
+      m_PersistentCalls:
+        m_Calls: []
+    Interacting:
+      m_PersistentCalls:
+        m_Calls: []
+  WarpPosition: {x: 0, y: 0, z: 0}
+  CurrentPipe: {fileID: 0}
+  CurrentPipeMin: 0
+  CurrentPipeMax: 0
+  CurrentPipeSide: 0
+  IsJumping: 0
 --- !u!4 &1442866559
 Transform:
   m_ObjectHideFlags: 0
@@ -28607,11 +28616,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideMoveType: 0
-  PipePoint: {fileID: 1942903537}
-  usePipePointYPos: 0
-  GroundPoint: {fileID: 0}
-  useGroundPoint: 0
+  sideToAttachTo: 0
+  axis: 0
 --- !u!65 &1904635176
 BoxCollider:
   m_ObjectHideFlags: 0
