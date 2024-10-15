@@ -16,6 +16,10 @@ public class ExitUI : MonoBehaviour
         {
             Main.SetActive(true);
             gameObject.SetActive(false);
+            
+            TitleUI title = FindObjectOfType<TitleUI>();
+            if (title != null) title.SubTitle.text = title.SubTitleText + " | " + "Main Menu";
+
             return;
         }
 

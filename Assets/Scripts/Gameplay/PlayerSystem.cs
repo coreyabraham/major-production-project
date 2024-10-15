@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -48,6 +48,12 @@ public class PlayerSystem : MonoBehaviour
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] private float JumpForce;
+
+    [field: Tooltip("The force that us applied to the player's z-axis upon hitting the jump key/button when climbing on a pipe.")]
+    [field: SerializeField] private float JumpForcePipe;
+
+    [field: Tooltip("")]
+    [field: SerializeField] private bool EnableScurryInAir;
 
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
@@ -114,8 +120,13 @@ public class PlayerSystem : MonoBehaviour
     private float CurrentMoveSpeed = 0.0f;
     private float PreviousMoveSpeed;
 
+    [HideInInspector] public PipeFunctionality CurrentPipe;
+    [HideInInspector] public float CurrentPipeMin = 0, CurrentPipeMax = 0;
+    [HideInInspector] public PipeSide CurrentPipeSide;
+
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
+
 
     [HideInInspector] public bool IsJumping;
 
@@ -127,7 +138,7 @@ public class PlayerSystem : MonoBehaviour
 
     #region Functions - Handlers
     public void OnMove(InputAction.CallbackContext ctx)
-    {
+    {        
         MoveInput = ctx.ReadValue<Vector2>();
         Events.Moving.Invoke(MoveInput);
     }
@@ -151,7 +162,11 @@ public class PlayerSystem : MonoBehaviour
     }
     public void OnJumping(InputAction.CallbackContext ctx)
     {
-        if (MoveType == MoveType.None || (IsClimbing && MoveInput.x == 0)) return;
+        if (MoveType == MoveType.None) return;
+        if ((IsClimbing && CurrentPipeSide == PipeSide.Left && MoveInput.x > 0) ||
+            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0) ||
+            (IsClimbing && MoveInput.x == 0)) { return; }
+
         IsJumping = ctx.ReadValueAsButton();
         Events.Jumping.Invoke(IsJumping);
     }
@@ -333,7 +348,7 @@ public class PlayerSystem : MonoBehaviour
 
         //SetMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
         if ((!IsJumpingFromClimb && !IsScurrying && !IsClimbing)) { SetMoveSpeed = MoveSpeed; }
-        else if (IsJumpingFromClimb) { SetMoveSpeed = MoveSpeed + 0.4f; }
+        else if (IsJumpingFromClimb) { SetMoveSpeed = JumpForcePipe; }
         else if (!IsJumpingFromClimb && !IsScurrying && IsClimbing) { SetMoveSpeed = ClimbSpeed; }
         else { SetMoveSpeed = ScurrySpeed; }
 
@@ -361,6 +376,9 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsJumping && !JumpButtonIsHeld)
             {
+                if (IsJumpingFromClimb && CurrentPipeSide == PipeSide.Right) { MoveInput.x = 1; }
+                else if (IsJumpingFromClimb && CurrentPipeSide == PipeSide.Left) { MoveInput.x = -1; }
+
                 Velocity.y = JumpForce;
                 IsClimbing = false;
                 IsJumpingFromClimb = true;
@@ -396,7 +414,7 @@ public class PlayerSystem : MonoBehaviour
 
             else
             {
-                CanScurry = false;
+                if (!EnableScurryInAir) { CanScurry = false; }
 
                 if (EnableCoyoteJump && !UsedCoyoteJump && CurrentCoyoteTime < CoyoteTimer)
                 {
@@ -417,7 +435,7 @@ public class PlayerSystem : MonoBehaviour
         {
             Velocity.y = MoveDelta.z;
 
-            actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, MoveEasing * Time.fixedDeltaTime);
+            actualVelocity = Vector3.Lerp(LastFrameVelocity, Velocity, 100 * Time.fixedDeltaTime);
             actualVelocity.z = 0;
         }
 

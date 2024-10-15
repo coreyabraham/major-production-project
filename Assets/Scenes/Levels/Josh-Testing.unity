@@ -5793,6 +5793,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Pipe_Thick_Short_Closed_low (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4087060908402718750, guid: 6692fc022928b384c82c085491abc69d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7802595049841682181, guid: 6692fc022928b384c82c085491abc69d, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -7325,6 +7329,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   parentToPlayer: 0
+  useFixedUpdate: 0
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!1 &1041967316
 GameObject:
   m_ObjectHideFlags: 0
@@ -10792,7 +10799,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a099ac655236644b87db4d8b797f1fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SceneReloading: 0
+  SceneReloading: 1
 --- !u!1 &1443068553
 GameObject:
   m_ObjectHideFlags: 0
@@ -12808,6 +12815,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Pipe_Thick_Short_Closed_low
       objectReference: {fileID: 0}
+    - target: {fileID: 4087060908402718750, guid: 6692fc022928b384c82c085491abc69d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7802595049841682181, guid: 6692fc022928b384c82c085491abc69d, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -14306,6 +14317,14 @@ PrefabInstance:
       propertyPath: respawnPoint
       value: 
       objectReference: {fileID: 1103629571}
+    - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
+      propertyPath: JumpForcePipe
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
+      propertyPath: PipeJumpForce
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: PullInhibitMultiplier
       value: 2
@@ -15933,6 +15952,10 @@ PrefabInstance:
     - target: {fileID: 4087060908402718750, guid: 6692fc022928b384c82c085491abc69d, type: 3}
       propertyPath: m_Name
       value: SM_Pipe_Thick_Short_Closed_low (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087060908402718750, guid: 6692fc022928b384c82c085491abc69d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7802595049841682181, guid: 6692fc022928b384c82c085491abc69d, type: 3}
       propertyPath: m_RootOrder

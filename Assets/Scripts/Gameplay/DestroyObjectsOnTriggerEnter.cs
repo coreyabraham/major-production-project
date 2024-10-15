@@ -14,55 +14,32 @@ public class DestroyObjectsOnTriggerEnter : MonoBehaviour
     [field: Tooltip("Should the GameObject that this script is on be destroyed immediately after the elements in the array are?")]
     [field: SerializeField] bool destroySelf;
     #endregion
-
-
     private void OnTriggerEnter(Collider other)
     {
         if (tagToLookFor == "") { return; }
+        if (!other.CompareTag(tagToLookFor)) { return; }
 
-        if (other.CompareTag(tagToLookFor))
+        foreach (GameObject obj in elements)
         {
-            if (elements.Length > 1)
-            {
-                for (int i = 0; i < elements.Length; i++)
-                {
-                    if (elements[i]) { Destroy(elements[i]); }
-                }
-            }
-            else
-            {
-                Destroy(elements[0]);
-            }
-            
-
-            if (destroySelf) { Destroy(this); }
+            if (!obj) continue;
+            Destroy(obj);
         }
+
+        if (!destroySelf) { return; }
+
+        Destroy(this);
     }
 
 
     private void Start()
     {
-        if (enableElementsOnStart)
+        if (!enableElementsOnStart) return;
+
+        foreach (GameObject obj in elements)
         {
-            for (int i = 0; i < elements.Length; i++)
-            {
-                elements[i].SetActive(true);
-            }
+            obj.SetActive(true);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /*
     private void OnTriggerEnter(Collider other)
