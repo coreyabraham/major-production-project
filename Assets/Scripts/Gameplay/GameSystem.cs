@@ -10,6 +10,7 @@ public class GameSystem : Singleton<GameSystem>
     [System.Serializable]
     public class GameEvents
     {
+        public UnityEvent<PlayerSystem, CameraSystem> ExternalsCached;
         public UnityEvent PlayerDied;
 
         public UnityEvent RequestLoadingUI;
@@ -96,6 +97,8 @@ public class GameSystem : Singleton<GameSystem>
                 if (Camera != null) break;
             }
         }
+
+        Events.ExternalsCached?.Invoke(Player, Camera);
     }
 
     public void RequestLoadScene(string SceneName)
@@ -160,10 +163,13 @@ public class GameSystem : Singleton<GameSystem>
 
     private void LoadEvents()
     {
+        Events.ExternalsCached ??= new();
         Events.PlayerDied ??= new();
+
         Events.RequestLoadingUI ??= new();
         Events.LoadingStarted ??= new();
         Events.LoadingProgress ??= new();
+        
         Events.SceneUnloaded ??= new();
         Events.SceneLoaded ??= new();
         Events.SceneChanged ??= new();

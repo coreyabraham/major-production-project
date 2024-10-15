@@ -37,7 +37,6 @@ public class LerpingObject : MonoBehaviour, ITouchable
     #region Private Variables
     bool dir;
     float timeElapsed = 0;
-    Transform previousPlayerParent;
     #endregion
 
     private void Callback(float DeltaTime)
@@ -78,16 +77,12 @@ public class LerpingObject : MonoBehaviour, ITouchable
     public void Entered(Collider other)
     {
         if (!parentToPlayer) return;
-        if (previousPlayerParent != null) return;
-
-        previousPlayerParent = GameSystem.Instance.Player.transform.parent;
         GameSystem.Instance.Player.transform.SetParent(transform);
     }
 
     public void Left(Collider other)
     {
         if (!parentToPlayer) return;
-        GameSystem.Instance.Player.transform.SetParent(previousPlayerParent);
-        previousPlayerParent = null;
+        GameSystem.Instance.Player.transform.SetParent(null);
     }
 }
