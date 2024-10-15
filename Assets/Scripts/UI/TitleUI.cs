@@ -10,9 +10,9 @@ public class TitleUI : MonoBehaviour
         public GameObject Frame;
     }
 
-    [field: SerializeField] private TMP_Text SubTitle;
-    [field: SerializeField] private string SubTitleText = "TEAM NAME";
-    [field: SerializeField] private string ButtonTag = "UI_BUTTON";
+    public TMP_Text SubTitle;
+    public string SubTitleText = "TEAM NAME";
+    public string ButtonTag = "UI_BUTTON";
 
     [field: Space(5.0f)]
 
