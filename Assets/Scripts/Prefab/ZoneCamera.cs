@@ -2,13 +2,6 @@ using UnityEngine;
 
 public class ZoneCamera : MonoBehaviour, ITouchable
 {
-    // TODO: MOVE THIS ENUMERATION LATER!
-    [System.Serializable]
-    public enum LocalScaleUsage
-    {
-        X, Y, Z
-    }
-
     [field: Header("ITouchable Inheritance")]
     [field: SerializeField] public bool Enabled { get; set; }
     [field: SerializeField] public bool HideOnStartup { get; set; }
@@ -18,7 +11,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: SerializeField] private bool IgnoreCurrentOffset;
 
     [field: Header("Scaling Options")]
-    public LocalScaleUsage LocalScaleType = LocalScaleUsage.X;
+    public CartesianCoords LocalScaleType = CartesianCoords.X;
     [field: SerializeField] private float TransformModifier = 0.5f;
     
     [field: Header("Utilization Options")]
@@ -110,9 +103,9 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
         switch (LocalScaleType)
         {
-            case LocalScaleUsage.X: TriggerSize = transform.localScale.x * TransformModifier; break;
-            case LocalScaleUsage.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
-            case LocalScaleUsage.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
+            case CartesianCoords.X: TriggerSize = transform.localScale.x * TransformModifier; break;
+            case CartesianCoords.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
+            case CartesianCoords.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
 
         if (!DeriveStartFOV) return;

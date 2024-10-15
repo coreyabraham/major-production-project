@@ -1,18 +1,16 @@
 using UnityEngine;
 
-
-public enum MopHandleStates
-{
-    WaitForPlayer = 0,
-    PlayerAttached,
-    PlayerJumpFromMop,
-    PlayerTimeout,
-    Deactivated
-}
-
-
 public class MopHandleLaunch : MonoBehaviour
 {
+    public enum MopHandleStates
+    {
+        WaitForPlayer = 0,
+        PlayerAttached,
+        PlayerJumpFromMop,
+        PlayerTimeout,
+        Deactivated
+    }
+
     #region Public Variables
     [field: Header("Mop Properties")]
 
@@ -42,7 +40,6 @@ public class MopHandleLaunch : MonoBehaviour
     float rotateTimer = 0;
     #endregion
 
-
     private void Update()
     {
         if (doMopMove)
@@ -59,8 +56,7 @@ public class MopHandleLaunch : MonoBehaviour
         {
             playSys.IsClimbing = true;
             playSys.IsJumpingFromClimb = false;
-            playSys.SetMoveType(MoveType.None);
-            playSys.SetVelocity(Vector3.zero);
+            playSys.SetMoveType(MoveType.None, true);
 
             playSys.Warp(mopPoint.transform.position);
             playSys.gameObject.transform.parent = mopPoint.transform;
@@ -100,28 +96,9 @@ public class MopHandleLaunch : MonoBehaviour
         }
     }
 
-
     private void Start()
     {
         parentOfThis = gameObject.transform.parent;
-    }
-
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!other.CompareTag("Player")) { return; }
-        playSys = other.GetComponent<PlayerSystem>();
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (!other.CompareTag("Player") || playSys) { return; }
-        playSys = other.GetComponent<PlayerSystem>();
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag("Player")) { return; }
-        playSys = null;
+        playSys = GameSystem.Instance.Player;
     }
 }

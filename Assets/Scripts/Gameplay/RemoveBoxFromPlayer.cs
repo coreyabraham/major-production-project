@@ -3,20 +3,23 @@ using UnityEngine;
 /// <summary>
 /// Goes on a trigger box and checks for the Player. It then removes the box from the player and classes them as unhidden.
 /// </summary>
-public class RemoveBoxFromPlayer : MonoBehaviour
+public class RemoveBoxFromPlayer : MonoBehaviour, ITouchable
 {
+    [field: Header("ITouchable Inheritance")]
+    public bool Enabled { get; set; } = true;
+    public bool HideOnStartup { get; set; } = false;
+
     bool hasTriggeredOnce = false;
 
-
-    private void OnTriggerEnter(Collider other)
+    public void Entered(Collider other)
     {
-        if (!other.CompareTag("Player") || hasTriggeredOnce) { return; }
-        
-        PlayerSystem playSys = other.GetComponent<PlayerSystem>();
-        playSys.IsHidden = false;
+        if (hasTriggeredOnce) { return; }
 
-        Destroy(playSys.gameObject.transform.GetChild(1).gameObject);
+        GameSystem.Instance.Player.IsHidden = false;
+        Destroy(GameSystem.Instance.Player.gameObject.transform.GetChild(1).gameObject);
 
         hasTriggeredOnce = true;
     }
+
+    public void Left(Collider other) {  }
 }

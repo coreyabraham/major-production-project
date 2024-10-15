@@ -1,11 +1,3 @@
-/*
- CameraSystem / ZoneCamera TO DO's
-    - Properly test ALL ZoneCamera.cs options to make sure they all work individually
-    - Implement "Overriding Options" so that they actually have an effect on the CameraSystem.cs
-    - Fix Inconsistent Field Of View Settings
-    - Make sure Blending Types and `Target Offset Object` are independant
- */
-
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering.HighDefinition;
@@ -47,7 +39,6 @@ public class CameraSystem : MonoBehaviour
 
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
-    //public PlayerSystem Player;
     [HideInInspector] public Camera main;
 
     [field: Space(2.5f)]
@@ -361,9 +352,9 @@ public class CameraSystem : MonoBehaviour
 
         switch (ActiveZoneTrigger.LocalScaleType)
         {
-            case ZoneCamera.LocalScaleUsage.X: selection = ActiveZoneTrigger.transform.position.x - tarPos.x; break;
-            case ZoneCamera.LocalScaleUsage.Y: selection = ActiveZoneTrigger.transform.position.y - tarPos.y; break;
-            case ZoneCamera.LocalScaleUsage.Z: selection = ActiveZoneTrigger.transform.position.z - tarPos.z; break;
+            case CartesianCoords.X: selection = ActiveZoneTrigger.transform.position.x - tarPos.x; break;
+            case CartesianCoords.Y: selection = ActiveZoneTrigger.transform.position.y - tarPos.y; break;
+            case CartesianCoords.Z: selection = ActiveZoneTrigger.transform.position.z - tarPos.z; break;
         }
 
         float distanceFromTriggerCentre = Mathf.Abs(selection);
@@ -427,6 +418,54 @@ public class CameraSystem : MonoBehaviour
     }
     #endregion
 
+    private void ModifyDepthOfField()
+    {
+        if (!DOF) return;
+
+        DOF.active = DepthOfFieldData.Active;
+
+        if (!DOF.active) return;
+
+        if (EasingStyle != EasingStyle.None)
+        {
+            DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+            DOF.farFocusStart.Interp(DOF.farFocusStart.value, DepthOfFieldData.FarRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.farFocusEnd.Interp(DOF.farFocusEnd.value, DepthOfFieldData.FarRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+            DOF.nearSampleCount = (int)Mathf.Lerp(DOF.nearSampleCount, DepthOfFieldData.NearSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.farSampleCount = (int)Mathf.Lerp(DOF.farSampleCount, DepthOfFieldData.FarSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+
+            DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+        }
+        else
+        {
+            DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
+            DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
+
+            DOF.farFocusStart = DepthOfFieldData.FarRangeStart;
+            DOF.farFocusEnd = DepthOfFieldData.FarRangeEnd;
+
+            DOF.nearSampleCount = DepthOfFieldData.NearSampleCount;
+            DOF.farSampleCount = DepthOfFieldData.FarSampleCount;
+
+            DOF.nearMaxBlur = DepthOfFieldData.NearMaxBlur;
+            DOF.farMaxBlur = DepthOfFieldData.FarMaxBlur;
+        }
+
+        DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
+        DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
+
+        DOF.farFocusStart.overrideState = DepthOfFieldData.FarRangeStart.overrideState;
+        DOF.farFocusEnd.overrideState = DepthOfFieldData.FarRangeEnd.overrideState;
+
+        DOF.focusMode = DepthOfFieldData.FocusMode;
+
+        DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
+    }
+
     private void Update()
     {
         if (!CutsceneRunning || !TrackCutsceneInterval) return;
@@ -457,49 +496,7 @@ public class CameraSystem : MonoBehaviour
         if (CameraType != CameraType.TargetState || CameraType != CameraType.OffsetState)
             main.fieldOfView = EasingStyle != EasingStyle.None ? Mathf.Lerp(main.fieldOfView, FieldOfView, Time.fixedDeltaTime * VFXLerpSpeed) : FieldOfView;
 
-        if (DOF) DOF.active = DepthOfFieldData.Active;
-
-        if (DOF != null && DOF.active)
-        {
-            if (EasingStyle != EasingStyle.None)
-            {
-                DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
-
-                DOF.farFocusStart.Interp(DOF.farFocusStart.value, DepthOfFieldData.FarRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.farFocusEnd.Interp(DOF.farFocusEnd.value, DepthOfFieldData.FarRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
-
-                DOF.nearSampleCount = (int)Mathf.Lerp(DOF.nearSampleCount, DepthOfFieldData.NearSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.farSampleCount = (int)Mathf.Lerp(DOF.farSampleCount, DepthOfFieldData.FarSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
-
-                DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
-            }
-            else
-            {
-                DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
-                DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
-
-                DOF.farFocusStart = DepthOfFieldData.FarRangeStart;
-                DOF.farFocusEnd = DepthOfFieldData.FarRangeEnd;
-
-                DOF.nearSampleCount = DepthOfFieldData.NearSampleCount;
-                DOF.farSampleCount = DepthOfFieldData.FarSampleCount;
-
-                DOF.nearMaxBlur = DepthOfFieldData.NearMaxBlur;
-                DOF.farMaxBlur = DepthOfFieldData.FarMaxBlur;
-            }
-
-            DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
-            DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
-
-            DOF.farFocusStart.overrideState = DepthOfFieldData.FarRangeStart.overrideState;
-            DOF.farFocusEnd.overrideState = DepthOfFieldData.FarRangeEnd.overrideState;
-
-            DOF.focusMode = DepthOfFieldData.FocusMode;
-
-            DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
-        }
+        ModifyDepthOfField();
 
         CameraTarget Target = CutsceneRunning ? CutscenePoints[CutsceneIndex] : PreviousCameraLocation;
 
