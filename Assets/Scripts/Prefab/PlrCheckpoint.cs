@@ -11,7 +11,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
     [field: SerializeField] private string OverrideName;
     [field: SerializeField] private Transform OverrideTranform;
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
         SaveData data = DataHandler.Instance.GetCachedData();
 
@@ -36,7 +36,9 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
         else Debug.LogWarning(name + "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
 
-    public void Left(Collider other) { }
+    public void Left(PlayerSystem Player) { }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

@@ -64,13 +64,15 @@ MonoBehaviour:
   IsJumpingFromClimb: 0
   FallingFromClimb: 0
   JumpForce: 3.5
+  JumpForcePipe: 0
+  EnableScurryInAir: 1
   GravityMultiplier: 1.05
   VelocityYIdle: 0.1
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
   Camera: {fileID: 0}
-  Animator: {fileID: 0}
+  Animator: {fileID: 4095228785318712889}
   InteractTag: Interactable
   TouchTag: Touchable
   Character: {fileID: 0}
@@ -95,6 +97,10 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   WarpPosition: {x: 0, y: 0, z: 0}
+  CurrentPipe: {fileID: 0}
+  CurrentPipeMin: 0
+  CurrentPipeMax: 0
+  CurrentPipeSide: 0
   IsJumping: 0
 --- !u!143 &1886212965
 CharacterController:

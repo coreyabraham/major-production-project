@@ -5,16 +5,22 @@ public interface ITouchable
     public bool Enabled { get; set; }
     public bool HideOnStartup { get; set; }
 
-    public virtual void TriggerEnter(Collider other)
+    public virtual void TriggerEnter(PlayerSystem Player)
     {
         if (!Enabled) return;
-        Entered(other);
+        Entered(Player);
     }
 
-    public virtual void TriggerLeave(Collider other)
+    public virtual void TriggerStay(PlayerSystem Player)
     {
         if (!Enabled) return;
-        Left(other);
+        Staying(Player);
+    }
+
+    public virtual void TriggerLeave(PlayerSystem Player)
+    {
+        if (!Enabled) return;
+        Left(Player);
     }
 
     public virtual void SetupTrigger(GameObject gameObject)
@@ -32,6 +38,7 @@ public interface ITouchable
         component.enabled = false;
     }
 
-    public void Entered(Collider other);
-    public void Left(Collider other);
+    public void Entered(PlayerSystem Player);
+    public void Left(PlayerSystem Player);
+    public void Staying(PlayerSystem Player);
 }

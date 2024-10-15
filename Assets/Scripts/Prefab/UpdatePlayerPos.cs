@@ -9,15 +9,16 @@ public class UpdatePlayerPos : MonoBehaviour, ITouchable
     [field: Header("Trigger Specific")]
     [field: SerializeField] private Transform TargetTransform;
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
-        if (!GameSystem.Instance.Player) return;
+        if (!Player) return;
         if (!TargetTransform) return;
-
-        GameSystem.Instance.Player.Warp(TargetTransform.position);
+        Player.Warp(TargetTransform.position);
     }
 
-    public void Left(Collider other) { }
+    public void Left(PlayerSystem Player) { }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

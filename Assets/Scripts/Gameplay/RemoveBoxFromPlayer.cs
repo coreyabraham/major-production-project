@@ -11,15 +11,17 @@ public class RemoveBoxFromPlayer : MonoBehaviour, ITouchable
 
     bool hasTriggeredOnce = false;
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
         if (hasTriggeredOnce) { return; }
 
-        GameSystem.Instance.Player.IsHidden = false;
-        Destroy(GameSystem.Instance.Player.gameObject.transform.GetChild(1).gameObject);
+        Player.IsHidden = false;
+        Destroy(Player.gameObject.transform.GetChild(1).gameObject);
 
         hasTriggeredOnce = true;
     }
 
-    public void Left(Collider other) {  }
+    public void Left(PlayerSystem Player) {  }
+
+    public void Staying(PlayerSystem Player) { }
 }
