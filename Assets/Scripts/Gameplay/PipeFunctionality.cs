@@ -15,9 +15,7 @@ public enum PipeAxis
 public class PipeFunctionality : MonoBehaviour
 {
     /* Things that are needed:
-     * - Why is this so terrible.
      * - Only allow jump when pushing in the same direction as their current up-direction, which will be away from the pipe.
-     * - Store max Y value of trigger. Prevent up movement on pipe when the player is above this range.
     */
 
     [field: Header("Pipe Specifics")]
@@ -27,14 +25,28 @@ public class PipeFunctionality : MonoBehaviour
     [field: Tooltip("In case the incorrect axis is being used when attaching to the pipes, adjust them using this.")]
     [field: SerializeField] PipeAxis axis;
 
-    private bool PlayerIsOn = false, SkipJumpToClimbCheck = false;  // Prevents player from reattaching to current pipe if true.
+    private bool SkipJumpToClimbCheck = false;  // Prevents player from reattaching to current pipe if true.
     private float SkipJumpCooldown = 1;
     private PlayerSystem playSys;
 
 
+
+    #region Functions - Private
+    private void InitialisePlayerOnPipe()
+    {
+        playSys.CurrentPipe = this;
+
+        BoxCollider collider = GetComponent<BoxCollider>();
+        playSys.CurrentPipeMin = collider.bounds.min.y;
+        playSys.CurrentPipeMax = collider.bounds.max.y;
+
+        playSys.CurrentPipeSide = sideToAttachTo;
+    }
+
+
     private void DetermineClimbHook()
     {
-        if (!SkipJumpToClimbCheck && !playSys.IsPlayerGrounded())
+        if (!SkipJumpToClimbCheck)
         {
             playSys.IsClimbing = true;
             playSys.IsJumpingFromClimb = false;
@@ -60,27 +72,33 @@ public class PipeFunctionality : MonoBehaviour
 
 
         // Beyond the below line, they've requested (as in pushed the interact key/button), which will detach them.
-        //if (!playSys.ClimbingRequested) return;
-        if (!Input.GetKeyDown(KeyCode.Space)) { return; }
+        if (!playSys.IsPlayerJumping()) { return; }
 
         SkipJumpCooldown = 0;
         playSys.SetVelocity(Vector3.zero);
     }
 
 
-    #region Functions - Private
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
         playSys = other.GetComponent<PlayerSystem>();
-        PlayerIsOn = true;
+        InitialisePlayerOnPipe();
     }
 
 
     private void Update()
     {
-        if (SkipJumpCooldown < 0.5f) { SkipJumpCooldown += Time.deltaTime; SkipJumpToClimbCheck = true; PlayerIsOn = false; playSys = null; }
-        else { SkipJumpToClimbCheck = false; }
+        if (SkipJumpCooldown < 0.2f)
+        {
+            SkipJumpCooldown += Time.deltaTime;
+            SkipJumpToClimbCheck = true;
+            playSys = null;
+        }
+        else
+        {
+            SkipJumpToClimbCheck = false;
+        }
 
         if (!playSys) return;
         DetermineClimbHook();
