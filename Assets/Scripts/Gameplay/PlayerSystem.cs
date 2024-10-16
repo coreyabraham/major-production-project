@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -267,11 +266,17 @@ public class PlayerSystem : MonoBehaviour
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
         if (!result) return;
 
-        touchable.TriggerEnter(other);
+        touchable.TriggerEnter(this);
     }
 
     private void OnTriggerStay(Collider other)
     {
+        if (other.gameObject.CompareTag(TouchTag))
+        {
+            if (CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable))
+                touchable.TriggerStay(this);
+        }
+
         if (!other.transform.root.CompareTag("Grabbable")) { return; }
         if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
 
@@ -301,7 +306,7 @@ public class PlayerSystem : MonoBehaviour
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
         if (!result) return;
 
-        touchable.TriggerLeave(other);
+        touchable.TriggerLeave(this);
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -472,9 +477,9 @@ public class PlayerSystem : MonoBehaviour
         if (!IsPulling)
         {
             CharacterRotation = Quaternion.Euler(
-                !IsClimbing ? 0.0f : 90.0f,
-                !IsClimbing ? rotation + 90.0f : 0.0f,
-                IsClimbing ? 180.0f : 0.0f
+                0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
+                !IsClimbing ? rotation + 90.0f : 180.0f,
+                0.0f // Original: IsClimbing ? 180.0f : 0.0f
             );
         }
         else
@@ -509,7 +514,6 @@ public class PlayerSystem : MonoBehaviour
         Animator.SetFloat("Speed", CurrentMoveSpeed);
         Animator.SetBool("Jump", IsJumping && !IsGrounded);
         Animator.SetBool("Climb", IsClimbing);
-        Animator.SetBool("Slide", IsScurrying);
 
         if (IsScurrying)
         {

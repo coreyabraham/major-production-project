@@ -44,7 +44,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     private bool PreviousIAO;
     private bool PreviousICO;
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
         if (IgnoreAnticipationOffset)
         {
@@ -68,7 +68,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
         }
     }
 
-    public void Left(Collider other)
+    public void Left(PlayerSystem Player)
     {
         if (IgnoreAnticipationOffset) GameSystem.Instance.Camera.IgnoreAnticipationOffset = PreviousIAO;
         if (IgnoreCurrentOffset) GameSystem.Instance.Camera.IgnoreCurrentOffset = PreviousICO;
@@ -78,6 +78,8 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
         GameSystem.Instance.Camera.RevertCameraType();
     }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Start()
     {

@@ -14,10 +14,6 @@ public enum PipeAxis
 
 public class PipeFunctionality : MonoBehaviour
 {
-    /* Things that are needed:
-     * - Only allow jump when pushing in the same direction as their current up-direction, which will be away from the pipe.
-    */
-
     [field: Header("Pipe Specifics")]
 
     [field: Tooltip("The side of the pipe that the player will attach to when interacting with this pipe.")]

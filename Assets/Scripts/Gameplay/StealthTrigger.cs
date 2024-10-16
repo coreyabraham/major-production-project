@@ -15,8 +15,9 @@ public class StealthTrigger : MonoBehaviour, ITouchable
     #endregion
 
     #region Functions - Public
-    public void Entered(Collider other) => playerSystem.IsHidden = true;
-    public void Left(Collider other) => playerSystem.IsHidden = false;
+    public void Entered(PlayerSystem Player) => playerSystem.IsHidden = true;
+    public void Left(PlayerSystem Player) => playerSystem.IsHidden = false;
+    public void Staying(PlayerSystem Player) { }
     #endregion
 
     #region Functions - Private

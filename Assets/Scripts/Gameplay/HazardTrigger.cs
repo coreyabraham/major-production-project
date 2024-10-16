@@ -20,9 +20,9 @@ public class HazardTrigger : MonoBehaviour, ITouchable
     #endregion
 
     #region Functions - Private
-    private bool HasPlayerBeenSpotted() => !GameSystem.Instance.Player.IsHidden && !hasBeenSpotted;
+    private bool HasPlayerBeenSpotted(PlayerSystem Player) => Player.IsHidden && !hasBeenSpotted;
 
-    private void PlayerIsSpotted()
+    private void PlayerIsSpotted(PlayerSystem Player)
     {
         hasBeenSpotted = true;
 
@@ -37,22 +37,21 @@ public class HazardTrigger : MonoBehaviour, ITouchable
             snap.enabled = true;
         }
 
-        GameSystem.Instance.Player.DeathTriggered();
+        Player.DeathTriggered();
     }
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
-        if (!HasPlayerBeenSpotted())
-        PlayerIsSpotted();
+        if (!HasPlayerBeenSpotted(Player))
+        PlayerIsSpotted(Player);
     }
 
-    public void Left(Collider other) {  }
+    public void Left(PlayerSystem Player) {  }
 
-    private void OnTriggerStay(Collider other)
+    public void Staying(PlayerSystem Player)
     {
-        if (!other.CompareTag("Player")) return;
-        if (!HasPlayerBeenSpotted()) return;
-        PlayerIsSpotted();
+        if (!HasPlayerBeenSpotted(Player)) return;
+        PlayerIsSpotted(Player);
     }
     #endregion
 
