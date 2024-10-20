@@ -74,15 +74,17 @@ public class LerpingObject : MonoBehaviour, ITouchable
         transform.position = startPos;
     }
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
         if (!parentToPlayer) return;
-        GameSystem.Instance.Player.transform.SetParent(transform);
+        Player.transform.SetParent(transform);
     }
 
-    public void Left(Collider other)
+    public void Left(PlayerSystem Player)
     {
         if (!parentToPlayer) return;
-        GameSystem.Instance.Player.transform.SetParent(null);
+        Player.transform.SetParent(null);
     }
+
+    public void Staying(PlayerSystem Player) {  }
 }

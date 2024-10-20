@@ -6,13 +6,15 @@ public class PlrDeathState : MonoBehaviour, ITouchable
     [field: SerializeField] public bool Enabled { get; set; } = true;
     [field: SerializeField] public bool HideOnStartup { get; set; }
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
-        if (!GameSystem.Instance.Player) return;
-        GameSystem.Instance.Player.DeathTriggered();
+        if (!Player) return;
+        Player.DeathTriggered();
     }
 
-    public void Left(Collider other) { }
+    public void Left(PlayerSystem Player) { }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }
