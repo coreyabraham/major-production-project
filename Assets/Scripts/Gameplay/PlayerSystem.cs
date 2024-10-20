@@ -137,7 +137,15 @@ public class PlayerSystem : MonoBehaviour
 
     #region Functions - Handlers
     public void OnMove(InputAction.CallbackContext ctx)
-    {        
+    {
+        /*Vector2 climbMoveCheck = ctx.ReadValue<Vector2>();
+        if (IsClimbing && transform.position.y > CurrentPipeMax && climbMoveCheck.y > 0)
+        {
+            climbMoveCheck.y = 0;
+            if (ctx.phase == InputActionPhase.Started) { }
+        }
+        MoveInput = climbMoveCheck;*/
+
         MoveInput = ctx.ReadValue<Vector2>();
         Events.Moving.Invoke(MoveInput);
     }
