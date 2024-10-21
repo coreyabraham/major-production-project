@@ -44,8 +44,8 @@ public class PromptUI : Singleton<PromptUI>
         SubLabel.text = data.SubTitle;
         BodyLabel.text = data.Description;
 
-        AcceptInteract.Text.text = data.AcceptButtonText;
-        DenyInteract.Text.text = data.DenyButtonText;
+        AcceptInteract.Label.text = data.AcceptButtonText;
+        DenyInteract.Label.text = data.DenyButtonText;
 
         cachedData = data;
     }
