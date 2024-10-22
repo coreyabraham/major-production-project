@@ -120,8 +120,9 @@ public class PlayerSystem : MonoBehaviour
     private float PreviousMoveSpeed;
 
     [HideInInspector] public PipeFunctionality CurrentPipe;
-    [HideInInspector] public float CurrentPipeMin = 0, CurrentPipeMax = 0;
     [HideInInspector] public PipeSide CurrentPipeSide;
+
+    private bool CanClimbUp = true;
 
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
@@ -138,14 +139,6 @@ public class PlayerSystem : MonoBehaviour
     #region Functions - Handlers
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        /*Vector2 climbMoveCheck = ctx.ReadValue<Vector2>();
-        if (IsClimbing && transform.position.y > CurrentPipeMax && climbMoveCheck.y > 0)
-        {
-            climbMoveCheck.y = 0;
-            if (ctx.phase == InputActionPhase.Started) { }
-        }
-        MoveInput = climbMoveCheck;*/
-
         MoveInput = ctx.ReadValue<Vector2>();
         Events.Moving.Invoke(MoveInput);
     }
@@ -199,6 +192,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerMoving() => IsMoving;
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
+    public bool ToggleUpMovement(bool enable) => CanClimbUp = enable;
     public bool TogglePullState(bool input) => IsPulling = input;
     public bool ToggleCharCont(bool enable) => Character.enabled = enable;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
@@ -368,6 +362,8 @@ public class PlayerSystem : MonoBehaviour
         Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
         Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
 
+        if (!CanClimbUp && MoveInput.y > 0) { MoveInput.y = 0; }
+
         MoveDelta = (MoveInput.x * right + MoveInput.y * forward) * SetMoveSpeed;
 
         if (IsJumping)
@@ -485,7 +481,7 @@ public class PlayerSystem : MonoBehaviour
         if (!IsPulling)
         {
             CharacterRotation = Quaternion.Euler(
-                0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
+                !IsClimbing ? 0.0f : 90.0f,
                 !IsClimbing ? rotation + 90.0f : 180.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f
             );
