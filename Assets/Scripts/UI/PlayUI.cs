@@ -181,7 +181,7 @@ public class PlayUI : MonoBehaviour
             clone.transform.SetParent(ScenesParent.transform, false);
 
             clone.name = SceneNames[index];
-            clone.Text.text = "Scene " + (i + 1).ToString() + ": " + clone.name;
+            clone.Label.text = "Scene " + (i + 1).ToString() + ": " + clone.name;
 
             clone.gameObject.SetActive(true);
             clone.Button.onClick.AddListener(() => SceneButtonClicked(index));
