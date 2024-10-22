@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
 
 /// <summary>This script is used to enable GameObjects when a specially tagged object falls through it.</summary>
 public class EnableObjectOnTriggerEnter : MonoBehaviour
@@ -20,21 +19,19 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
     [field: SerializeField] bool canKillPlayer;
     #endregion
 
-
-
     private void UpdateVisibilityRandomly()
     {
         List<GameObject> invisibleObjs = new();
 
-        for (int i = 0; i < elementsToEnable.Length; i++)
+        foreach (GameObject obj in elementsToEnable)
         {
-            if (!elementsToEnable[i].activeInHierarchy) { invisibleObjs.Add(elementsToEnable[i]); }
+            if (obj.activeInHierarchy) continue;
+            invisibleObjs.Add(obj);
         }
 
         int result = Random.Range(0, invisibleObjs.Count - 1);
         invisibleObjs[result].SetActive(true);
     }
-
 
     private void UpdateVisibilitySpecifically(string nameOfObject)
     {
@@ -46,7 +43,6 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
             case "FallingNoodleBox": elementsToEnable[0].SetActive(true); break;
         }
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
@@ -67,9 +63,8 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
         }
     }
 
-
     private void Start()
     {
-        for (int i = 0; i < elementsToEnable.Length; i++) { elementsToEnable[i].SetActive(false); }
+        foreach (GameObject obj in elementsToEnable) obj.SetActive(false);
     }
 }

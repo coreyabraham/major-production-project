@@ -5,17 +5,17 @@ public interface IInteractable
     public float InteractionRange { get; set; }
     public bool IgnoreInteractionRange { get; set; }
     
-    public virtual void Interact(GameObject This, GameObject Interactor = null)
+    public virtual void Interact(GameObject This, PlayerSystem Interactor = null)
     {
-        if (!Interactor) Interactor = GameSystem.Instance.Player.gameObject;
+        if (!Interactor) Interactor = GameSystem.Instance.Player;
         
         if (!IgnoreInteractionRange)
         {
             if (Vector3.Distance(This.transform.position, Interactor.transform.position) > InteractionRange) return;
         }
 
-        Interacted();
+        Interacted(Interactor);
 ;    }
 
-    public virtual void Interacted() { }
+    public void Interacted(PlayerSystem Player);
 }

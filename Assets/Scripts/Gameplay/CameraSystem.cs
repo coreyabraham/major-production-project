@@ -1,11 +1,3 @@
-/*
- CameraSystem / ZoneCamera TO DO's
-    - Properly test ALL ZoneCamera.cs options to make sure they all work individually
-    - Implement "Overriding Options" so that they actually have an effect on the CameraSystem.cs
-    - Fix Inconsistent Field Of View Settings
-    - Make sure Blending Types and `Target Offset Object` are independant
- */
-
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering.HighDefinition;
@@ -31,7 +23,6 @@ public class CameraSystem : MonoBehaviour
     [field: SerializeField] private float AnticipationOffset = 0.0f;
 
     [field: Header("View Fields")]
-    [field: SerializeField] private Vector2 FieldOfViewClamp = new(0, 180);
     [field: SerializeField] private float FieldOfView = 80.0f;
 
     [field: Header("Lerping Speeds")]
@@ -48,7 +39,6 @@ public class CameraSystem : MonoBehaviour
 
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
-    //public PlayerSystem Player;
     [HideInInspector] public Camera main;
 
     [field: Space(2.5f)]
@@ -203,11 +193,9 @@ public class CameraSystem : MonoBehaviour
             rotation = Zone.TargetRotation
         };
 
-        FieldOfView = Zone.TargetFOV;
-
-        if (Zone.OverridePreviousPosition) PreviousOffset.position = Zone.TargetPosition;
-        if (Zone.OverridePreviousRotation) PreviousOffset.rotation = Zone.TargetRotation;
-        if (Zone.OverridePreviousFOV) PreviousFOV = Zone.TargetFOV;
+        PreviousOffset.position = Zone.OverridePreviousPosition ? Zone.TargetPosition : PreviousOffset.position;
+        PreviousOffset.rotation = Zone.OverridePreviousRotation ? Zone.TargetRotation : PreviousOffset.rotation;
+        PreviousFOV = Zone.OverridePreviousFOV ? Zone.TargetFOV : PreviousFOV;
     }
 
     public void ResetZoneCamOffset()
@@ -287,7 +275,6 @@ public class CameraSystem : MonoBehaviour
     private void CutsceneFinished()
     {
         CutsceneRunning = false;
-        (PreviousCameraType, CameraType) = (CameraType, PreviousCameraType);
         
         CurrentInterval = 0.0f;
         MaxInterval = 0.0f;
@@ -297,6 +284,7 @@ public class CameraSystem : MonoBehaviour
         CutscenePoints = null;
 
         CurrentState = CameraState.Generic;
+        (PreviousCameraType, CameraType) = (CameraType, PreviousCameraType);
 
         if (ActivePlayer) ActivePlayer.SetMoveType(PreviousMoveType, true);
         
@@ -339,11 +327,8 @@ public class CameraSystem : MonoBehaviour
         CameraTarget cameraDelta = GetCameraDelta();
         if (!ActivePlayer) return cameraDelta;
 
-        // TODO: This needs to be improved!
         if (IgnorePlayerJumps && !ActivePlayer.IsPlayerGrounded() && !ActivePlayer.IsClimbing && !ActivePlayer.IsJumpingFromClimb && !ActivePlayer.FallingFromClimb)
-        {
             cameraDelta.position.y = (cameraDelta.position.y >= GroundCameraPosition.y) ? GroundCameraPosition.y : cameraDelta.position.y;
-        }
 
         if (ActivePlayer)
         {
@@ -367,9 +352,9 @@ public class CameraSystem : MonoBehaviour
 
         switch (ActiveZoneTrigger.LocalScaleType)
         {
-            case ZoneCamera.LocalScaleUsage.X: selection = ActiveZoneTrigger.transform.position.x - tarPos.x; break;
-            case ZoneCamera.LocalScaleUsage.Y: selection = ActiveZoneTrigger.transform.position.y - tarPos.y; break;
-            case ZoneCamera.LocalScaleUsage.Z: selection = ActiveZoneTrigger.transform.position.z - tarPos.z; break;
+            case CartesianCoords.X: selection = ActiveZoneTrigger.transform.position.x - tarPos.x; break;
+            case CartesianCoords.Y: selection = ActiveZoneTrigger.transform.position.y - tarPos.y; break;
+            case CartesianCoords.Z: selection = ActiveZoneTrigger.transform.position.z - tarPos.z; break;
         }
 
         float distanceFromTriggerCentre = Mathf.Abs(selection);
@@ -393,21 +378,13 @@ public class CameraSystem : MonoBehaviour
         Vector3 targetCamPos = CameraSubject.transform.position + newCamOffset;
         targetCamPos.x += GetAnticipationOffset();
 
-        Quaternion quaternion;
+        Vector3 angles = ActiveZoneTrigger.UseRotationOffset ?
+            Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation)
+            : CurrentOffset.rotation.eulerAngles;
 
-        if (ActiveZoneTrigger.UseRotationOffset)
-        {
-            //HANDLES BLENDED ROTATION
-            Vector3 targetCamRotation = Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation);
-            quaternion = Quaternion.Euler(targetCamRotation.x, targetCamRotation.y, targetCamRotation.z);
-        }
-        else
-        {
-            //HANDLES ROTATION
-            quaternion = Quaternion.Euler(CurrentOffset.rotation.x, CurrentOffset.rotation.y, CurrentOffset.rotation.z);
-        }
+        Quaternion quaternion = Quaternion.Euler(angles);
 
-        if (ActiveZoneTrigger.UseFOVAdjustment) FieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
+        if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -425,21 +402,13 @@ public class CameraSystem : MonoBehaviour
         Vector3 targetCamPos = CameraSubject.transform.position + CurrentOffset.position;
         targetCamPos.x += GetAnticipationOffset();
 
-        Quaternion quaternion;
+        Vector3 angles = ActiveZoneTrigger.UseRotationOffset ? 
+            Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation)
+            : CurrentOffset.rotation.eulerAngles;
 
-        if (ActiveZoneTrigger.UseRotationOffset)
-        {
-            //HANDLES BLENDED ROTATION
-            Vector3 targetCamRotation = Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation);
-            quaternion = Quaternion.Euler(targetCamRotation.x, targetCamRotation.y, targetCamRotation.z);
-        }
-        else
-        {
-            //HANDLES ROTATION
-            quaternion = Quaternion.Euler(CurrentOffset.rotation.x, CurrentOffset.rotation.y, CurrentOffset.rotation.z);
-        }
+        Quaternion quaternion = Quaternion.Euler(angles);
 
-        if (ActiveZoneTrigger.UseFOVAdjustment) FieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
+        if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -448,6 +417,54 @@ public class CameraSystem : MonoBehaviour
         };
     }
     #endregion
+
+    private void ModifyDepthOfField()
+    {
+        if (!DOF) return;
+
+        DOF.active = DepthOfFieldData.Active;
+
+        if (!DOF.active) return;
+
+        if (EasingStyle != EasingStyle.None)
+        {
+            DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+            DOF.farFocusStart.Interp(DOF.farFocusStart.value, DepthOfFieldData.FarRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.farFocusEnd.Interp(DOF.farFocusEnd.value, DepthOfFieldData.FarRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
+
+            DOF.nearSampleCount = (int)Mathf.Lerp(DOF.nearSampleCount, DepthOfFieldData.NearSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.farSampleCount = (int)Mathf.Lerp(DOF.farSampleCount, DepthOfFieldData.FarSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
+
+            DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+            DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
+        }
+        else
+        {
+            DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
+            DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
+
+            DOF.farFocusStart = DepthOfFieldData.FarRangeStart;
+            DOF.farFocusEnd = DepthOfFieldData.FarRangeEnd;
+
+            DOF.nearSampleCount = DepthOfFieldData.NearSampleCount;
+            DOF.farSampleCount = DepthOfFieldData.FarSampleCount;
+
+            DOF.nearMaxBlur = DepthOfFieldData.NearMaxBlur;
+            DOF.farMaxBlur = DepthOfFieldData.FarMaxBlur;
+        }
+
+        DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
+        DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
+
+        DOF.farFocusStart.overrideState = DepthOfFieldData.FarRangeStart.overrideState;
+        DOF.farFocusEnd.overrideState = DepthOfFieldData.FarRangeEnd.overrideState;
+
+        DOF.focusMode = DepthOfFieldData.FocusMode;
+
+        DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
+    }
 
     private void Update()
     {
@@ -476,64 +493,10 @@ public class CameraSystem : MonoBehaviour
             PreviousCameraSubject = CameraSubject;
         }
 
-        // TODO: MOVE OR SPLIT THIS ENTIRE BIT, IT'S ESSENTIALLY BLOAT!
-        #region TEMPORARY_REGION
-        float CameraFOV = Mathf.Clamp(FieldOfView, FieldOfViewClamp.x, FieldOfViewClamp.y);
+        if (CameraType != CameraType.TargetState || CameraType != CameraType.OffsetState)
+            main.fieldOfView = EasingStyle != EasingStyle.None ? Mathf.Lerp(main.fieldOfView, FieldOfView, Time.fixedDeltaTime * VFXLerpSpeed) : FieldOfView;
 
-        if (DOF) DOF.active = DepthOfFieldData.Active;
-
-        if (EasingStyle != EasingStyle.None)
-        {
-            main.fieldOfView = Mathf.Lerp(main.fieldOfView, CameraFOV, Time.fixedDeltaTime * VFXLerpSpeed);
-
-            if (DOF != null && DOF.active)
-            {
-                DOF.nearFocusStart.Interp(DOF.nearFocusStart.value, DepthOfFieldData.NearRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.nearFocusEnd.Interp(DOF.nearFocusEnd.value, DepthOfFieldData.NearRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
-
-                DOF.farFocusStart.Interp(DOF.farFocusStart.value, DepthOfFieldData.FarRangeStart.value, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.farFocusEnd.Interp(DOF.farFocusEnd.value, DepthOfFieldData.FarRangeEnd.value, Time.fixedDeltaTime * VFXLerpSpeed);
-
-                DOF.nearSampleCount = (int)Mathf.Lerp(DOF.nearSampleCount, DepthOfFieldData.NearSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.farSampleCount = (int)Mathf.Lerp(DOF.farSampleCount, DepthOfFieldData.FarSampleCount, Time.fixedDeltaTime * VFXLerpSpeed);
-
-                DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
-                DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
-            }
-        }
-        else
-        {
-            main.fieldOfView = CameraFOV;
-
-            if (DOF != null && DOF.active)
-            {
-                DOF.nearFocusStart = DepthOfFieldData.NearRangeStart;
-                DOF.nearFocusEnd = DepthOfFieldData.NearRangeEnd;
-
-                DOF.farFocusStart = DepthOfFieldData.FarRangeStart;
-                DOF.farFocusEnd = DepthOfFieldData.FarRangeEnd;
-
-                DOF.nearSampleCount = DepthOfFieldData.NearSampleCount;
-                DOF.farSampleCount = DepthOfFieldData.FarSampleCount;
-
-                DOF.nearMaxBlur = DepthOfFieldData.NearMaxBlur;
-                DOF.farMaxBlur = DepthOfFieldData.FarMaxBlur;
-            }
-        }
-
-        if (DOF != null && DOF.active)
-        {
-            DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
-            DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
-
-            DOF.farFocusStart.overrideState = DepthOfFieldData.FarRangeStart.overrideState;
-            DOF.farFocusEnd.overrideState = DepthOfFieldData.FarRangeEnd.overrideState;
-
-            DOF.focusMode = DepthOfFieldData.FocusMode;
-
-            DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
-        }
-        #endregion
+        ModifyDepthOfField();
 
         CameraTarget Target = CutsceneRunning ? CutscenePoints[CutsceneIndex] : PreviousCameraLocation;
 
@@ -554,8 +517,6 @@ public class CameraSystem : MonoBehaviour
 
     private void Start()
     {
-        PreviousCameraSubject = CameraSubject;
-
         if (!CameraSubject) CameraSubject = GameSystem.Instance.Player.gameObject;
         if (AutomateStartCameraOffset) CurrentOffset.position = transform.position - CameraSubject.transform.position;
 

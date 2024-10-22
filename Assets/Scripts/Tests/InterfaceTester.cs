@@ -8,7 +8,7 @@ public class InterfaceTester : MonoBehaviour, IInteractable
 
     private AudioSource Source;
 
-    public void Interacted()
+    public void Interacted(PlayerSystem Player)
     {
         if (Source.isPlaying) Source.Stop();
         Source.Play();

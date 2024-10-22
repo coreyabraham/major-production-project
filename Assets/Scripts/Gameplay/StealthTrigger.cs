@@ -4,25 +4,17 @@ using UnityEngine;
 /// Trigger used for parts of stealth sections that are deemed to be "safe zones".
 /// These triggers can exist within the hazard triggers and still function.
 /// </summary>
-public class StealthTrigger : MonoBehaviour
+public class StealthTrigger : MonoBehaviour, ITouchable
 {
     #region Private Variables
-    private PlayerSystem playerSystem;
+    [field: Header("ITouchable Inheritance")]
+    [field: SerializeField] public bool Enabled { get; set; } = true;
+    [field: SerializeField] public bool HideOnStartup { get; set; } = false;
     #endregion
 
-    #region Functions - Private
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!other.CompareTag("Player")) { return; }
-        playerSystem.IsHidden = true;
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag("Player") || !playerSystem) { return; }
-
-        playerSystem.IsHidden = false;
-        playerSystem = null;
-    }
+    #region Functions - Public
+    public void Entered(PlayerSystem Player) => Player.IsHidden = true;
+    public void Left(PlayerSystem Player) => Player.IsHidden = false;
+    public void Staying(PlayerSystem Player) { }
     #endregion
 }

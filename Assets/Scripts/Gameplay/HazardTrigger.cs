@@ -3,22 +3,33 @@ using UnityEngine;
 
 // Script that will kill the player if they enter or are detected within the trigger it's attached to.
 // The player can avoid being seen if their "IsHidden" bool is enabled.
-public class HazardTrigger : MonoBehaviour
+public class HazardTrigger : MonoBehaviour, ITouchable
 {
-    float resetTimer = 0;
+    #region Public Variables
+    [field: Header("ITouchable Inherited")]
+    [field: SerializeField] public bool Enabled { get; set; } = true;
+    [field: SerializeField] public bool HideOnStartup { get; set; } = false;
 
-    public bool useCrowSound, useSnap;
+    [field: Header("Audio")]
+    public bool useCrowSound;
+    public bool useSnap;
 
-    #region Private Variables
-    private PlayerSystem playerSystem;
-    private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
     public AudioSource crowCaw;
     public AudioSource crowSwoop;
     public AudioSource snap;
     #endregion
 
+    #region Private Variables
+    private float resetTimer = 0;
+    private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
+    #endregion
+
+    #region Functions - Public
+    public void ResetSpottedStatus() => hasBeenSpotted = false;
+    #endregion
+
     #region Functions - Private
-    private void PlayerIsSpotted()
+    private void PlayerIsSpotted(PlayerSystem Player)
     {
         hasBeenSpotted = true;
 
@@ -33,69 +44,38 @@ public class HazardTrigger : MonoBehaviour
             snap.enabled = true;
         }
 
-        playerSystem.DeathTriggered();
-
+        Player.DeathTriggered();
     }
 
-
-    private void OnTriggerEnter(Collider other)
+    public void Entered(PlayerSystem Player)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerSystem = other.GetComponent<PlayerSystem>();
-
-
-            if (!playerSystem.IsHidden && !hasBeenSpotted)
-            {
-                PlayerIsSpotted();
-            }
-            else
-            {
-                playerSystem = null;
-            }
-        }
+        if (Player.IsHidden) return;
+        PlayerIsSpotted(Player);
     }
 
-    private void OnTriggerStay(Collider other)
+    public void Left(PlayerSystem Player) {  }
+
+    public void Staying(PlayerSystem Player)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerSystem = other.GetComponent<PlayerSystem>();
-
-
-            if (!playerSystem.IsHidden && !hasBeenSpotted)
-            {
-                PlayerIsSpotted();
-            }
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            playerSystem = null;
-        }
+        if (Player.IsHidden) return;
+        PlayerIsSpotted(Player);
     }
     #endregion
-
-
 
     private void Update()
     {
         if (hasBeenSpotted) { resetTimer += Time.deltaTime; }
-        if (resetTimer > 1)
+        if (resetTimer < 1) { return; }
+
+        if (useCrowSound)
         {
-            if (useCrowSound)
-            {
-                crowCaw.enabled = false;
-                crowSwoop.enabled = false;
-            }
-
-            if (useSnap) { snap.enabled = false; }
-
-            hasBeenSpotted = false;
-            resetTimer = 0;
+            crowCaw.enabled = false;
+            crowSwoop.enabled = false;
         }
+
+        if (useSnap) { snap.enabled = false; }
+
+        hasBeenSpotted = false;
+        resetTimer = 0;
     }
 }

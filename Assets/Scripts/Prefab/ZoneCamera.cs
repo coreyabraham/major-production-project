@@ -2,13 +2,6 @@ using UnityEngine;
 
 public class ZoneCamera : MonoBehaviour, ITouchable
 {
-    // TODO: MOVE THIS ENUMERATION LATER!
-    [System.Serializable]
-    public enum LocalScaleUsage
-    {
-        X, Y, Z
-    }
-
     [field: Header("ITouchable Inheritance")]
     [field: SerializeField] public bool Enabled { get; set; }
     [field: SerializeField] public bool HideOnStartup { get; set; }
@@ -18,7 +11,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: SerializeField] private bool IgnoreCurrentOffset;
 
     [field: Header("Scaling Options")]
-    public LocalScaleUsage LocalScaleType = LocalScaleUsage.X;
+    public CartesianCoords LocalScaleType = CartesianCoords.X;
     [field: SerializeField] private float TransformModifier = 0.5f;
     
     [field: Header("Utilization Options")]
@@ -51,7 +44,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     private bool PreviousIAO;
     private bool PreviousICO;
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
         if (IgnoreAnticipationOffset)
         {
@@ -75,16 +68,18 @@ public class ZoneCamera : MonoBehaviour, ITouchable
         }
     }
 
-    public void Left(Collider other)
+    public void Left(PlayerSystem Player)
     {
         if (IgnoreAnticipationOffset) GameSystem.Instance.Camera.IgnoreAnticipationOffset = PreviousIAO;
         if (IgnoreCurrentOffset) GameSystem.Instance.Camera.IgnoreCurrentOffset = PreviousICO;
 
-        if (ZoneBlending) GameSystem.Instance.Camera.SetActiveTriggerZone(null);
-        else GameSystem.Instance.Camera.ResetZoneCamOffset();
+        GameSystem.Instance.Camera.SetActiveTriggerZone(null);
+        GameSystem.Instance.Camera.ResetZoneCamOffset();
 
         GameSystem.Instance.Camera.RevertCameraType();
     }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Start()
     {
@@ -110,9 +105,9 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
         switch (LocalScaleType)
         {
-            case LocalScaleUsage.X: TriggerSize = transform.localScale.x * TransformModifier; break;
-            case LocalScaleUsage.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
-            case LocalScaleUsage.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
+            case CartesianCoords.X: TriggerSize = transform.localScale.x * TransformModifier; break;
+            case CartesianCoords.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
+            case CartesianCoords.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
 
         if (!DeriveStartFOV) return;

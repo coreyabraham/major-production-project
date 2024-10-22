@@ -18,14 +18,16 @@ public class CutsceneTrigger : MonoBehaviour, ITouchable
         print("Cutscene has concluded");
     }
 
-    public void Entered(Collider other)
+    public void Entered(PlayerSystem Player)
     {
         CameraSystem Camera = GameSystem.Instance.Camera;
         if (!Camera) return;
         Camera.BeginCutscene(CutscenePoints, TimeInterval, !UseDefaultSpeed ? CameraSpeed : -1.0f);
     }
 
-    public void Left(Collider other) { }
+    public void Left(PlayerSystem Player) { }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

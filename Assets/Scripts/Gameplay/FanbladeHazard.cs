@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Animates the blades within the AC Unit without using actual animations. This needs to be placed on the trigger for chewing through the wire.
 /// </summary>
-public class FanbladeHazard : MonoBehaviour
+public class FanbladeHazard : MonoBehaviour, IInteractable
 {
     #region Public Variables
     [field: Header("References")]
@@ -24,6 +24,10 @@ public class FanbladeHazard : MonoBehaviour
     [field: SerializeField] AudioSource unitRunning;
     [field: Tooltip("Audio for the AC Unit when it is deactivated/loses power.")]
     [field: SerializeField] AudioSource unitStopped;
+
+    [field: Header("IInteractable Inheritance")]
+    [field: SerializeField] public float InteractionRange { get; set; } = 1.0f;
+    [field: SerializeField] public bool IgnoreInteractionRange { get; set; } = false;
     #endregion
 
     #region Private Variables
@@ -31,22 +35,19 @@ public class FanbladeHazard : MonoBehaviour
     bool hasBeenDeactivated = false;
     #endregion
 
-    private void OnTriggerStay(Collider other)
+    public void Interacted(PlayerSystem Player)
     {
-        if (!other.CompareTag("Player") || hasBeenDeactivated) { return; }
+        if (hasBeenDeactivated) { return; }
 
-        if (Input.GetKey(KeyCode.E))
-        {
-            hazardTrigger.SetActive(false);
-            unitIsPowered = false;
-            unitRunning.enabled = false;
-            unitStopped.enabled = true;
-        }
+        hazardTrigger.SetActive(false);
+        unitIsPowered = false;
+        unitRunning.enabled = false;
+        unitStopped.enabled = true;
     }
 
     private void Update()
     {
-        if (currSpeed != 0) { blade.transform.Rotate(0, 0, currSpeed * Time.deltaTime); }
+        if (blade != null && currSpeed != 0) { blade.transform.Rotate(0, 0, currSpeed * Time.deltaTime); }
 
         if (unitIsPowered && currSpeed > maxSpeed) { currSpeed -= 300 * Time.deltaTime; }
         else if (unitIsPowered && currSpeed < maxSpeed) { currSpeed = maxSpeed; }

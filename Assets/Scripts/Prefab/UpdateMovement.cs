@@ -10,13 +10,11 @@ public class UpdateMovement : MonoBehaviour, ITouchable
     [field: SerializeField] private MoveType TargetMoveType;
     [field: SerializeField] private bool ResetVelocity;
 
-    public void Entered(Collider other)
-    {
-        if (!GameSystem.Instance.Player) return;
-        GameSystem.Instance.Player.SetMoveType(TargetMoveType, ResetVelocity);
-    }
+    public void Entered(PlayerSystem Player) => Player.SetMoveType(TargetMoveType, ResetVelocity);
 
-    public void Left(Collider other) { }
+    public void Staying(PlayerSystem Player) { }
+
+    public void Left(PlayerSystem Player) { }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

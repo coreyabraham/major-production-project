@@ -9,9 +9,11 @@ public class LoadingTester : MonoBehaviour, ITouchable
     [field: Header("Trigger Specific")]
     [field: SerializeField] private string SceneName = "Josh";
 
-    public void Entered(Collider other) => GameSystem.Instance.RequestLoadScene(SceneName);
+    public void Entered(PlayerSystem Player) => GameSystem.Instance.RequestLoadScene(SceneName);
 
-    public void Left(Collider other) { }
+    public void Left(PlayerSystem Player) { }
+
+    public void Staying(PlayerSystem Player) { }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }
