@@ -485,7 +485,7 @@ public class PlayerSystem : MonoBehaviour
         if (!IsPulling)
         {
             CharacterRotation = Quaternion.Euler(
-                0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
+                !IsClimbing ? 0.0f : 90.0f,
                 !IsClimbing ? rotation + 90.0f : 180.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f
             );
