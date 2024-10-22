@@ -117,12 +117,12 @@ public class CameraSystem : MonoBehaviour
 
     public CameraTarget GetCameraDelta()
     {
-        Vector3 posModifier = (!IgnoreCurrentOffset) ? CurrentOffset.position : Vector3.zero;
+        Vector3 posModifier = !IgnoreCurrentOffset ? CurrentOffset.position : Vector3.zero;
 
         Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
         Vector3 newPos = tarPos + posModifier;
 
-        Vector3 rotModifier = (!IgnoreCurrentOffset) ? CurrentOffset.rotation.eulerAngles : Vector3.zero;
+        Vector3 rotModifier = !IgnoreCurrentOffset ? CurrentOffset.rotation.eulerAngles : Vector3.zero;
         Quaternion newRot = Quaternion.Euler(main.transform.rotation.eulerAngles + rotModifier);
 
         return new()
@@ -307,7 +307,7 @@ public class CameraSystem : MonoBehaviour
         return anticipation;
     }
 
-    private CameraTarget GetPanningTransformation()
+    private CameraTarget GetTrackingTransformation()
     {
         Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
 
@@ -334,7 +334,6 @@ public class CameraSystem : MonoBehaviour
         {
             if (ActivePlayer.IsPlayerMoving() && CameraSubject == ActivePlayer.gameObject)
             {
-                //cameraDelta.position.x += GetAnticipationOffset();
                 cameraDelta.position.x = Mathf.Lerp(cameraDelta.position.x, cameraDelta.position.x + GetAnticipationOffset(), Time.fixedDeltaTime * AnticipationSpeed);
             }
 
@@ -380,16 +379,18 @@ public class CameraSystem : MonoBehaviour
             ) : CurrentOffset.position;
 
         Vector3 position = CameraSubject.transform.position + newCamOffset;
-        position.x += GetAnticipationOffset();
+        position.x = Mathf.Lerp(position.x, position.x + GetAnticipationOffset(), Time.fixedDeltaTime * AnticipationSpeed);
 
         if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
 
-        Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ?
-            Quaternion.Lerp(
-                CurrentOffset.rotation, 
-                ActiveZoneTrigger.TargetRotation, 
+        Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
+            Vector3.Lerp(
+                CurrentOffset.rotation.eulerAngles,
+                ActiveZoneTrigger.TargetRotation.eulerAngles,
                 curveEvaluation
-                ) : CurrentOffset.rotation;
+                ) : CurrentOffset.rotation.eulerAngles;
+
+        Quaternion quaternion = Quaternion.Euler(rotation);
 
         if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
@@ -416,12 +417,14 @@ public class CameraSystem : MonoBehaviour
 
         if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
 
-        Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ? 
+        Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ?
             Quaternion.Lerp(
                 cameraDelta.rotation, 
                 ActiveZoneTrigger.TargetRotation, 
                 curveEvaluation
                 ) : ActiveZoneTrigger.TargetRotation;
+
+        //Quaternion quaternion = Quaternion.Euler(rotation);
 
         if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
@@ -519,14 +522,14 @@ public class CameraSystem : MonoBehaviour
             && !ActivePlayer.IsJumpingFromClimb
             && !ActivePlayer.FallingFromClimb;
 
-        CameraTarget Target = CutsceneRunning ? CutscenePoints[CutsceneIndex] : PreviousCameraLocation;
+        CameraTarget Target = !CutsceneRunning ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
 
         if (!CutsceneRunning && CameraType != CameraType.Scriptable)
         {
             switch (CameraType)
             {
                 case CameraType.Follow: Target = GetFollowTransformation(); break;
-                case CameraType.Tracking: Target = GetPanningTransformation(); break;
+                case CameraType.Tracking: Target = GetTrackingTransformation(); break;
 
                 case CameraType.OffsetState: Target = GetOffsetTransformation(); break;
                 case CameraType.TargetState: Target = GetTargetTransformation(); break;
@@ -546,11 +549,6 @@ public class CameraSystem : MonoBehaviour
 
         PreviousCameraType = CameraType;
         PreviousFOV = FieldOfView;
-
-        //DefaultRotation = main.transform.localRotation;
-        //CurrentRotation = DefaultRotation;
-
-        //DefaultPosOffset = CurrentPosOffset;
 
         if (!DepthOfFieldData.Volume) return;
 
