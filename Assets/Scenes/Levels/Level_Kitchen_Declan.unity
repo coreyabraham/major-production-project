@@ -308,12 +308,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isActive: 1
   objects:
-  - {fileID: 469475679254754270, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
-  - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
   - {fileID: 6607428095003246214, guid: d77f5139c6e66354b81671ebd0a11f99, type: 3}
-  alterAngle: 0
-  spawnrate: 1
-  delayBetweenSpawns: 2
+  - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
+  - {fileID: 469475679254754270, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
+  alterAngle: 1
+  spawnrate: 2
+  delayBetweenSpawns: 5
   axisToSpawnAlong: 0
   ignoreRigidbodyCheck: 0
 --- !u!1 &21662780
@@ -1427,6 +1427,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -1520,6 +1522,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -2564,6 +2568,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -6343,7 +6349,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 91.92
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1836519368656619745, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
+    - {fileID: 6971089716394448176, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
 --- !u!4 &435756003 stripped
 Transform:
@@ -7967,7 +7975,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2309137973648779772, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
+    - {fileID: 7021594246581897495, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
 --- !u!4 &624177280 stripped
 Transform:
@@ -10798,7 +10808,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 869163071}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.5600014, y: -2.845, z: 0.196}
+  m_LocalPosition: {x: -5.5600014, y: -2.845, z: 0.271}
   m_LocalScale: {x: 0.117473096, y: 5.5996375, z: 0.117473096}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12231,6 +12241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -14159,6 +14171,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -14292,6 +14306,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -15961,6 +15977,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -17053,118 +17071,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 115742f508d33f847b81a2ab6a916189, type: 3}
   m_PrefabInstance: {fileID: 1425659065}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1428697049
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1428697050}
-  - component: {fileID: 1428697054}
-  - component: {fileID: 1428697053}
-  - component: {fileID: 1428697052}
-  - component: {fileID: 1428697051}
-  m_Layer: 0
-  m_Name: Pipe Trigger 1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!4 &1428697050
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1428697049}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.47, y: 0.193, z: 0}
-  m_LocalScale: {x: 0.7980968, y: 0.89461374, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6128447481273122800}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1428697051
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1428697049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sideToAttachTo: 1
-  axis: 0
---- !u!65 &1428697052
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1428697049}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.9999998, y: 1.2284747, z: 1}
-  m_Center: {x: 0, y: 0.11423869, z: 0}
---- !u!23 &1428697053
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1428697049}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 257
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: c25ccc89c54de6c47b465d8420458b71, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1428697054
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1428697049}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1433060471
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17998,6 +17904,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -18967,6 +18875,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -24469,7 +24379,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1836519368656619745, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
+    - {fileID: 6971089716394448176, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
 --- !u!4 &1958943025 stripped
 Transform:
@@ -26212,6 +26124,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -26795,7 +26709,6 @@ Transform:
   m_LocalScale: {x: 0.24171375, y: 1.1624112, z: 0.81968504}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1428697050}
   - {fileID: 6128447481558304552}
   m_Father: {fileID: 6128447481645977729}
   m_RootOrder: 1
@@ -26835,8 +26748,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 3.6903882, z: 1}
-  m_Center: {x: 0, y: 1.648545, z: 0}
+  m_Size: {x: 1, y: 4.9713097, z: 1}
+  m_Center: {x: 0, y: 1.0080878, z: 0}
 --- !u!23 &6128447481558304551
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -26892,7 +26805,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6128447481273122800}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6128447481558304553
 MonoBehaviour:
@@ -26906,6 +26819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isConnectedToGround: 0
   sideToAttachTo: 1
   axis: 0
 --- !u!1 &6128447481558304555
@@ -27020,6 +26934,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isConnectedToGround: 0
   sideToAttachTo: 0
   axis: 0
 --- !u!1 &6128447482344246787
