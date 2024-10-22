@@ -18,6 +18,8 @@ public class PipeFunctionality : MonoBehaviour
 
     [field: Tooltip("Does one end of this pipe connect to the ground?\nCan the player run into this pipe while grounded?")]
     [field: SerializeField] bool isConnectedToGround;
+    [field: Tooltip("Does the player automatically detach from the pipe when they reach the bottom of it?")]
+    [field: SerializeField] bool canDetachAtBottom;
     [field: Tooltip("The side of the pipe that the player will attach to when interacting with this pipe.")]
     [field: SerializeField] PipeSide sideToAttachTo;
     [field: Tooltip("In case the incorrect axis is being used when attaching to the pipes, adjust them using this.")]
@@ -37,6 +39,7 @@ public class PipeFunctionality : MonoBehaviour
         playSys.CurrentPipe = this;
         playSys.CurrentPipeSide = sideToAttachTo;
         playSys.ToggleUpMovement(true);
+        playSys.ToggleDownMovement(true);
     }
 
 
@@ -105,7 +108,19 @@ public class PipeFunctionality : MonoBehaviour
         if (!playSys) return;
 
         if (playSys.gameObject.transform.position.y - 0.02f > Trig.bounds.max.y) { playSys.ToggleUpMovement(false); }
-        if (playSys.gameObject.transform.position.y - 0.26f < Trig.bounds.min.y && !isConnectedToGround) { playSys.IsClimbing = false; DereferencePlayer(); return; }
+        if (playSys.gameObject.transform.position.y - 0.23f < Trig.bounds.min.y && !isConnectedToGround)
+        {
+            if (canDetachAtBottom)
+            {
+                playSys.IsClimbing = false;
+                DereferencePlayer();
+                return;
+            }
+            else
+            {
+                playSys.ToggleDownMovement(false);
+            }
+        }
 
         DetermineClimbHook();
     }
@@ -114,6 +129,7 @@ public class PipeFunctionality : MonoBehaviour
     private void Awake()
     {
         Trig = GetComponent<BoxCollider>();
+        if (isConnectedToGround) { canDetachAtBottom = true; }
     }
     #endregion
 }

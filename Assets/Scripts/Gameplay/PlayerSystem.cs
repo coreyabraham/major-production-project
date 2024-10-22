@@ -9,9 +9,6 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The speed that the player moves when on the ground.")]
     [field: SerializeField] private float MoveSpeed;
 
-    [field: Tooltip("The speed that the player moves when climbing.")]
-    [field: SerializeField] private float ClimbSpeed;
-
     [field: Tooltip("The speed that the player moves when scurrying on the ground.")]
     [field: SerializeField] private float ScurrySpeed;
 
@@ -39,16 +36,11 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The duration of time that the player can fall for and coyote jump.")]
     [field: SerializeField] private float CoyoteTimer = 1.0f;
 
-    [HideInInspector] public bool ClimbingRequested;
-    [HideInInspector] public bool IsClimbing;
-    [HideInInspector] public bool IsJumpingFromClimb;
-    [HideInInspector] public bool FallingFromClimb;
-
     [field: Header("Jumping & Gravity")]
     [field: Tooltip("The force that is applied to the player's y-axis upon hitting the jump key/button.")]
     [field: SerializeField] private float JumpForce;
 
-    [field: Tooltip("The force that us applied to the player's z-axis upon hitting the jump key/button when climbing on a pipe.")]
+    [field: Tooltip("The force that is applied to the player's z-axis upon hitting the jump key/button when climbing on a pipe.")]
     [field: SerializeField] private float JumpForcePipe;
 
     [field: Tooltip("")]
@@ -57,6 +49,21 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
     [field: SerializeField] private float VelocityYIdle = 0.0f;
+    
+    [HideInInspector] public bool ClimbingRequested;
+    [HideInInspector] public bool IsClimbing;
+    [HideInInspector] public bool IsJumpingFromClimb;
+    [HideInInspector] public bool FallingFromClimb;
+
+    [field: Header("Climbing & Sliding")]
+    [field: Tooltip("The speed that the player moves when climbing.")]
+    [field: SerializeField] private float ClimbSpeed;
+
+    [field: Tooltip("The speed at which the player will begin sliding. This force is eased onto the player and isn't instantaneous.")]
+    [field: SerializeField] private float SlideSpeed;
+
+    [field: Tooltip("How long the player has to be still on a pipe before they begin sliding.")]
+    [field: SerializeField] private float TimeBeforeSlide;
 
     [field: Header("Lerping")]
     [field: SerializeField] private EasingStyle LerpStyle;
@@ -122,7 +129,8 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public PipeFunctionality CurrentPipe;
     [HideInInspector] public PipeSide CurrentPipeSide;
 
-    private bool CanClimbUp = true;
+    private bool CanClimbUp = true, CanClimbDown = true;
+    private float SlideTimer = 0.0f;
 
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
@@ -130,7 +138,7 @@ public class PlayerSystem : MonoBehaviour
 
     [HideInInspector] public bool IsJumping;
 
-    private bool IsScurrying, IsGrounded, IsMoving, IsPulling, IsBeingLaunched;
+    private bool IsScurrying, IsGrounded, IsMoving, IsPulling, IsSliding, IsBeingLaunched;
 
     private readonly List<GameObject> CachedInteractables = new();
     private readonly Dictionary<GameObject, ITouchable> CachedTouchables = new();
@@ -193,6 +201,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
     public bool ToggleUpMovement(bool enable) => CanClimbUp = enable;
+    public bool ToggleDownMovement(bool enable) => CanClimbDown = enable;
     public bool TogglePullState(bool input) => IsPulling = input;
     public bool ToggleCharCont(bool enable) => Character.enabled = enable;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
@@ -279,7 +288,7 @@ public class PlayerSystem : MonoBehaviour
                 touchable.TriggerStay(this);
         }
 
-        if (!other.transform.root.CompareTag("Grabbable")) { return; }
+        if (!other.transform.parent.CompareTag("Grabbable")) { return; }
         if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
 
         PullObjPos = other.transform.root.transform.position;
@@ -362,7 +371,7 @@ public class PlayerSystem : MonoBehaviour
         Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
         Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
 
-        if (!CanClimbUp && MoveInput.y > 0) { MoveInput.y = 0; }
+        if ((!CanClimbUp && MoveInput.y > 0) || (!CanClimbDown && MoveInput.y < 0)) { MoveInput.y = 0; }
 
         MoveDelta = (MoveInput.x * right + MoveInput.y * forward) * SetMoveSpeed;
 
@@ -375,6 +384,17 @@ public class PlayerSystem : MonoBehaviour
 
         if (IsClimbing)
         {
+            if (MoveInput.y == 0) { if (SlideTimer < TimeBeforeSlide) { SlideTimer += Time.fixedDeltaTime; } }
+            else { SlideTimer = 0; }
+            
+            if (SlideTimer >= TimeBeforeSlide)
+            {
+                // Begin sliding downwards
+                IsSliding = true;
+
+                Debug.Log("Should be sliding right now.");
+            }
+
             if (IsScurrying) { IsScurrying = false; }
 
             if (!IsJumping && JumpButtonIsHeld)
