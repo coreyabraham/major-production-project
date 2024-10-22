@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,7 +14,7 @@ public class InputHandler : Singleton<InputHandler>
     [field: Header("Generic")]
     public bool InputUsability = true;
 
-    private InputActionMap InputActionMap;
+    [HideInInspector] public InputActionMap InputActionMap;
 
     public void EnableControls()
     {
@@ -25,6 +26,11 @@ public class InputHandler : Singleton<InputHandler>
     {
         if (InputActionMap == null) return;
         InputActionMap.Disable();
+    }
+
+    public void RebindControls()
+    {
+        throw new NotImplementedException();
     }
 
     private void OnEnable() => EnableControls();

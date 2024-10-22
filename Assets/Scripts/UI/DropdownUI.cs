@@ -22,15 +22,12 @@ public class DropdownUI : MonoBehaviour
 
     [field: SerializeField] private List<TMP_Dropdown.OptionData> CustomListings;
 
-    private void ValueModified(int value)
-    {
-        ValueChanged?.Invoke(value);
-    }
+    private void ValueModified(int value) => ValueChanged?.Invoke(value);
 
     private void Awake()
     {
         if (DropdownFillType != DropdownTypeUI.None) Dropdown.ClearOptions();
-        
+
         // TODO: PLEASE REPLACE THIS IN THE FUTURE!
         static bool FindStringInList(string target, List<string> list)
         {

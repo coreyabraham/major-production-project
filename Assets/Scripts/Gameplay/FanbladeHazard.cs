@@ -47,7 +47,7 @@ public class FanbladeHazard : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (currSpeed != 0) { blade.transform.Rotate(0, 0, currSpeed * Time.deltaTime); }
+        if (blade != null && currSpeed != 0) { blade.transform.Rotate(0, 0, currSpeed * Time.deltaTime); }
 
         if (unitIsPowered && currSpeed > maxSpeed) { currSpeed -= 300 * Time.deltaTime; }
         else if (unitIsPowered && currSpeed < maxSpeed) { currSpeed = maxSpeed; }
