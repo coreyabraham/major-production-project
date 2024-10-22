@@ -65,6 +65,6 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
 
     private void Start()
     {
-        foreach (GameObject obj in elementsToEnable) obj.SetActive(true);
+        foreach (GameObject obj in elementsToEnable) obj.SetActive(false);
     }
 }
