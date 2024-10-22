@@ -13,7 +13,7 @@ public class CameraSystem : MonoBehaviour
 
     #region Public / Serialized Private Variables
     [field: Header("Booleans")]
-    [field: SerializeField] private bool IgnorePlayerJumps = false;
+    [field: SerializeField] private bool CameraJumpsWithPlayer = false;
     [field: SerializeField] private bool AutomateStartCameraOffset = false;
     public bool IgnoreAnticipationOffset = false;
     public bool IgnoreCurrentOffset = false;
@@ -53,6 +53,8 @@ public class CameraSystem : MonoBehaviour
 
     private CameraTarget PreviousCameraLocation;
     private Vector3 GroundCameraPosition;
+
+    private bool IgnoreCameraJumping = false;
 
     private bool CutsceneRunning = false;
     private bool TrackCutsceneInterval = false;
@@ -120,9 +122,8 @@ public class CameraSystem : MonoBehaviour
         Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
         Vector3 newPos = tarPos + posModifier;
 
-        Vector3 rotReference = new(main.transform.rotation.x, main.transform.rotation.y, main.transform.rotation.z);
         Vector3 rotModifier = (!IgnoreCurrentOffset) ? CurrentOffset.rotation.eulerAngles : Vector3.zero;
-        Quaternion newRot = Quaternion.Euler(rotReference + rotModifier);
+        Quaternion newRot = Quaternion.Euler(main.transform.rotation.eulerAngles + rotModifier);
 
         return new()
         {
@@ -327,8 +328,7 @@ public class CameraSystem : MonoBehaviour
         CameraTarget cameraDelta = GetCameraDelta();
         if (!ActivePlayer) return cameraDelta;
 
-        if (IgnorePlayerJumps && !ActivePlayer.IsPlayerGrounded() && !ActivePlayer.IsClimbing && !ActivePlayer.IsJumpingFromClimb && !ActivePlayer.FallingFromClimb)
-            cameraDelta.position.y = (cameraDelta.position.y >= GroundCameraPosition.y) ? GroundCameraPosition.y : cameraDelta.position.y;
+        if (IgnoreCameraJumping) cameraDelta.position.y = cameraDelta.position.y >= GroundCameraPosition.y ? GroundCameraPosition.y : cameraDelta.position.y;
 
         if (ActivePlayer)
         {
@@ -373,22 +373,29 @@ public class CameraSystem : MonoBehaviour
 
         float curveEvaluation = GetOffsetAndTargetEvaluation();
 
-        Vector3 newCamOffset = ActiveZoneTrigger.UsePositionOffset ? Vector3.Lerp(CurrentOffset.position, ActiveZoneTrigger.TargetPosition, curveEvaluation) : CurrentOffset.position;
+        Vector3 newCamOffset = ActiveZoneTrigger.UsePositionOffset ? Vector3.Lerp(
+            CurrentOffset.position, 
+            ActiveZoneTrigger.TargetPosition, 
+            curveEvaluation
+            ) : CurrentOffset.position;
 
-        Vector3 targetCamPos = CameraSubject.transform.position + newCamOffset;
-        targetCamPos.x += GetAnticipationOffset();
+        Vector3 position = CameraSubject.transform.position + newCamOffset;
+        position.x += GetAnticipationOffset();
 
-        Vector3 angles = ActiveZoneTrigger.UseRotationOffset ?
-            Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation)
-            : CurrentOffset.rotation.eulerAngles;
+        if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
 
-        Quaternion quaternion = Quaternion.Euler(angles);
+        Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ?
+            Quaternion.Lerp(
+                CurrentOffset.rotation, 
+                ActiveZoneTrigger.TargetRotation, 
+                curveEvaluation
+                ) : CurrentOffset.rotation;
 
         if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
-            position = targetCamPos,
+            position = position,
             rotation = quaternion
         };
     }
@@ -398,21 +405,29 @@ public class CameraSystem : MonoBehaviour
         if (!ActiveZoneTrigger || !CameraSubject) return GetFollowTransformation();
 
         float curveEvaluation = GetOffsetAndTargetEvaluation();
+        CameraTarget cameraDelta = GetCameraDelta();
 
-        Vector3 targetCamPos = CameraSubject.transform.position + CurrentOffset.position;
-        targetCamPos.x += GetAnticipationOffset();
+        Vector3 position = ActiveZoneTrigger.UsePositionOffset ? 
+            Vector3.Lerp(
+                cameraDelta.position,
+                ActiveZoneTrigger.TargetPosition,
+                curveEvaluation
+                ) : ActiveZoneTrigger.TargetPosition;
 
-        Vector3 angles = ActiveZoneTrigger.UseRotationOffset ? 
-            Vector3.Lerp(CurrentOffset.rotation.eulerAngles, ActiveZoneTrigger.TargetRotation.eulerAngles, curveEvaluation)
-            : CurrentOffset.rotation.eulerAngles;
+        if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
 
-        Quaternion quaternion = Quaternion.Euler(angles);
+        Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ? 
+            Quaternion.Lerp(
+                cameraDelta.rotation, 
+                ActiveZoneTrigger.TargetRotation, 
+                curveEvaluation
+                ) : ActiveZoneTrigger.TargetRotation;
 
         if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
-            position = targetCamPos,
+            position = position,
             rotation = quaternion
         };
     }
@@ -497,6 +512,12 @@ public class CameraSystem : MonoBehaviour
             main.fieldOfView = EasingStyle != EasingStyle.None ? Mathf.Lerp(main.fieldOfView, FieldOfView, Time.fixedDeltaTime * VFXLerpSpeed) : FieldOfView;
 
         ModifyDepthOfField();
+
+        IgnoreCameraJumping = CameraJumpsWithPlayer
+            && !ActivePlayer.IsPlayerGrounded()
+            && !ActivePlayer.IsClimbing
+            && !ActivePlayer.IsJumpingFromClimb
+            && !ActivePlayer.FallingFromClimb;
 
         CameraTarget Target = CutsceneRunning ? CutscenePoints[CutsceneIndex] : PreviousCameraLocation;
 

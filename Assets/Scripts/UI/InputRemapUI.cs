@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +16,26 @@ public class InputRemapUI : MonoBehaviour
     private float CurrentTimeout;
 
     private InputActionRebindingExtensions.RebindingOperation RebindingOperation;
+
+    private void ReassignValues(RebindData data)
+    {
+        print(data.ActionReference.action.bindings[0].path);
+
+        if (data.CarriedBinds.Length != 0)
+        {
+            for (int i = 0; i < data.CarriedBinds.Length; i++)
+            {
+                data.CarriedBinds[i] = "";
+            }
+        }
+
+        data.CarriedBinds = new string[data.ActionReference.action.bindings.Count];
+
+        for (int i = 0; i < data.ActionReference.action.bindings.Count; i++)
+        {
+            data.CarriedBinds[i] = data.ActionReference.action.bindings[i].path;
+        }
+    }
 
     private void AssignText(NavigatorButton NavigatorButton = null, RebindData RebindData = null)
     {
@@ -39,7 +60,8 @@ public class InputRemapUI : MonoBehaviour
         InputHandler.Instance.EnableControls();
 
         CachedData.AwaitingInput = false;
-        
+        ReassignValues(CachedData);
+
         CachedData = null;
         CachedButton = null;
     }
@@ -67,8 +89,6 @@ public class InputRemapUI : MonoBehaviour
             .OnMatchWaitForAnother(0.1f)
             .OnComplete(operation => RebindComplete())
             .Start();
-
-        print(Data.ActionReference);
     }
 
     private void Update()
@@ -85,17 +105,6 @@ public class InputRemapUI : MonoBehaviour
         RebindComplete();
     }
 
-    private void Start()
-    {
-        //foreach (var test in InputHandler.Instance.InputActionMap.actions[0].bindings)
-        //{
-        //    print(test.name + " | " + test.path);
-        //}
-
-        // TODO: USE THIS TO APPLY BINDS ON STARTUP USING JSON ENCODING / DECODING IN `SettingsUI.cs`!!!
-        InputHandler.Instance.InputActionMap.actions[1].ApplyBindingOverride("<Keyboard>/h");
-    }
-
     private void Awake()
     {
         foreach (NavigatorButton button in RebinderButtons)
@@ -108,8 +117,11 @@ public class InputRemapUI : MonoBehaviour
                 continue;
             }
 
+            ReassignValues(data);
             AssignText(button, data);
+
             button.ClickedEvent.AddListener(() => RebindButtonClicked(button));
         }
     }
 }
+ 

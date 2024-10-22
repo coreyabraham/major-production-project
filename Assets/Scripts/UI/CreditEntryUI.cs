@@ -30,3 +30,4 @@ public class CreditEntryUI : MonoBehaviour
         IconImage.sprite = MemberIcon;
     }
 }
+ 

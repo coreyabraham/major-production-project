@@ -28,14 +28,10 @@ public class InputHandler : Singleton<InputHandler>
         InputActionMap.Disable();
     }
 
-    public void RebindControls()
-    {
-        throw new NotImplementedException();
-    }
-
     private void OnEnable() => EnableControls();
 
     private void OnDisable() => DisableControls();
 
     override protected void Initialize() => InputActionMap = Actions.FindActionMap(ActionMap, true);
 }
+ 
