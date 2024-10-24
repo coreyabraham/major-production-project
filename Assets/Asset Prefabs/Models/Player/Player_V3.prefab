@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 1640778888}
   - component: {fileID: 1640778891}
   - component: {fileID: 1640778890}
-  - component: {fileID: 1640778889}
-  - component: {fileID: 1640778892}
   m_Layer: 0
   m_Name: RatTrack
   m_TagString: Untagged
@@ -85,58 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1640778889
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1640778887}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1640778892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1640778887}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93cb99b740fc27b488ae87992273f39b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 0
-  <HideOnStartup>k__BackingField: 1
-  IgnoreAnticipationOffset: 0
-  IgnoreCurrentOffset: 0
-  LocalScaleType: 0
-  TransformModifier: 0.5
-  UsePositionOffset: 0
-  UseRotationOffset: 0
-  UseFOVAdjustment: 0
-  OverridePreviousPosition: 0
-  OverridePreviousRotation: 0
-  OverridePreviousFOV: 0
-  TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 0}
-  TargetObject: {fileID: 0}
-  TargetFOV: 0
-  DeriveStartFOV: 0
-  SumDerivedFOV: 0
-  ZoneBlending: 0
-  LerpCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  BlendType: 0
-  TriggerSize: 0
 --- !u!1 &6246030398808792733
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,7 +147,7 @@ MonoBehaviour:
   IsClimbing: 0
   IsJumpingFromClimb: 0
   FallingFromClimb: 0
-  JumpForce: 4
+  JumpForce: 3.5
   JumpForcePipe: 1.75
   EnableScurryInAir: 1
   GravityMultiplier: 1.05
