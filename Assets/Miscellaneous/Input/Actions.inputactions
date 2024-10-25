@@ -53,7 +53,7 @@
             ],
             "bindings": [
                 {
-                    "name": "2D Vector",
+                    "name": "PC WASD / Gamepad D-Pad",
                     "id": "b4aa28d0-88d1-48e7-86a0-610b264061b4",
                     "path": "2DVector",
                     "interactions": "",
@@ -152,7 +152,7 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "2D Vector",
+                    "name": "Gamepad Sticks",
                     "id": "e64814a4-b362-4b54-b9d8-669cfccd3de7",
                     "path": "2DVector(mode=2)",
                     "interactions": "",
@@ -207,6 +207,61 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "PC Arrow Keys",
+                    "id": "81f53314-96c7-4eb1-8b93-51969a7f4a18",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "03d1e48f-b25f-4156-8aee-efbfeb0f4c29",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "ad5297bd-7db3-45ae-8155-7fea1c6bf415",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "c2dd7dd9-9bc4-4b3e-829a-93152cc175c2",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "587ded21-a935-48bf-9b12-178da80f7b0b",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "4af9eaba-12d3-469a-928f-46f4097be00a",
                     "path": "<Keyboard>/space",
@@ -231,7 +286,7 @@
                 {
                     "name": "",
                     "id": "4f0f33e6-9da9-4f94-90f3-81724b78dae6",
-                    "path": "<Keyboard>/leftShift",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -241,12 +296,12 @@
                 },
                 {
                     "name": "",
-                    "id": "e68f45fa-6bb3-421d-95fc-2e80527f35d6",
-                    "path": "<Keyboard>/e",
+                    "id": "e8db7b6b-f54c-471c-989f-378c4ef1cbd1",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Climb",
+                    "action": "Scurry",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -258,17 +313,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Scurry",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0f09ed62-46ea-41b7-92e0-8aa11c61e291",
-                    "path": "<Gamepad>/buttonWest",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Climb",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
