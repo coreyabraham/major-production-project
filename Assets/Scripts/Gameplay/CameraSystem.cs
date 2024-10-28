@@ -61,7 +61,7 @@ public class CameraSystem : MonoBehaviour
 
     private float CurrentInterval = 0.0f;
     private float MaxInterval = 0.0f;
-    private float CutsceneSpeed = 0.0f;
+    private float CutsceneSpeed = -1.0f;
 
     private int CutsceneIndex = 0;
     private CameraTarget[] CutscenePoints;
@@ -69,6 +69,7 @@ public class CameraSystem : MonoBehaviour
     private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
 
+    private float LerpToFOV;
     private float PreviousFOV;
 
     private ZoneCamera ActiveZoneTrigger;
@@ -117,18 +118,16 @@ public class CameraSystem : MonoBehaviour
 
     public CameraTarget GetCameraDelta()
     {
-        Vector3 posModifier = !IgnoreCurrentOffset ? CurrentOffset.position : Vector3.zero;
-
         Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
-        Vector3 newPos = tarPos + posModifier;
-
-        Vector3 rotModifier = !IgnoreCurrentOffset ? CurrentOffset.rotation.eulerAngles : Vector3.zero;
-        Quaternion newRot = Quaternion.Euler(main.transform.rotation.eulerAngles + rotModifier);
+        Vector3 posModifier = !IgnoreCurrentOffset ? CurrentOffset.position : Vector3.zero;
+        
+        Vector3 position = tarPos + posModifier;
+        Quaternion rotation = !IgnoreCurrentOffset ? CurrentOffset.rotation : new Quaternion();
 
         return new()
         {
-            position = newPos,
-            rotation = newRot
+            position = position,
+            rotation = rotation
         };
     }
 
@@ -137,30 +136,36 @@ public class CameraSystem : MonoBehaviour
 
     public void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
     {
-        float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : Time.fixedDeltaTime * CameraLerpSpeed;
+        float DefaultLerpSpeed = CameraLerpSpeed * Time.fixedDeltaTime;
+        float LerpValue = CustomLerpSpeed > 0.0f ? CustomLerpSpeed : DefaultLerpSpeed;
+
+        Vector3 EularRotation = Rotation.eulerAngles;
 
         if (EasingStyle != EasingStyle.None)
         {
             switch (EasingStyle)
             {
+                // TODO: Fix this method, something isn't adding up properly when lerping since `Rotation` is always zero'd (it's meant to be that way)
+                // and yet it still doesn't lerp properly to said zero'd value!
+
                 case EasingStyle.Basic:
                     {
                         Position = Vector3.MoveTowards(main.transform.position, Position, LerpValue);
-                        Rotation = Quaternion.RotateTowards(main.transform.rotation, Rotation, LerpValue);
+                        EularRotation = Vector3.MoveTowards(main.transform.rotation.eulerAngles, EularRotation, LerpValue);
                     }
                     break;
 
                 case EasingStyle.Lerp:
                     {
                         Position = Vector3.Lerp(main.transform.position, Position, LerpValue);
-                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, LerpValue);
+                        EularRotation = Vector3.Lerp(main.transform.rotation.eulerAngles, EularRotation, LerpValue);
                     }
                     break;
 
                 case EasingStyle.Slerp:
                     {
                         Position = Vector3.Slerp(main.transform.position, Position, LerpValue);
-                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, LerpValue);
+                        EularRotation = Vector3.Slerp(main.transform.rotation.eulerAngles, EularRotation, LerpValue);
                     }
                     break;
             }
@@ -172,7 +177,7 @@ public class CameraSystem : MonoBehaviour
             rotation = main.transform.rotation
         };
 
-        main.transform.SetPositionAndRotation(Position, Rotation);
+        main.transform.SetPositionAndRotation(Position, Quaternion.Euler(EularRotation));
 
         if (!CutsceneRunning || TrackCutsceneInterval) return;
         if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
@@ -202,7 +207,7 @@ public class CameraSystem : MonoBehaviour
     public void ResetZoneCamOffset()
     {
         CurrentOffset = PreviousOffset;
-        FieldOfView = PreviousFOV;
+        LerpToFOV = PreviousFOV;
     }
     #endregion
 
@@ -279,7 +284,7 @@ public class CameraSystem : MonoBehaviour
         
         CurrentInterval = 0.0f;
         MaxInterval = 0.0f;
-        CutsceneSpeed = 0.0f;
+        CutsceneSpeed = -1.0f;
 
         CutsceneIndex = 0;
         CutscenePoints = null;
@@ -326,7 +331,7 @@ public class CameraSystem : MonoBehaviour
     private CameraTarget GetFollowTransformation()
     {
         CameraTarget cameraDelta = GetCameraDelta();
-        if (!ActivePlayer) return cameraDelta;
+        if (!ActivePlayer) return cameraDelta;  
 
         if (IgnoreCameraJumping) cameraDelta.position.y = cameraDelta.position.y >= GroundCameraPosition.y ? GroundCameraPosition.y : cameraDelta.position.y;
 
@@ -392,7 +397,7 @@ public class CameraSystem : MonoBehaviour
 
         Quaternion quaternion = Quaternion.Euler(rotation);
 
-        if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
+        if (ActiveZoneTrigger.UseFOVAdjustment) LerpToFOV = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -417,16 +422,26 @@ public class CameraSystem : MonoBehaviour
 
         if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
 
-        Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ?
-            Quaternion.Lerp(
-                cameraDelta.rotation, 
-                ActiveZoneTrigger.TargetRotation, 
-                curveEvaluation
-                ) : ActiveZoneTrigger.TargetRotation;
+        // For some reason this doesn't work as it should? Possibly because of Raw Quaternion and Eular Conversion differences.
+        // Either way just use the eularAngles version, it seems to work more consistently.
 
-        //Quaternion quaternion = Quaternion.Euler(rotation);
+        //Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ?
+        //    Quaternion.Lerp(
+        //        cameraDelta.rotation,
+        //        ActiveZoneTrigger.TargetRotation,
+        //        curveEvaluation
+        //        ) : ActiveZoneTrigger.TargetRotation;
 
-        if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
+        Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
+            Vector3.Lerp(
+                    cameraDelta.rotation.eulerAngles,
+                    ActiveZoneTrigger.TargetRotation.eulerAngles,
+                    curveEvaluation
+                ) : ActiveZoneTrigger.TargetRotation.eulerAngles;
+
+        Quaternion quaternion = Quaternion.Euler(rotation);
+
+        if (ActiveZoneTrigger.UseFOVAdjustment) LerpToFOV = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -512,7 +527,13 @@ public class CameraSystem : MonoBehaviour
         }
 
         if (CameraType != CameraType.TargetState || CameraType != CameraType.OffsetState)
-            main.fieldOfView = EasingStyle != EasingStyle.None ? Mathf.Lerp(main.fieldOfView, FieldOfView, Time.fixedDeltaTime * VFXLerpSpeed) : FieldOfView;
+        {
+            main.fieldOfView = EasingStyle != EasingStyle.None 
+                ? Mathf.Lerp(
+                    main.fieldOfView, 
+                    LerpToFOV, 
+                    Time.fixedDeltaTime * VFXLerpSpeed) : LerpToFOV;
+        }
 
         ModifyDepthOfField();
 
@@ -547,8 +568,10 @@ public class CameraSystem : MonoBehaviour
         DefaultOffset = CurrentOffset;
         PreviousOffset = DefaultOffset;
 
-        PreviousCameraType = CameraType;
         PreviousFOV = FieldOfView;
+        LerpToFOV = FieldOfView;
+
+        PreviousCameraType = CameraType;
 
         if (!DepthOfFieldData.Volume) return;
 
