@@ -21,6 +21,8 @@ public class FallingObjectSpawner : MonoBehaviour
     [field: SerializeField] float spawnrate;
     [field: Tooltip("The amount of time in seconds between instantiations.")]
     [field: SerializeField] float spawnDelay;
+    [field: Tooltip("The amount of prefabs that are allowed to be spawned before the spawner stops.\n\nSet to 0 for unlimited spawning.")]
+    [field: SerializeField] int spawnLimit;
 
     [field: Header("Rotation")]
 
@@ -36,10 +38,24 @@ public class FallingObjectSpawner : MonoBehaviour
     BoxCollider box;
     Vector3 posToSpawnAt;
     Quaternion angToSpawnAt;
+    [HideInInspector] public int amountSpawned = 0;
     #endregion
 
 
+    #region Public Functions
+    public void ToggleActiveState(bool setActive)
+    {
+        if (isActive && (spawnLimit != 0 && amountSpawned >= spawnLimit))
+        {
+            Debug.LogWarning("You're attempting to activate a Falling Object Spawner that has already reached its Spawn Limit! Nothing will spawn if it's activated!"); return;
+        }
 
+        isActive = setActive;
+    }
+    #endregion
+
+
+    #region Private Functions
     private void InstantiateObject(int index)
     {
         GameObject objToSpawn = objects[index];
@@ -64,6 +80,7 @@ public class FallingObjectSpawner : MonoBehaviour
         //{ Debug.LogError("Prefab doesn't have a rigidbody component! It needs a rigidbody to work properly!"); isActive = false; return; }
 
         Instantiate(objToSpawn, posToSpawnAt, angToSpawnAt);
+        amountSpawned++;
 
         timer = 0;
     }
@@ -72,7 +89,7 @@ public class FallingObjectSpawner : MonoBehaviour
     private void Update()
     {
         timer += Time.deltaTime * spawnrate;
-        if (objects.Length <= 0 || !isActive) { return; }
+        if (objects.Length <= 0 || !isActive || (spawnLimit != 0 && amountSpawned >= spawnLimit)) { return; }
 
         if (timer >= spawnDelay)
         {
@@ -87,4 +104,5 @@ public class FallingObjectSpawner : MonoBehaviour
     {
         box = GetComponent<BoxCollider>();
     }
+    #endregion
 }
