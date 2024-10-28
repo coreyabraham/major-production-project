@@ -76,6 +76,8 @@ public class FallingObjectSpawner : MonoBehaviour
         else if (useKnifeAngle && axisToSpawnAlong == PipeAxis.Z) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x, -90, -75)); }
         else { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x, 0, 0)); }
 
+        objToSpawn.tag = "SpawnedPrefab";
+
         if (autoAddRigidbody && !objToSpawn.GetComponent<Rigidbody>()) { objToSpawn.AddComponent<Rigidbody>(); }
         //{ Debug.LogError("Prefab doesn't have a rigidbody component! It needs a rigidbody to work properly!"); isActive = false; return; }
 
