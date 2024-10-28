@@ -33,7 +33,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
         bool result = DataHandler.Instance.SaveCachedDataToFile();
 
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
-        else Debug.LogWarning(name + "Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
+        else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
     }
 
     public void Left(PlayerSystem Player) { }
