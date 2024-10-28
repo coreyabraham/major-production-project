@@ -43,7 +43,15 @@ public class FallingObjectSpawner : MonoBehaviour
 
 
     #region Public Functions
-    public void ToggleActiveState(bool setActive) => isActive = setActive;
+    public void ToggleActiveState(bool setActive)
+    {
+        if (isActive && (spawnLimit != 0 && amountSpawned >= spawnLimit))
+        {
+            Debug.LogWarning("You're attempting to activate a Falling Object Spawner that has already reached its Spawn Limit! Nothing will spawn if it's activated!"); return;
+        }
+
+        isActive = setActive;
+    }
     #endregion
 
 

@@ -17,7 +17,7 @@ public class ActivateFallingObjSpawner : MonoBehaviour
     #endregion
 
     #region Private Variables
-    bool hasActivatedOnce;
+    bool hasActivatedOnce = false;
     #endregion
 
     #region Private Functions
@@ -36,6 +36,8 @@ public class ActivateFallingObjSpawner : MonoBehaviour
                 spawnerScript[i].ToggleActiveState(true);
             }
         }
+
+        hasActivatedOnce = true;
     }
 
     private void Start()
