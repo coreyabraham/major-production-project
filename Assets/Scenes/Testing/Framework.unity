@@ -368,8 +368,16 @@ PrefabInstance:
       value: CutsceneTrigger
       objectReference: {fileID: 0}
     - target: {fileID: 8122402453089048066, guid: 8f4e03c2f76ad7141b32d59c990f72b8, type: 3}
+      propertyPath: UseWarpTransform
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8122402453089048066, guid: 8f4e03c2f76ad7141b32d59c990f72b8, type: 3}
       propertyPath: <Enabled>k__BackingField
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8122402453089048066, guid: 8f4e03c2f76ad7141b32d59c990f72b8, type: 3}
+      propertyPath: WarpTransform.position.z
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8122402453089048066, guid: 8f4e03c2f76ad7141b32d59c990f72b8, type: 3}
       propertyPath: CutscenePoints.Array.size
@@ -584,7 +592,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isConnectedToGround: 0
   sideToAttachTo: 0
   axis: 0
 --- !u!65 &481070580
@@ -1250,6 +1257,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1640778890, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: Camera
       value: 
@@ -2970,17 +2981,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1291926515021471309, guid: 485b70a37aae48e4795aba9eefe41201, type: 3}
-      propertyPath: BlendType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1291926515021471309, guid: 485b70a37aae48e4795aba9eefe41201, type: 3}
       propertyPath: TargetFOV
       value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 1291926515021471309, guid: 485b70a37aae48e4795aba9eefe41201, type: 3}
       propertyPath: TargetObject
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1425970895}
     - target: {fileID: 1291926515021471309, guid: 485b70a37aae48e4795aba9eefe41201, type: 3}
       propertyPath: TargetPosition.y
       value: 2
@@ -4364,6 +4371,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isConnectedToGround: 0
   sideToAttachTo: 0
   axis: 0

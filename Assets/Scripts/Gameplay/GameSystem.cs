@@ -35,7 +35,6 @@ public class GameSystem : Singleton<GameSystem>
 
     [field: Header("Miscellaneous")]
     public bool GameplayPaused = false;
-    public bool RunningInEditor = false;
 
     [field: Header("Collections")]
     [field: SerializeField] private List<string> LevelNames;
@@ -183,12 +182,6 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
-#if UNITY_EDITOR
-        RunningInEditor = true;
-#else
-        RunningInEditor = false;
-#endif
-
         for (int i = 0; i < LevelNames.Count; i++)
         {
             Levels.Add(i, LevelNames[i]);

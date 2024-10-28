@@ -40,11 +40,13 @@ public class MopHandleLaunch : MonoBehaviour
     float rotateTimer = 0;
     #endregion
 
+    #region Functions
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) { return; }
         playSys = GameSystem.Instance.Player;
     }
+
 
     private void Update()
     {
@@ -105,6 +107,6 @@ public class MopHandleLaunch : MonoBehaviour
     private void Start()
     {
         parentOfThis = gameObject.transform.parent;
-        //playSys = GameSystem.Instance.Player;
     }
+    #endregion
 }

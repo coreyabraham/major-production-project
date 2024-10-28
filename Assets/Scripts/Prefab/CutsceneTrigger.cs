@@ -12,16 +12,24 @@ public class CutsceneTrigger : MonoBehaviour, ITouchable
     [field: SerializeField] private float CameraSpeed;
 
     [field: SerializeField] private bool UseDefaultSpeed;
+    [field: SerializeField] private bool UseWarpTransform;
+    [field: SerializeField] CameraTarget WarpTransform;
+
+    private PlayerSystem CachedPlayer;
 
     public void CutsceneEnded()
     {
         print("Cutscene has concluded");
+        if (UseWarpTransform) CachedPlayer.Warp(WarpTransform.position, WarpTransform.rotation);
+        CachedPlayer = null;
     }
 
     public void Entered(PlayerSystem Player)
     {
         CameraSystem Camera = GameSystem.Instance.Camera;
         if (!Camera) return;
+        
+        CachedPlayer = Player;
         Camera.BeginCutscene(CutscenePoints, TimeInterval, !UseDefaultSpeed ? CameraSpeed : -1.0f);
     }
 
