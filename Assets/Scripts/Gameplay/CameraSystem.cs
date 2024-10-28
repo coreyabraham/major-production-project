@@ -21,9 +21,7 @@ public class CameraSystem : MonoBehaviour
     [field: Header("Angles and Offsets")]
     [field: SerializeField] private CameraTarget CurrentOffset;
     [field: SerializeField] private float AnticipationOffset = 0.0f;
-
-    [field: Header("View Fields")]
-    [field: SerializeField] private float FieldOfView = 80.0f;
+    public float FieldOfView = 80.0f;
 
     [field: Header("Lerping Speeds")]
     [field: SerializeField] private float CameraLerpSpeed;
@@ -69,7 +67,6 @@ public class CameraSystem : MonoBehaviour
     private MoveType PreviousMoveType;
     private CameraType PreviousCameraType;
 
-    private float LerpToFOV;
     private float PreviousFOV;
 
     private ZoneCamera ActiveZoneTrigger;
@@ -207,7 +204,7 @@ public class CameraSystem : MonoBehaviour
     public void ResetZoneCamOffset()
     {
         CurrentOffset = PreviousOffset;
-        LerpToFOV = PreviousFOV;
+        FieldOfView = PreviousFOV;
     }
     #endregion
 
@@ -397,7 +394,7 @@ public class CameraSystem : MonoBehaviour
 
         Quaternion quaternion = Quaternion.Euler(rotation);
 
-        if (ActiveZoneTrigger.UseFOVAdjustment) LerpToFOV = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
+        if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -422,16 +419,6 @@ public class CameraSystem : MonoBehaviour
 
         if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
 
-        // For some reason this doesn't work as it should? Possibly because of Raw Quaternion and Eular Conversion differences.
-        // Either way just use the eularAngles version, it seems to work more consistently.
-
-        //Quaternion quaternion = ActiveZoneTrigger.UseRotationOffset ?
-        //    Quaternion.Lerp(
-        //        cameraDelta.rotation,
-        //        ActiveZoneTrigger.TargetRotation,
-        //        curveEvaluation
-        //        ) : ActiveZoneTrigger.TargetRotation;
-
         Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
             Vector3.Lerp(
                     cameraDelta.rotation.eulerAngles,
@@ -441,7 +428,7 @@ public class CameraSystem : MonoBehaviour
 
         Quaternion quaternion = Quaternion.Euler(rotation);
 
-        if (ActiveZoneTrigger.UseFOVAdjustment) LerpToFOV = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
+        if (ActiveZoneTrigger.UseFOVAdjustment) main.fieldOfView = Mathf.Lerp(FieldOfView, ActiveZoneTrigger.TargetFOV, curveEvaluation);
 
         return new()
         {
@@ -531,8 +518,8 @@ public class CameraSystem : MonoBehaviour
             main.fieldOfView = EasingStyle != EasingStyle.None 
                 ? Mathf.Lerp(
                     main.fieldOfView, 
-                    LerpToFOV, 
-                    Time.fixedDeltaTime * VFXLerpSpeed) : LerpToFOV;
+                    FieldOfView, 
+                    Time.fixedDeltaTime * VFXLerpSpeed) : FieldOfView;
         }
 
         ModifyDepthOfField();
@@ -569,7 +556,6 @@ public class CameraSystem : MonoBehaviour
         PreviousOffset = DefaultOffset;
 
         PreviousFOV = FieldOfView;
-        LerpToFOV = FieldOfView;
 
         PreviousCameraType = CameraType;
 
