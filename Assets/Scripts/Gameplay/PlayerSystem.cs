@@ -254,8 +254,13 @@ public class PlayerSystem : MonoBehaviour
     private void SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
+        bool RunningInEditor = false;
 
-        if (!GameSystem.Instance.RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
+#if UNITY_EDITOR
+        RunningInEditor = true;
+#endif
+
+        if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
 
         if (string.IsNullOrWhiteSpace(data.checkpointName) || IgnoreCheckpointData == true)
         {

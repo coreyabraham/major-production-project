@@ -294,7 +294,14 @@ public class DataHandler : Singleton<DataHandler>
 
     private void Start()
     {
-        if (!GameSystem.Instance.RunningInEditor && IgnoreSaveRequests) IgnoreSaveRequests = false;
+        bool RunningInEditor = false;
+
+#if UNITY_EDITOR
+        RunningInEditor = true;
+#endif
+
+        if (RunningInEditor || !IgnoreSaveRequests) return;
+        IgnoreSaveRequests = false;
     }
 
     protected override void Initialize()
