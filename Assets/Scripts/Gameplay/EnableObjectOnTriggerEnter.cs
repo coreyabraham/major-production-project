@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>This script is used to enable GameObjects when a specially tagged object falls through it.</summary>
@@ -28,20 +29,26 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
             if (obj.activeInHierarchy) continue;
             invisibleObjs.Add(obj);
         }
-
-        int result = Random.Range(0, invisibleObjs.Count - 1);
-        invisibleObjs[result].SetActive(true);
+        
+        if (invisibleObjs.Count < 1) { return; }
+        int result = Random.Range(1, invisibleObjs.Count);
+        invisibleObjs[result - 1].SetActive(true);
     }
 
     private void UpdateVisibilitySpecifically(string nameOfObject)
     {
+        bool wasSuccessful = true;
         switch (nameOfObject)
         {
-            case "FallingPotPlant": elementsToEnable[2].SetActive(true); break;
-            case "FallingSprayCan": elementsToEnable[1].SetActive(true); break;
+            case "FallingPotPlant": elementsToEnable[2].SetActive(true);break;
+            case "FallingSprayCan": elementsToEnable[1].SetActive(true);break;
             case "FallingPipe": elementsToEnable[0].SetActive(true); break;
             case "FallingNoodleBox": elementsToEnable[0].SetActive(true); break;
+            default: wasSuccessful = false; break;
         }
+
+        if (wasSuccessful) { return; }
+        UpdateVisibilityRandomly();
     }
 
     private void OnTriggerEnter(Collider other)

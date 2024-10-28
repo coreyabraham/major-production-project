@@ -7,8 +7,8 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("CameraSystem Settings")]
-    [field: SerializeField] private bool IgnoreAnticipationOffset;
-    [field: SerializeField] private bool IgnoreCurrentOffset;
+    public bool IgnoreAnticipationOffset;
+    public bool IgnoreCurrentOffset;
 
     [field: Header("Scaling Options")]
     public CartesianCoords LocalScaleType = CartesianCoords.X;

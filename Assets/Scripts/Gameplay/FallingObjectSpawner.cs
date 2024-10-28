@@ -5,11 +5,11 @@ public class FallingObjectSpawner : MonoBehaviour
 {
     #region Public Variables
     [field: Tooltip("Follows regular spawn conditions when true, overrides spawn conditions when false.")]
-    [field: SerializeField] bool isActive;
+    /*[field: SerializeField] bool isActive;*/
 
     [field: Space]
 
-    [field: Tooltip("The objects that the spawner will instantiate.")]
+  /*  [field: Tooltip("The objects that the spawner will instantiate.")]*/
     [field: SerializeField] GameObject[] objects;
     [field: SerializeField] bool alterAngle;
     [field: Tooltip("The speed at which the prefabs will be instantiated.")]
@@ -33,7 +33,7 @@ public class FallingObjectSpawner : MonoBehaviour
     Quaternion angToSpawnAt;
     #endregion
 
-
+   public bool isActive;
 
     private void InstantiateObject(int index)
     {

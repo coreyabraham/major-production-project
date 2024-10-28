@@ -16,33 +16,27 @@ public class PipeFunctionality : MonoBehaviour
 {
     [field: Header("Pipe Specifics")]
 
-    [field: Tooltip("Does one end of this pipe connect to the ground?\nCan the player run into this pipe while grounded?")]
-    [field: SerializeField] bool isConnectedToGround;
     [field: Tooltip("The side of the pipe that the player will attach to when interacting with this pipe.")]
     [field: SerializeField] PipeSide sideToAttachTo;
     [field: Tooltip("In case the incorrect axis is being used when attaching to the pipes, adjust them using this.")]
     [field: SerializeField] PipeAxis axis;
 
-    
     private bool SkipJumpToClimbCheck = false;  // Prevents player from reattaching to current pipe if true.
     private float SkipJumpCooldown = 1;
     private PlayerSystem playSys;
 
-    private BoxCollider Trig;
 
 
     #region Functions - Private
-    private void ReferencePlayer()
+    private void InitialisePlayerOnPipe()
     {
         playSys.CurrentPipe = this;
+
+        BoxCollider collider = GetComponent<BoxCollider>();
+        playSys.CurrentPipeMin = collider.bounds.min.y;
+        playSys.CurrentPipeMax = collider.bounds.max.y;
+
         playSys.CurrentPipeSide = sideToAttachTo;
-        playSys.ToggleUpMovement(true);
-    }
-
-
-    private void DereferencePlayer()
-    {
-        playSys = null;
     }
 
 
@@ -83,9 +77,9 @@ public class PipeFunctionality : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.transform.root.CompareTag("Player")) return;
+        if (!other.CompareTag("Player")) return;
         playSys = other.GetComponent<PlayerSystem>();
-        ReferencePlayer();
+        InitialisePlayerOnPipe();
     }
 
 
@@ -95,7 +89,7 @@ public class PipeFunctionality : MonoBehaviour
         {
             SkipJumpCooldown += Time.deltaTime;
             SkipJumpToClimbCheck = true;
-            DereferencePlayer();
+            playSys = null;
         }
         else
         {
@@ -103,17 +97,7 @@ public class PipeFunctionality : MonoBehaviour
         }
 
         if (!playSys) return;
-
-        if (playSys.gameObject.transform.position.y - 0.02f > Trig.bounds.max.y) { playSys.ToggleUpMovement(false); }
-        if (playSys.gameObject.transform.position.y - 0.26f < Trig.bounds.min.y && !isConnectedToGround) { playSys.IsClimbing = false; DereferencePlayer(); return; }
-
         DetermineClimbHook();
-    }
-
-
-    private void Awake()
-    {
-        Trig = GetComponent<BoxCollider>();
     }
     #endregion
 }

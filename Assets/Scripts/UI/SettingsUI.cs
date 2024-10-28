@@ -59,7 +59,7 @@ public class SettingsUI : MonoBehaviour
     [field: SerializeField] PromptDataUI ResetPromptData;
 
     [field: Header("Groups")]
-    [field: SerializeField] private int VisibleFrameOnStartup;
+    [field: SerializeField] private int VisibleIndexOnStartup;
     [field: SerializeField] private SettingsGroup[] Groups;
 
     [field: Header("Audio")]
@@ -183,17 +183,11 @@ public class SettingsUI : MonoBehaviour
         Dropdown.value = GetDropdownOptionIndex(Dropdown.options, Text);
     }
 
-    private void UpdateUI(PlayerSettings Settings, bool StartupPreload = false)
+    private void UpdateUI(PlayerSettings Settings)
     {
         MasterSlider.Slider.value = Settings.MasterVolume;
         MusicSlider.Slider.value = Settings.MusicVolume;
         SoundSlider.Slider.value = Settings.SoundVolume;
-
-        if (StartupPreload)
-        {
-            MasterSlider.transform.parent.gameObject.SetActive(true);
-            ResolutionDD.transform.parent.gameObject.SetActive(true);
-        }
 
         ResolutionDD.Dropdown.value = GetDropdownOptionIndex(ResolutionDD.Dropdown.options, Settings.Resolution);
         QualityDD.Dropdown.value = GetDropdownOptionIndex(QualityDD.Dropdown.options, Settings.Quality);
@@ -203,18 +197,9 @@ public class SettingsUI : MonoBehaviour
         FPSSlider.Slider.value = Settings.FramesPerSecond;
         VsyncCB.Checkbox.isOn = Settings.UseVsync;
 
-        if (StartupPreload)
-        {
-            MasterSlider.transform.parent.gameObject.SetActive(false);
-            ResolutionDD.transform.parent.gameObject.SetActive(false);
-            ContrastSlider.transform.parent.gameObject.SetActive(true);
-        }
-
         ContrastSlider.Slider.value = Settings.Contrast;
         BrightnessSlider.Slider.value = Settings.Brightness;
         ColourAccDD.Dropdown.value = GetDropdownOptionIndex(ColourAccDD.Dropdown.options, Settings.ColourAccessibility);
-
-        if (StartupPreload) ContrastSlider.transform.parent.gameObject.SetActive(false);
     }
 
     private void UpdateGraphics()
@@ -226,6 +211,11 @@ public class SettingsUI : MonoBehaviour
         {
             string currentResolution = ResolutionDD.Dropdown.options[ResolutionDD.Dropdown.value].text;
             strings = currentResolution.Split('x');
+        }
+
+        for (int i = 0; i < strings.Length; i++)
+        {
+            print("Index: " + i.ToString() + ", Value: " + strings[i]);
         }
 
         int.TryParse(strings[0], out int width);
@@ -267,8 +257,8 @@ public class SettingsUI : MonoBehaviour
         ResetPromptData.PromptFinalized = ResetPromptFinished;
 
         PlayerSettings currentData = JsonHandler.GetCurrentData();
-
-        UpdateUI(currentData, true);
+        
+        UpdateUI(currentData);
         UpdateGraphics();
 
         ResolutionDD.DropdownInitalized.AddListener(() => DropdownInitalized(ResolutionDD.Dropdown, currentData.Resolution));
@@ -281,9 +271,9 @@ public class SettingsUI : MonoBehaviour
             group.Navigator.Button.onClick.AddListener(() => ChangeSubFrame(group.Frame));
         }
 
-        if (VisibleFrameOnStartup > Groups.Length || VisibleFrameOnStartup < 0) return;
+        if (VisibleIndexOnStartup > Groups.Length || VisibleIndexOnStartup < 0) return;
 
-        ChangeSubFrame(Groups[VisibleFrameOnStartup].Frame);
+        ChangeSubFrame(Groups[VisibleIndexOnStartup].Frame);
 
         SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip);
     }

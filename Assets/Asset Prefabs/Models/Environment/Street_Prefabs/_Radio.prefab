@@ -11,9 +11,11 @@ GameObject:
   - component: {fileID: 1808058794279921260}
   - component: {fileID: 3366537966231775689}
   - component: {fileID: 674606701299408131}
+  - component: {fileID: -340963800732437855}
+  - component: {fileID: 5114246666761666027}
   m_Layer: 0
   m_Name: _Radio
-  m_TagString: Untagged
+  m_TagString: special
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,3 +85,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &-340963800732437855
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1323023960528600278}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0649923, y: 0.38190192, z: 0.25189328}
+  m_Center: {x: -0.017214447, y: 0.19095096, z: -0.00223995}
+--- !u!54 &5114246666761666027
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1323023960528600278}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
