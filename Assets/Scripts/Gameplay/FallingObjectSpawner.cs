@@ -105,6 +105,10 @@ public class FallingObjectSpawner : MonoBehaviour
     private void Awake()
     {
         box = GetComponent<BoxCollider>();
+
+        if (spawnrate < 0) { spawnrate = -spawnrate; }
+        if (spawnDelay < 0) { spawnDelay = -spawnDelay; }
+        if (spawnLimit < 0) { spawnLimit = 0; }
     }
     #endregion
 }

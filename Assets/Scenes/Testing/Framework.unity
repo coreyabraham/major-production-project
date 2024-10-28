@@ -592,6 +592,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isConnectedToGround: 0
+  canDetachAtBottom: 0
   sideToAttachTo: 0
   axis: 0
 --- !u!65 &481070580
@@ -1271,7 +1273,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: IgnoreCheckpointData
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6246030398808792733, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_Name
@@ -2981,6 +2983,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1291926515021471309, guid: 485b70a37aae48e4795aba9eefe41201, type: 3}
+      propertyPath: BlendType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1291926515021471309, guid: 485b70a37aae48e4795aba9eefe41201, type: 3}
       propertyPath: TargetFOV
       value: 40
       objectReference: {fileID: 0}
@@ -4091,10 +4097,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Essentials
       objectReference: {fileID: 0}
-    - target: {fileID: 9141108622811272769, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
-      propertyPath: IgnoreSaveRequests
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
 --- !u!1001 &2016348525
@@ -4371,5 +4373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isConnectedToGround: 0
+  canDetachAtBottom: 0
   sideToAttachTo: 0
   axis: 0
