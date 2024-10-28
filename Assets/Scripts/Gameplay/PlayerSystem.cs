@@ -296,11 +296,11 @@ public class PlayerSystem : MonoBehaviour
         if (!other.transform.parent.CompareTag("Grabbable")) { return; }
         if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
 
-        PullObjPos = other.transform.root.transform.position;
+        PullObjPos = other.transform.parent.transform.position;
         float grabX;
 
         // I know this is an atrocious way of checking which side of the object the player is on...
-        if (transform.position.x < other.transform.root.transform.position.x)
+        if (transform.position.x < other.transform.parent.transform.position.x)
         {
             // On the left of the object.
             grabX = transform.position.x - 0.1f;
@@ -311,12 +311,12 @@ public class PlayerSystem : MonoBehaviour
             grabX = transform.position.x + 0.1f;
         }
 
-        other.transform.root.transform.position = new(grabX - other.transform.localPosition.x, other.transform.root.transform.position.y, other.transform.root.transform.position.z);
+        other.transform.parent.transform.position = new(grabX - other.transform.localPosition.x, other.transform.parent.transform.position.y, other.transform.parent.transform.position.z);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.root.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; }
+        if (other.transform.parent.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
