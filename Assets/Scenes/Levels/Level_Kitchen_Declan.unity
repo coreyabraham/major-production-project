@@ -303,10 +303,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8370844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e678d58e03e49cd47aabf41403e62c2e, type: 3}
+  m_Script: {fileID: 11500000, guid: b9cf6868dec87f646857e3a98f8e9f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isActive: 1
   objects:
   - {fileID: 6607428095003246214, guid: d77f5139c6e66354b81671ebd0a11f99, type: 3}
   - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
@@ -316,6 +315,7 @@ MonoBehaviour:
   delayBetweenSpawns: 5
   axisToSpawnAlong: 0
   ignoreRigidbodyCheck: 0
+  isActive: 1
 --- !u!1 &21662780
 GameObject:
   m_ObjectHideFlags: 0
@@ -1374,8 +1374,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -1398,8 +1396,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -2454,8 +2450,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -5871,6 +5865,10 @@ PrefabInstance:
       propertyPath: m_Center.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8155472169287050273, guid: 099e98b784e8c384a91ce180e96202b9, type: 3}
+      propertyPath: m_TagString
+      value: Grabbable
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 099e98b784e8c384a91ce180e96202b9, type: 3}
 --- !u!1001 &422959260
@@ -7737,8 +7735,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -13963,8 +13959,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -14130,8 +14124,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -15802,8 +15794,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -17915,8 +17905,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -18661,7 +18649,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.176
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 137921169106927466, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
+    - {fileID: -1901838970203280149, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
 --- !u!1001 &1567228193
 PrefabInstance:
@@ -18955,8 +18945,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -19984,6 +19972,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1632796855 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6923b3149c7f0dd4ebc8aa0d1a0f4806, type: 3}
+  m_PrefabInstance: {fileID: 1790369457}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1633786737
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22561,6 +22554,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6923b3149c7f0dd4ebc8aa0d1a0f4806, type: 3}
   m_PrefabInstance: {fileID: 1790369457}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &1790369461
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632796855}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.3369147, y: 0.30891097, z: 0.28588632}
+  m_Center: {x: 0.00014173985, y: 0.15358609, z: -0.13114132}
 --- !u!1001 &1791189413
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23703,7 +23709,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 9.88
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 681100772011608072, guid: dc0b3a13796289f45aec1f54c3dd659f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: dc0b3a13796289f45aec1f54c3dd659f, type: 3}
 --- !u!1001 &1892612261
 PrefabInstance:
@@ -24084,7 +24091,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 5.016
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 681100772011608072, guid: dc0b3a13796289f45aec1f54c3dd659f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: dc0b3a13796289f45aec1f54c3dd659f, type: 3}
 --- !u!1001 &1945122215
 PrefabInstance:
@@ -26209,8 +26217,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -26904,7 +26910,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isConnectedToGround: 0
   sideToAttachTo: 1
   axis: 0
 --- !u!1 &6128447481558304555
@@ -27019,7 +27024,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711fc009bd7b80a49b9d07b681304ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isConnectedToGround: 0
   sideToAttachTo: 0
   axis: 0
 --- !u!1 &6128447482344246787

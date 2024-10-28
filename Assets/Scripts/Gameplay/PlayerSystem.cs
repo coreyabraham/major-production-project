@@ -262,15 +262,26 @@ public class PlayerSystem : MonoBehaviour
 
         if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
 
-        if (string.IsNullOrWhiteSpace(data.checkpointName) || IgnoreCheckpointData == true)
+        bool CheckpointExists = !string.IsNullOrWhiteSpace(data.checkpointName);
+
+        if (CheckpointExists)
+        {
+            foreach (PlrCheckpoint checkpoint in FindObjectsOfType<PlrCheckpoint>())
+            {
+                if (checkpoint.gameObject.name != data.checkpointName) continue;
+                CheckpointExists = true;
+                break;
+            }
+        }
+
+        if (!CheckpointExists || IgnoreCheckpointData == true)
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
             return;
         }
 
         Vector3 Position = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointPosition);
-        Vector3 Eular = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointRotation);
-        Quaternion Rotation = Quaternion.Euler(Eular);
+        Quaternion Rotation = Quaternion.Euler(DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointRotation));
 
         Warp(Position, Rotation);
     }
@@ -296,11 +307,11 @@ public class PlayerSystem : MonoBehaviour
         if (!other.transform.parent.CompareTag("Grabbable")) { return; }
         if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
 
-        PullObjPos = other.transform.root.transform.position;
+        PullObjPos = other.transform.parent.transform.position;
         float grabX;
 
         // I know this is an atrocious way of checking which side of the object the player is on...
-        if (transform.position.x < other.transform.root.transform.position.x)
+        if (transform.position.x < other.transform.parent.transform.position.x)
         {
             // On the left of the object.
             grabX = transform.position.x - 0.1f;
@@ -311,12 +322,12 @@ public class PlayerSystem : MonoBehaviour
             grabX = transform.position.x + 0.1f;
         }
 
-        other.transform.root.transform.position = new(grabX - other.transform.localPosition.x, other.transform.root.transform.position.y, other.transform.root.transform.position.z);
+        other.transform.parent.transform.position = new(grabX - other.transform.localPosition.x, other.transform.parent.transform.position.y, other.transform.parent.transform.position.z);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.root.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; }
+        if (other.transform.parent.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
@@ -540,11 +551,11 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
-        Animator.SetBool("IsGrounded", IsGrounded);
         Animator.SetFloat("vSpeed", Character.velocity.y);
         Animator.SetFloat("Speed", CurrentMoveSpeed);
         Animator.SetBool("Jump", IsJumping && !IsGrounded);
         Animator.SetBool("Climb", IsClimbing);
+        Animator.SetBool("IsGrounded", IsGrounded);
 
         if (IsScurrying)
         {
