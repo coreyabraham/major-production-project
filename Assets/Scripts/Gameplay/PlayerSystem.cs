@@ -540,6 +540,8 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
+        Animator.SetBool("IsGrounded", IsGrounded);
+        Animator.SetFloat("vSpeed", Character.velocity.y);
         Animator.SetFloat("Speed", CurrentMoveSpeed);
         Animator.SetBool("Jump", IsJumping && !IsGrounded);
         Animator.SetBool("Climb", IsClimbing);
