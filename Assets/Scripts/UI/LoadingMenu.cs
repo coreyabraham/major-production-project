@@ -21,9 +21,10 @@ public class LoadingMenu : MonoBehaviour
     private bool UIRequested = false;
 
     private float ArtificialTimer = 0.0f;
-    private float MaxArtificialTimer = 3.0f;
+    readonly private float MaxArtificialTimer = 0.0f;
 
     private float TimeElapsed = 0.0f;
+    private float CurrentProgress = 0.0f;
 
     public void ToggleLoadingScreen(bool Toggle) => Canvas.SetActive(Toggle);
 
@@ -37,25 +38,25 @@ public class LoadingMenu : MonoBehaviour
 
     public void LoadingFinished()
     {
-        Loading = false;
-
         print("Time Spent loading: " + TimeElapsed.ToString());
-        TimeElapsed = 0.0f;
 
+        Loading = false;
         UIRequested = false;
 
+        TimeElapsed = 0.0f;
         ArtificialTimer = 0.0f;
-        MaxArtificialTimer = 3.0f;
+        CurrentProgress = 0.0f;
 
-        // Here temporarily until animation work is finished!
+        Bar.value = Bar.minValue;
+        Label.text = "Progress: " + Bar.minValue.ToString() + "%";
+
         ToggleLoadingScreen(false);
     }
 
     public void LoadingUpdated(float Progress)
     {
-        print(Progress);
-        Bar.value = Mathf.Lerp(Bar.value, Progress, Time.deltaTime * LerpingModifier);
-        Label.text = "Progress: " + (Progress * 100.0f).ToString() + "%";
+        if (!Loading) return;
+        CurrentProgress = Progress;
     }
 
     private void Update()
@@ -75,6 +76,10 @@ public class LoadingMenu : MonoBehaviour
         }
 
         if (!Loading) return;
+
+        Bar.value = Mathf.Lerp(Bar.value, CurrentProgress * 2, LerpingModifier * Time.deltaTime);
+        Label.text = "Progress: " + Mathf.Round(CurrentProgress * 100.0f).ToString() + "%";
+
         TimeElapsed += Time.deltaTime;
     }
 

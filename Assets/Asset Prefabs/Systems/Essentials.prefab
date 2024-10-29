@@ -106,11 +106,17 @@ MonoBehaviour:
   Player: {fileID: 0}
   Camera: {fileID: 0}
   GameplayPaused: 0
-  RunningInEditor: 0
-  LevelNames:
-  - Level_Alleyway
-  - Level_Kitchen
-  - Level_Burrow
+  SceneEntries:
+  - name: Title Screen
+    index: 0
+  - name: Level_Alleyway_Changes
+    index: 1
+  - name: Level_Kitchen_Declan
+    index: 2
+  - name: Level_Burrow
+    index: 3
+  - name: Level_End
+    index: 4
   BlacklistedPauseScenes:
   - Title Screen
   Events:
@@ -251,12 +257,6 @@ MonoBehaviour:
   Actions: {fileID: -944628639613478452, guid: 37717043224923d4c96574aabac3b2bf, type: 3}
   ActionMap: Player
   InputUsability: 1
-  InputActionMap:
-    m_Name: 
-    m_Id: 
-    m_Asset: {fileID: 0}
-    m_Actions: []
-    m_Bindings: []
 --- !u!1 &7229351052136600103
 GameObject:
   m_ObjectHideFlags: 0
