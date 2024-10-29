@@ -138,7 +138,8 @@ public class PlayerSystem : MonoBehaviour
 
     [HideInInspector] public bool IsJumping;
 
-    private bool IsScurrying, IsGrounded, IsMoving, IsPulling, IsSliding, IsBeingLaunched;
+    private bool IsScurrying, IsGrounded, IsMoving, IsSliding, IsBeingLaunched;
+    private bool IsGrabbing, IsPushing, IsPulling;
 
     private readonly List<GameObject> CachedInteractables = new();
     private readonly Dictionary<GameObject, ITouchable> CachedTouchables = new();
@@ -159,7 +160,7 @@ public class PlayerSystem : MonoBehaviour
     public void OnScurry(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
-            IsClimbing || IsPulling || IsJumpingFromClimb) return;
+            IsClimbing || IsGrabbing || IsJumpingFromClimb) return;
         
         IsScurrying = !IsScurrying;
 
@@ -172,8 +173,8 @@ public class PlayerSystem : MonoBehaviour
     {
         if (MoveType == MoveType.None) return;
         if ((IsClimbing && CurrentPipeSide == PipeSide.Left && MoveInput.x > 0) ||
-            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0) ||
-            (IsClimbing && MoveInput.x == 0)) { return; }
+            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0)// ||
+            /*(IsClimbing && MoveInput.x == 0)*/) { return; }
 
         IsJumping = ctx.ReadValueAsButton();
         Events.Jumping.Invoke(IsJumping);
@@ -202,7 +203,7 @@ public class PlayerSystem : MonoBehaviour
     public bool IsPlayerGrounded() => IsGrounded;
     public bool ToggleUpMovement(bool enable) => CanClimbUp = enable;
     public bool ToggleDownMovement(bool enable) => CanClimbDown = enable;
-    public bool TogglePullState(bool input) => IsPulling = input;
+    public bool TogglePullState(bool input) => IsGrabbing = input;
     public bool ToggleCharCont(bool enable) => Character.enabled = enable;
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
@@ -327,7 +328,7 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.parent.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; }
+        if (other.transform.parent.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
@@ -393,6 +394,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (IsJumping)
         {
+            SlideTimer = 0;
+
             // If IsJumping is true, set JumpButtonIsHeld to true after .05 seconds.
             TimeUntilJumpButtonIsDisabled += Time.fixedDeltaTime;
             if (TimeUntilJumpButtonIsDisabled > 0.05f) JumpButtonIsHeld = true;
@@ -400,6 +403,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (IsClimbing)
         {
+            IsJumpingFromClimb = false;
+
             if (MoveInput.y == 0) { if (SlideTimer < TimeBeforeSlide) { SlideTimer += Time.fixedDeltaTime; } }
             else { SlideTimer = 0; }
             
@@ -411,6 +416,8 @@ public class PlayerSystem : MonoBehaviour
                 Debug.Log("Should be sliding right now.");
             }
 
+            if (IsBeingLaunched) { IsBeingLaunched = false; }
+
             if (IsScurrying) { IsScurrying = false; }
 
             if (!IsJumping && JumpButtonIsHeld)
@@ -421,12 +428,13 @@ public class PlayerSystem : MonoBehaviour
 
             if (IsJumping && !JumpButtonIsHeld)
             {
-                if (IsJumpingFromClimb && CurrentPipeSide == PipeSide.Right) { MoveInput.x = 1; }
-                else if (IsJumpingFromClimb && CurrentPipeSide == PipeSide.Left) { MoveInput.x = -1; }
+                IsJumpingFromClimb = true;
+
+                if (IsJumpingFromClimb && CurrentPipeSide == PipeSide.Right) { ApplyImpulseToPlayer(0.5f); }
+                else if (IsJumpingFromClimb && CurrentPipeSide == PipeSide.Left) { ApplyImpulseToPlayer(-0.5f); }
 
                 Velocity.y = JumpForce;
                 IsClimbing = false;
-                IsJumpingFromClimb = true;
             }
             else if (ClimbingRequested)
             {
@@ -439,6 +447,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (!IsClimbing)
         {
+            SlideTimer = 0;
+
             if (!IsBeingLaunched)
             {
                 Velocity.z = MoveDelta.z;
@@ -455,6 +465,18 @@ public class PlayerSystem : MonoBehaviour
 
                 if (IsJumping && !FloorMaterial.PreventJumping && !JumpButtonIsHeld) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
+
+                if (IsGrabbing)
+                {
+                    if ((MoveInput.x < 0 && PullObjPos.x > transform.position.x) || (MoveInput.x > 0 && PullObjPos.x < transform.position.x))
+                    { IsPulling = true; }
+                    else { IsPulling = false; }
+
+
+                    if ((MoveInput.x > 0 && PullObjPos.x > transform.position.x) || (MoveInput.x < 0 && PullObjPos.x < transform.position.x))
+                    { IsPushing = true; }
+                    else { IsPushing = false; }
+                }
             }
 
             else
@@ -489,7 +511,7 @@ public class PlayerSystem : MonoBehaviour
 
         if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
-        if (!IsPulling) Character.Move(actualVelocity * Time.fixedDeltaTime);
+        if (!IsGrabbing) Character.Move(actualVelocity * Time.fixedDeltaTime);
         else Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime);
 
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
@@ -514,11 +536,11 @@ public class PlayerSystem : MonoBehaviour
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
 
-        if (!IsPulling)
+        if (!IsGrabbing)
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
-                !IsClimbing ? rotation + 90.0f : 180.0f,
+                !IsClimbing ? rotation + 90.0f : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f
             );
         }
