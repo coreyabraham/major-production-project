@@ -1,7 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -25,10 +24,6 @@ public class GameSystem : Singleton<GameSystem>
         public UnityEvent<Scene, LoadSceneMode> SceneLoaded;
         public UnityEvent<Scene, Scene> SceneChanged;
     }
-
-    [field: Header("Tags")]
-    public string PlayerTag = "Player";
-    public string CameraTag = "Camera";
 
     [field: Header("Externals")]
     public PlayerSystem Player;
@@ -84,26 +79,10 @@ public class GameSystem : Singleton<GameSystem>
         Events.PlayerDied?.Invoke();
     }
 
-    // TODO: IMPROVE THIS SEARCHING MECHANISM!
     public void RefreshCachedExternals()
     {
-        if (Player == null)
-        {
-            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(PlayerTag))
-            {
-                obj.TryGetComponent(out Player);
-                if (Player != null) break;
-            }
-        }
-
-        if (Camera == null)
-        {
-            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(CameraTag))
-            {
-                obj.TryGetComponent(out Camera);
-                if (Camera != null) break;
-            }
-        }
+        if (Player == null) Player = FindFirstObjectByType<PlayerSystem>();
+        if (Camera == null) Camera = FindFirstObjectByType<CameraSystem>();
 
         Events.ExternalsCached?.Invoke(Player, Camera);
     }
