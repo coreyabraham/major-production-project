@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class PlayUI : MonoBehaviour
 {
     [field: Header("Miscellaneous")]
-    [field: SerializeField] private string[] LevelEntries;
+    [field: SerializeField] private int StartingLevelIndex;
 
     [field: Header("Parents")]
     [field: SerializeField] private GameObject SavesParent;
@@ -72,7 +72,7 @@ public class PlayUI : MonoBehaviour
 
        if (string.IsNullOrWhiteSpace(targetData.levelName))
        {
-            targetData.levelName = LevelEntries[0];
+            targetData.levelName = GameSystem.Instance.GetLevelName(StartingLevelIndex);
             DataHandler.Instance.SetCachedData(targetData);
             SceneManager.LoadScene(targetData.levelName);
             
