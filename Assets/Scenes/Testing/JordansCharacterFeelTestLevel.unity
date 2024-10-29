@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 370.61963, g: 281.42505, b: 224.03467, a: 1}
+  m_IndirectSpecularColor: {r: 418.14575, g: 336.03906, b: 314.5332, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1848,7 +1848,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4389518994105382359, guid: 099e98b784e8c384a91ce180e96202b9, type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4389518994105382359, guid: 099e98b784e8c384a91ce180e96202b9, type: 3}
       propertyPath: m_LocalScale.x
@@ -3419,10 +3419,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 2110618089}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls:
@@ -3832,7 +3830,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &348038814
 GameObject:
@@ -4173,10 +4171,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 940071751}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -4396,7 +4392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4389518994105382359, guid: 099e98b784e8c384a91ce180e96202b9, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4389518994105382359, guid: 099e98b784e8c384a91ce180e96202b9, type: 3}
       propertyPath: m_LocalScale.x
@@ -4839,7 +4835,6 @@ MonoBehaviour:
   Player: {fileID: 0}
   Camera: {fileID: 761082605}
   GameplayPaused: 0
-  RunningInEditor: 0
   LevelNames: []
   BlacklistedPauseScenes: []
   Events:
@@ -5090,7 +5085,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &492712390
 GameObject:
@@ -5614,10 +5609,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 1924465826}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -5683,6 +5676,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConnectedToGround: 1
+  canDetachAtBottom: 0
   sideToAttachTo: 1
   axis: 0
 --- !u!1 &584524697
@@ -5734,6 +5728,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConnectedToGround: 0
+  canDetachAtBottom: 0
   sideToAttachTo: 1
   axis: 0
 --- !u!65 &584524700
@@ -6356,7 +6351,7 @@ MonoBehaviour:
       values?
     AcceptButtonText: Yes, I'm sure.
     DenyButtonText: No, maybe not.
-  VisibleFrameOnStartup: 0
+  VisibleIndexOnStartup: 0
   Groups:
   - Frame: {fileID: 1286654543}
     Navigator: {fileID: 1396712389}
@@ -8147,7 +8142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7d8f4a76a325f74f96a25bf3958353e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IgnorePlayerJumps: 1
+  CameraJumpsWithPlayer: 0
   AutomateStartCameraOffset: 0
   IgnoreAnticipationOffset: 0
   IgnoreCurrentOffset: 0
@@ -8382,7 +8377,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &773299193
 GameObject:
@@ -8526,10 +8521,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 245790578}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls:
@@ -8746,6 +8739,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConnectedToGround: 0
+  canDetachAtBottom: 0
   sideToAttachTo: 1
   axis: 0
 --- !u!65 &801546413
@@ -9003,6 +8997,13 @@ MonoBehaviour:
     Contrast: 0.5
     Brightness: 0.5
     ColourAccessibility: Default
+    AnalogMoveAction: []
+    DigitalMoveAction: []
+    JumpAction: []
+    ScurryAction: []
+    ClimbAction: []
+    InteractAction: []
+    PauseAction: []
   Initialized:
     m_PersistentCalls:
       m_Calls: []
@@ -9413,7 +9414,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10486,10 +10487,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 1684575800}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -11294,7 +11293,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1079610504
 GameObject:
@@ -11614,7 +11613,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1089311181
 GameObject:
@@ -11667,10 +11666,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 1711754790}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -11904,7 +11901,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1110964545
 GameObject:
@@ -12643,10 +12640,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 1691458990}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -13328,10 +13323,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 349404520}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -14366,10 +14359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 694716378}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -15014,6 +15005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConnectedToGround: 0
+  canDetachAtBottom: 0
   sideToAttachTo: 0
   axis: 0
 --- !u!65 &1423572670
@@ -15729,7 +15721,7 @@ Transform:
   - {fileID: 235942736}
   - {fileID: 1246761226}
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1548308839
 GameObject:
@@ -16570,10 +16562,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 157281747}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls:
@@ -16878,10 +16868,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 2063291569}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls:
@@ -17432,12 +17420,6 @@ MonoBehaviour:
   Actions: {fileID: -944628639613478452, guid: 37717043224923d4c96574aabac3b2bf, type: 3}
   ActionMap: Player
   InputUsability: 1
-  InputActionMap:
-    m_Name: 
-    m_Id: 
-    m_Asset: {fileID: 0}
-    m_Actions: []
-    m_Bindings: []
 --- !u!1 &1711754788
 GameObject:
   m_ObjectHideFlags: 0
@@ -17770,10 +17752,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetFrame: {fileID: 0}
-  Text: 
   Button: {fileID: 1740189587}
-  Label: {fileID: 0}
-  DefaultText: 
+  Text: {fileID: 0}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -19968,7 +19948,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1931947947
 GameObject:
@@ -20377,7 +20357,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1985096342
 GameObject:
@@ -20408,7 +20388,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1989363438
 GameObject:
@@ -20783,6 +20763,63 @@ Transform:
   m_Father: {fileID: 568218839}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2054500205
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3916449101958731386, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_Name
+      value: _Crow
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.0327833
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.44035685
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.08927035
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.93972284
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.34193724
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -1479.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400532617046625472, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 27c4e05bd396cf8459d94dc43eeb87a3, type: 3}
 --- !u!1 &2056882392
 GameObject:
   m_ObjectHideFlags: 0
@@ -20832,6 +20869,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConnectedToGround: 0
+  canDetachAtBottom: 0
   sideToAttachTo: 0
   axis: 0
 --- !u!65 &2056882395
