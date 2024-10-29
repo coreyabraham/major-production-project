@@ -25,6 +25,13 @@ public class GameSystem : Singleton<GameSystem>
         public UnityEvent<Scene, Scene> SceneChanged;
     }
 
+    [System.Serializable]
+    public struct SceneEntry
+    {
+        public string name;
+        public int index;
+    }
+
     [field: Header("Tags")]
     public string PlayerTag = "Player";
     public string CameraTag = "Camera";
@@ -37,17 +44,23 @@ public class GameSystem : Singleton<GameSystem>
     public bool GameplayPaused = false;
 
     [field: Header("Collections")]
-    [field: SerializeField] private List<string> LevelNames;
-    private Dictionary<int, string> Levels = new();
+    public SceneEntry[] SceneEntries;
     public string[] BlacklistedPauseScenes;
 
     [field: Header("Events")]
     public GameEvents Events;
 
+    private readonly Dictionary<int, string> Levels = new();
+
     private string TargetSceneName;
     private float ElapsedPlaytime;
 
     private bool SceneRequested = false;
+
+    private float SceneLoadingProgress = 0.0f;
+    private float SceneLoadingModifier = 0.01f;
+
+    private AsyncOperation SceneLoadingOperation;
 
     public float GetElapsedPlaytime() => ElapsedPlaytime;
     public void SetPausedState(bool State) => GameplayPaused = State;
@@ -63,12 +76,13 @@ public class GameSystem : Singleton<GameSystem>
 
     public string GetLevelNameWithIndex() => GetLevelName(GetCurrentSceneBuildIndex());
 
-    public bool IsCurrentSceneAValidLevel()
+    public bool IsTargetSceneAValidLevel(Scene Target)
     {
-        Scene activeScene = SceneManager.GetActiveScene();
-        if (Levels.Count < activeScene.buildIndex) return false;
-        return Levels[activeScene.buildIndex] == activeScene.name;
+        if (Target.buildIndex < Levels.Count || Target.buildIndex > Levels.Count) return false;
+        return Levels[Target.buildIndex] == Target.name;
     }
+
+    public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
 
     public void PlayerDiedCallback()
     {
@@ -102,9 +116,9 @@ public class GameSystem : Singleton<GameSystem>
 
     public void RequestLoadScene(string SceneName)
     {
-        if (string.IsNullOrWhiteSpace(TargetSceneName))
+        if (string.IsNullOrWhiteSpace(SceneName))
         {
-            Debug.LogWarning(name + " | Could not Load Scene with Name: " + TargetSceneName + "\nMake sure the target Scene you're attempting to load is in the `Build Settings` 'Scenes in Build' list!");
+            Debug.LogWarning(name + " | Could not Load Scene with Name: " + SceneName + "\nMake sure the target Scene you're attempting to load is in the `Build Settings` 'Scenes in Build' list!");
             return;
         }
 
@@ -126,30 +140,46 @@ public class GameSystem : Singleton<GameSystem>
         Events.LoadingStarted?.Invoke();
 
         StartCoroutine(LoadSceneInBackground(TargetSceneName));
-        StartCoroutine(UnloadSceneInBackground());
+        StartCoroutine(TrackLoadingOperation());
+        StartCoroutine(UnloadPreviouScene(SceneManager.GetActiveScene()));
 
         TargetSceneName = string.Empty;
         SceneRequested = false;
     }
 
-    // Could possibly be done in an Update loop instead? If so, then try adding Lerping to it!
     IEnumerator LoadSceneInBackground(string SceneName)
     {
-        AsyncOperation operation = SceneManager.LoadSceneAsync(SceneName);
+        SceneLoadingOperation = SceneManager.LoadSceneAsync(SceneName);
+        SceneLoadingOperation.allowSceneActivation = false;
+        
+        SceneLoadingProgress = 0.0f;
 
-        while (!operation.isDone)
+        while (SceneLoadingProgress <= 1.0f)
         {
-            Events.LoadingProgress?.Invoke(Mathf.Clamp01(operation.progress / 0.9f));
-            yield return null;
+            Events.LoadingProgress?.Invoke(SceneLoadingProgress);
+            SceneLoadingProgress += SceneLoadingModifier;
+
+            yield return new WaitForSeconds(SceneLoadingModifier);
         }
 
         Events.LoadingFinished?.Invoke();
     }
 
-    IEnumerator UnloadSceneInBackground()
+    IEnumerator TrackLoadingOperation()
     {
-        AsyncOperation operation = SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
-        while (!operation.isDone) yield return null;
+        while (!SceneLoadingOperation.isDone)
+        {
+            SceneLoadingOperation.allowSceneActivation = SceneLoadingProgress >= 1.0f;
+            yield return null;
+        }
+
+        SceneLoadingOperation = null;
+        SceneLoadingProgress = 0.0f;
+    }
+
+    IEnumerator UnloadPreviouScene(Scene Previous)
+    {
+        yield return SceneManager.UnloadSceneAsync(Previous);
     }
 
     private void SceneLoaded(Scene Scene, LoadSceneMode Mode) => Events.SceneLoaded?.Invoke(Scene, Mode);
@@ -182,10 +212,7 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
-        for (int i = 0; i < LevelNames.Count; i++)
-        {
-            Levels.Add(i, LevelNames[i]);
-        }
+        foreach (SceneEntry entry in SceneEntries) Levels.Add(entry.index, entry.name);
 
         LoadEvents();
         RefreshCachedExternals();
