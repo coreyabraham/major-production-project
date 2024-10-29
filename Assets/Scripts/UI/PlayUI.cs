@@ -34,7 +34,7 @@ public class PlayUI : MonoBehaviour
     [field: SerializeField] private string NonSelectedText = "Selected File: N / A";
 
     [field: Header("Prompter")]
-    [field: SerializeField] private PromptUI PromptSystem;
+    public PromptUI PromptSystem;
     [field: SerializeField] private PromptDataUI ClearData;
 
     private SaveFileUI[] CachedFiles;
@@ -46,6 +46,8 @@ public class PlayUI : MonoBehaviour
 
     public void TestBtnClicked()
     {
+        print("RAN!");
+
         if (SceneSelector.activeSelf)
         {
             SavesParent.SetActive(true);

@@ -1,6 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -25,13 +26,6 @@ public class GameSystem : Singleton<GameSystem>
         public UnityEvent<Scene, Scene> SceneChanged;
     }
 
-    [System.Serializable]
-    public struct SceneEntry
-    {
-        public string name;
-        public int index;
-    }
-
     [field: Header("Tags")]
     public string PlayerTag = "Player";
     public string CameraTag = "Camera";
@@ -44,13 +38,13 @@ public class GameSystem : Singleton<GameSystem>
     public bool GameplayPaused = false;
 
     [field: Header("Collections")]
-    public SceneEntry[] SceneEntries;
     public string[] BlacklistedPauseScenes;
 
     [field: Header("Events")]
     public GameEvents Events;
 
     private readonly Dictionary<int, string> Levels = new();
+    private string[] DataConfirmation;
 
     private string TargetSceneName;
     private float ElapsedPlaytime;
@@ -212,7 +206,19 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
-        foreach (SceneEntry entry in SceneEntries) Levels.Add(entry.index, entry.name);
+        string CurrentSceneName = SceneManager.GetActiveScene().name;
+
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string levelName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i));
+            if (levelName == CurrentSceneName) continue;
+            Levels.Add(i, levelName);
+        }
+
+        DataConfirmation = new string[Levels.Count];
+
+        for (int i = 0; i < DataConfirmation.Length; i++)
+            DataConfirmation[i] = Levels[i];
 
         LoadEvents();
         RefreshCachedExternals();

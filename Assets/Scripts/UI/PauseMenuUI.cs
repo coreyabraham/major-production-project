@@ -6,6 +6,7 @@ public class PauseMenuUI : MonoBehaviour
 {
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
     [field: SerializeField] private string TitleUIObject = "TitleUI";
+    [field: SerializeField] private string PlayUIObject = "PlayUI";
 
     [field: Space(2.5f)]
 
@@ -40,6 +41,7 @@ public class PauseMenuUI : MonoBehaviour
         if (Scene.name != TitleScreenScene) return;
 
         TitleUI TitleUI = null;
+        PlayUI PlayUI = null;
 
         foreach (GameObject obj in Scene.GetRootGameObjects())
         {
@@ -52,12 +54,26 @@ public class PauseMenuUI : MonoBehaviour
             break;
         }
 
+        foreach (GameObject obj in Scene.GetRootGameObjects())
+        {
+            if (obj.name != PlayUIObject) continue;
+
+            PlayUI play = obj.GetComponent<PlayUI>();
+            if (!play) continue;
+
+            PlayUI = play;
+            break;
+        }
+
         if (!TitleUI) return;
+        if (!PlayUI) return;
 
         TitleUI.ExitMenu.PromptUI = Settings.PromptHandler;
 
         TitleUI.SettingsMenu.JsonHandler = Settings.JsonHandler;
         TitleUI.SettingsMenu.PromptHandler = Settings.PromptHandler;
+
+        PlayUI.PromptSystem = Settings.PromptHandler;
     }
 
     public void InputCalled(InputAction.CallbackContext ctx)
