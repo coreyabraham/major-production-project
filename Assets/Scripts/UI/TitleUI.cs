@@ -58,7 +58,11 @@ public class TitleUI : MonoBehaviour
         }
 
         string str = (!foundTarget) ? Frame.name : target.Name;
-        SubTitle.text = SubTitleText + " | " + str;
+
+        string combo = SubTitleText + " | ";
+        if (string.IsNullOrWhiteSpace(SubTitleText)) combo = string.Empty;
+
+        SubTitle.text = combo + str;
 
         GetButtons();
     }
