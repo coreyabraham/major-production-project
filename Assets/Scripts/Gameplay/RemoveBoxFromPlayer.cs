@@ -16,7 +16,7 @@ public class RemoveBoxFromPlayer : MonoBehaviour, ITouchable
         if (hasTriggeredOnce) { return; }
 
         Player.IsHidden = false;
-        Destroy(Player.gameObject.transform.GetChild(1).gameObject);
+        Destroy(Player.gameObject.transform.GetChild(2).gameObject);
 
         hasTriggeredOnce = true;
     }

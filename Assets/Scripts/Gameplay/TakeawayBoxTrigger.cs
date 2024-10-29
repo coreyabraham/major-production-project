@@ -19,6 +19,7 @@ public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
     #region Functions - Private
     public void Interacted(PlayerSystem Player)
     {
+        Debug.Log(Player.IsHidden);
         if (Player.IsHidden) return;
 
         takeawayBox.transform.parent = Player.gameObject.transform;

@@ -34,7 +34,7 @@ public class ScriptedObjectFalling : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if ((other.CompareTag("Player") && Input.GetKey(KeyCode.E)) || (other.CompareTag(tag) && isAffectedByKin))
+        if ((other.CompareTag("Player")) || (other.CompareTag(tag) && isAffectedByKin))
         {
             if (colliderToDestroy.Length >= 1)
             {
