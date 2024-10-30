@@ -152,6 +152,8 @@ public class PlayerSystem : MonoBehaviour
     private bool CanClimbUp = true, CanClimbDown = true;
     private float SlideTimer = 0.0f;
 
+    private float grabDist;
+
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
 
@@ -193,8 +195,8 @@ public class PlayerSystem : MonoBehaviour
     {
         if (MoveType == MoveType.None) return;
         if ((IsClimbing && CurrentPipeSide == PipeSide.Left && MoveInput.x > 0) ||
-            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0)// ||
-            /*(IsClimbing && MoveInput.x == 0)*/) { return; }
+            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0) ||
+            (IsGrabbing)) { return; }
 
         IsJumping = ctx.ReadValueAsButton();
         Events.Jumping.Invoke(IsJumping);
@@ -320,6 +322,7 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.transform.parent.CompareTag(GrabTag)) { grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance(); }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
@@ -339,19 +342,20 @@ public class PlayerSystem : MonoBehaviour
         if (!other.transform.parent.CompareTag(GrabTag)) { return; }
         if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
 
-        PullObjPos = other.transform.parent.transform.position;
+        PullObjPos = other.transform.parent.position;
 
         // I know this is an atrocious way of checking which side of the object the player is on...
         // dw about it, I made it slightly less offensive lol
 
-        float grabX = transform.position.x < other.transform.parent.transform.position.x 
-            ? transform.position.x - 0.1f // Left Side
-            : transform.position.x + 0.1f; // Right Side
+        float grabX = transform.position.x < other.transform.parent.position.x 
+            ? transform.position.x + grabDist // Left Side
+            : transform.position.x - grabDist; // Right Side
 
-        other.transform.parent.transform.position = new(
+
+        other.transform.parent.position = new(
             grabX - other.transform.localPosition.x, 
-            other.transform.parent.transform.position.y, 
-            other.transform.parent.transform.position.z
+            other.transform.parent.position.y, 
+            other.transform.parent.position.z
         );
     }
 
@@ -540,7 +544,7 @@ public class PlayerSystem : MonoBehaviour
 
         if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
-        Vector3 importedVelocity = !IsPulling ? actualVelocity : actualVelocity / PullInhibitMultiplier;
+        Vector3 importedVelocity = !IsGrabbing ? actualVelocity : actualVelocity / PullInhibitMultiplier;
         Character.Move(importedVelocity * Time.fixedDeltaTime);
 
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);

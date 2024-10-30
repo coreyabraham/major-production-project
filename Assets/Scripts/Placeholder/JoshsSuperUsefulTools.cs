@@ -12,6 +12,6 @@ public class JoshsSuperUsefulTools : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R) && SceneReloading) { SceneManager.LoadScene("Josh-Testing"); }
+        if (Input.GetKeyDown(KeyCode.R) && SceneReloading) { SceneManager.LoadScene("JoshsPlayground"); }
     }
 }
