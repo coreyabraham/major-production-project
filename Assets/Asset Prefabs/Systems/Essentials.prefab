@@ -106,13 +106,23 @@ MonoBehaviour:
   Player: {fileID: 0}
   Camera: {fileID: 0}
   GameplayPaused: 0
-  LevelNames:
-  - Level_Alleyway
-  - Level_Kitchen
-  - Level_Burrow
+  SceneEntries:
+  - name: Title Screen
+    index: 0
+  - name: Level_Alleyway_Changes
+    index: 1
+  - name: Level_Kitchen_Declan
+    index: 2
+  - name: Level_Burrow
+    index: 3
+  - name: Level_End
+    index: 4
   BlacklistedPauseScenes:
   - Title Screen
   Events:
+    ExternalsCached:
+      m_PersistentCalls:
+        m_Calls: []
     PlayerDied:
       m_PersistentCalls:
         m_Calls: []
@@ -396,6 +406,35 @@ MonoBehaviour:
     Contrast: 0.5
     Brightness: 0.5
     ColourAccessibility: Default
+    AnalogMoveAction:
+    - <Gamepad>/leftStick/up
+    - <Gamepad>/leftStick/down
+    - <Gamepad>/leftStick/left
+    - <Gamepad>/leftStick/right
+    DigitalMoveAction:
+    - <Keyboard>/w
+    - <Keyboard>/a
+    - <Keyboard>/s
+    - <Keyboard>/d
+    - <Gamepad>/dpad/up
+    - <Gamepad>/dpad/left
+    - <Gamepad>/dpad/down
+    - <Gamepad>/dpad/right
+    JumpAction:
+    - <Keyboard>/space
+    - <Gamepad>/buttonSouth
+    ScurryAction:
+    - <Keyboard>/leftShift
+    - <Gamepad>/leftTrigger
+    ClimbAction:
+    - <Keyboard>/q
+    - <Gamepad>/buttonNorth
+    InteractAction:
+    - <Keyboard>/e
+    - '<Gamepad>/buttonNorth '
+    PauseAction:
+    - <Keyboard>/leftShift
+    - <Gamepad>/buttonWest
   Initialized:
     m_PersistentCalls:
       m_Calls: []
@@ -585,6 +624,10 @@ PrefabInstance:
     - target: {fileID: 3070676829403038581, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: m_Name
       value: PauseMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 4641272938538745316, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: m_SortingOrder
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7033943551672774518, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: JsonHandler

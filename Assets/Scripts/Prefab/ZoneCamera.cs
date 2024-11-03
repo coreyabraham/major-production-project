@@ -7,8 +7,8 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("CameraSystem Settings")]
-    [field: SerializeField] private bool IgnoreAnticipationOffset;
-    [field: SerializeField] private bool IgnoreCurrentOffset;
+    public bool IgnoreAnticipationOffset;
+    public bool IgnoreCurrentOffset;
 
     [field: Header("Scaling Options")]
     public CartesianCoords LocalScaleType = CartesianCoords.X;
@@ -24,6 +24,11 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     public bool OverridePreviousRotation;
     public bool OverridePreviousFOV;
 
+    [field: Header("Deriving Options")]
+    [field: SerializeField] private bool DerivePosition;
+    [field: SerializeField] private bool DeriveRotation;
+    [field: SerializeField] private bool DeriveFieldOfView;
+
     [field: Header("Transformations")]
     public Vector3 TargetPosition;
     public Quaternion TargetRotation;
@@ -31,7 +36,6 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     [field: Header("FOV Adjustments")]
     public float TargetFOV;
-    [field: SerializeField] private bool DeriveStartFOV;
     [field: SerializeField] private bool SumDerivedFOV;
 
     [field: Header("Camera Animations")]
@@ -85,7 +89,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     {
         if (TargetObject != null)
         {
-            if (ZoneBlending)
+            if (DerivePosition)
             {
                 switch (BlendType)
                 {
@@ -96,9 +100,17 @@ public class ZoneCamera : MonoBehaviour, ITouchable
             }
 
             //Get rotation of target and set in newRotOffset
-            TargetRotation = TargetObject.transform.rotation;
+            if (DeriveRotation) TargetRotation = TargetObject.transform.rotation;
         }
 
+        if (DeriveFieldOfView)
+        {
+            float originalTargetFOV = TargetFOV;
+            TargetFOV = GameSystem.Instance.Camera.FieldOfView;
+            if (SumDerivedFOV) TargetFOV += originalTargetFOV;
+        }
+
+        // TODO: This is part of the reason for bug #334's existence, please fix it!
         if (TargetRotation.x > 180) { TargetRotation.x -= 360; }
         if (TargetRotation.y > 180) { TargetRotation.y -= 360; }
         if (TargetRotation.z > 180) { TargetRotation.z -= 360; }
@@ -109,12 +121,6 @@ public class ZoneCamera : MonoBehaviour, ITouchable
             case CartesianCoords.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
             case CartesianCoords.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
-
-        if (!DeriveStartFOV) return;
-
-        float originalTargetFOV = TargetFOV;
-        TargetFOV = GameSystem.Instance.Camera.main.fieldOfView;
-        if (SumDerivedFOV) TargetFOV += originalTargetFOV;
     }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);

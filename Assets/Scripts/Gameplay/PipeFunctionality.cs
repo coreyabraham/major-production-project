@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#region Enums - Public
 public enum PipeSide
 {
     Left = 0,
@@ -11,32 +12,53 @@ public enum PipeAxis
     X = 0,
     Z
 }
+#endregion
 
 public class PipeFunctionality : MonoBehaviour
 {
-    [field: Header("Pipe Specifics")]
+    #region Variables - Public
+    [field: Header("Pipe-Specific Variables")]
+
+    [field: Tooltip("If true, the pipe automatically makes the player slide down. They will not be able to control themselves and will be forced to slide on this pipe. The only way off is to either jump or get detached at the bottom of the pipe.\n\nIf this is true, the other two Pipe-Specific Variables will be automatically set.")]
+    [field: SerializeField] bool isPermaSlippery;
+    [field: Tooltip("Does one end of this pipe connect to the ground?\nCan the player run into this pipe while grounded?")]
+    [field: SerializeField] bool isConnectedToGround;
+    [field: Tooltip("Does the player automatically detach from the pipe when they reach the bottom of it?")]
+    [field: SerializeField] bool canDetachAtBottom;
+
+    [field: Header("Player-Specific Variables")]
 
     [field: Tooltip("The side of the pipe that the player will attach to when interacting with this pipe.")]
     [field: SerializeField] PipeSide sideToAttachTo;
     [field: Tooltip("In case the incorrect axis is being used when attaching to the pipes, adjust them using this.")]
     [field: SerializeField] PipeAxis axis;
+    #endregion
 
+    #region Variables - Private
     private bool SkipJumpToClimbCheck = false;  // Prevents player from reattaching to current pipe if true.
     private float SkipJumpCooldown = 1;
     private PlayerSystem playSys;
 
+    private BoxCollider Trig;
+    #endregion
 
-
+    #region Functions - Public
+    public bool GetSlipperyState() => isPermaSlippery;
+    #endregion
+    
     #region Functions - Private
-    private void InitialisePlayerOnPipe()
+    private void ReferencePlayer()
     {
         playSys.CurrentPipe = this;
-
-        BoxCollider collider = GetComponent<BoxCollider>();
-        playSys.CurrentPipeMin = collider.bounds.min.y;
-        playSys.CurrentPipeMax = collider.bounds.max.y;
-
         playSys.CurrentPipeSide = sideToAttachTo;
+        playSys.ToggleUpMovement(true);
+        playSys.ToggleDownMovement(true);
+    }
+
+
+    private void DereferencePlayer()
+    {
+        playSys = null;
     }
 
 
@@ -77,9 +99,9 @@ public class PipeFunctionality : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.transform.root.CompareTag("Player")) return;
         playSys = other.GetComponent<PlayerSystem>();
-        InitialisePlayerOnPipe();
+        ReferencePlayer();
     }
 
 
@@ -89,7 +111,7 @@ public class PipeFunctionality : MonoBehaviour
         {
             SkipJumpCooldown += Time.deltaTime;
             SkipJumpToClimbCheck = true;
-            playSys = null;
+            DereferencePlayer();
         }
         else
         {
@@ -97,7 +119,32 @@ public class PipeFunctionality : MonoBehaviour
         }
 
         if (!playSys) return;
+
+        if (playSys.gameObject.transform.position.y - 0.02f > Trig.bounds.max.y) { playSys.ToggleUpMovement(false); }
+        if (playSys.gameObject.transform.position.y - 0.23f < Trig.bounds.min.y && !isConnectedToGround)
+        {
+            if (canDetachAtBottom)
+            {
+                playSys.IsClimbing = false;
+                DereferencePlayer();
+                return;
+            }
+            else
+            {
+                playSys.ToggleDownMovement(false);
+            }
+        }
+
         DetermineClimbHook();
+    }
+
+
+    private void Awake()
+    {
+        Trig = GetComponent<BoxCollider>();
+        if (isConnectedToGround) { canDetachAtBottom = true; }
+
+        if (isPermaSlippery) { isConnectedToGround = false; canDetachAtBottom = true; }
     }
     #endregion
 }

@@ -51,6 +51,12 @@ public class DataHandler : Singleton<DataHandler>
 
     public Vector3 ConvertFloatArrayToVector3(float[] array)
     {
+        if (array.Length != 3)
+        {
+            Debug.LogWarning(name + " | Could not read provided Float Arrray for Array to Vector3 Conversion, the provided Array didn't include exactly 3 float values!");
+            return Vector3.zero;
+        }
+
         Vector3 vector = new()
         {
             x = float.MaxValue,
@@ -288,13 +294,26 @@ public class DataHandler : Singleton<DataHandler>
 
     private void ValidateData()
     {
-        if (!Directory.Exists(GetFilePath())) Directory.CreateDirectory(GetFilePath());
-        for (int i = 0; i < MaxSaveFiles; i++) CreateSaveFile(GetFileName(i), true);
+        if (!Directory.Exists(GetFilePath())) 
+            Directory.CreateDirectory(GetFilePath());
+
+        for (int i = 0; i < MaxSaveFiles; i++)
+        {
+            string filename = GetFileName(i);
+            CreateSaveFile(filename, true);
+        }
     }
 
     private void Start()
     {
-        if (!GameSystem.Instance.RunningInEditor && IgnoreSaveRequests) IgnoreSaveRequests = false;
+        bool RunningInEditor = false;
+
+#if UNITY_EDITOR
+        RunningInEditor = true;
+#endif
+
+        if (RunningInEditor || !IgnoreSaveRequests) return;
+        IgnoreSaveRequests = false;
     }
 
     protected override void Initialize()
@@ -303,8 +322,8 @@ public class DataHandler : Singleton<DataHandler>
 
         if (ClearDataOnStartup)
         {
-            for (int i = 0; i < MaxSaveFiles; i++) DestroyFileData(GetFileName(i));
-            return;
+            for (int i = 0; i < MaxSaveFiles; i++) 
+                DestroyFileData(GetFileName(i));
         }
 
         if (CacheDataOnStartup) RefreshCachedData();

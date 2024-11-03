@@ -7,6 +7,7 @@ public class CreditsUI : MonoBehaviour
     {
         public string MemberName;
         public string MemberRoles;
+        public string MemberLink;
         public Sprite MemberIcon;
     }
 
@@ -24,6 +25,7 @@ public class CreditsUI : MonoBehaviour
             
             entry.MemberName = prefab.MemberName;
             entry.MemberRoles = prefab.MemberRoles;
+            entry.MemberLink = prefab.MemberLink; 
             entry.MemberIcon = prefab.MemberIcon;
 
             entry.name = "Credit_" + (index + 1).ToString();
@@ -34,3 +36,4 @@ public class CreditsUI : MonoBehaviour
         }
     }
 }
+ 

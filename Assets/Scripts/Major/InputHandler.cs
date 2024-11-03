@@ -33,3 +33,4 @@ public class InputHandler : Singleton<InputHandler>
 
     override protected void Initialize() => InputActionMap = Actions.FindActionMap(ActionMap, true);
 }
+ 
