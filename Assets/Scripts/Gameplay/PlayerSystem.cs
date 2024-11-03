@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -43,17 +44,20 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The force that is applied to the player's z-axis upon hitting the jump key/button when climbing on a pipe.")]
     [field: SerializeField] private float JumpForcePipe;
 
-    [field: Tooltip("")]
+    [field: Tooltip("Permits attempting a Scurry mid-air, better to be enabled to preserve game-flow.")]
     [field: SerializeField] private bool EnableScurryInAir;
+
+    [field: Tooltip("When MoveType: `Two Dimensions Only` is Enabled, this prevents the Player from going off the Z-Axis.")]
+    [field: SerializeField] private bool LockZAxis;
+
+    [field: Tooltip("This is the world-space position that represents where the Player's Z-Axis will be locked to.")]
+    [field: SerializeField] private float ZAxisPlane;
 
     [field: Tooltip("How much the gravity applied to the player is multiplied.")]
     [field: SerializeField] private float GravityMultiplier;
+
+    [field: Tooltip("How much velocity the player should inherit while they're grounded.")]
     [field: SerializeField] private float VelocityYIdle = 0.0f;
-    
-    [HideInInspector] public bool ClimbingRequested;
-    [HideInInspector] public bool IsClimbing;
-    [HideInInspector] public bool IsJumpingFromClimb;
-    [HideInInspector] public bool FallingFromClimb;
 
     [field: Header("Climbing & Sliding")]
     [field: Tooltip("The speed that the player moves when climbing.")]
@@ -72,34 +76,53 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("The force that the player will push objects.")]
     [field: SerializeField] private float PushForce;
 
+    [field: Header("Interacting")]
+    [field: Tooltip("The GameObject Tag used to identify ALL Interactable GameObjects within the current scene.")]
+    [field: SerializeField] private string InteractTag = "Interactable";
+
+    [field: Tooltip("The GameObject Tag used to identify ALL Touchable GameObjects within the current scene.")]
+    [field: SerializeField] private string TouchTag = "Touchable";
+
+    [field: Tooltip("The GameObject Tag used to identify ALL Grabbable GameObjects within the current scene.")]
+    [field: SerializeField] private string GrabTag = "Grabbable";
+
+    [field: Header("Miscellaneous")]
+    [field: SerializeField] private bool IgnoreCheckpointData = false;
+    [field: SerializeField] private string SurfaceMaterialsPath = "SurfaceMaterials";
+    [field: SerializeField] private SurfaceMaterial GenericSurface;
+
+    [field: Tooltip("All the Surface Types that the Player can interact with")]
+    private Dictionary<string, SurfaceMaterial> Surfaces = new();
+
     [field: Header("Externals")]
     [field: Tooltip("Reference to the camera that will follow the player.")]
     public CameraSystem Camera;
     [field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
     public Animator Animator;
 
-    [field: Header("Interacting")]
-    [field: Tooltip("The GameObject Tag used to identify ALL Interactable GameObjects within the current scene.")]
-    [field: SerializeField] private string InteractTag = "Interactable";
-    [field: Tooltip("The GameObject Tag used to identify ALL Touchable GameObjects within the current scene.")]
-    [field: SerializeField] private string TouchTag = "Touchable";
-
-    [HideInInspector] public CharacterController Character;
-    [HideInInspector] public bool IsHidden = false;
-
-    [field: Header("Miscellaneous")]
-    [field: SerializeField] private bool IgnoreCheckpointData = false;
-    [field: SerializeField] private string SurfaceMaterialsPath = "SurfaceMaterials";
-    [field: SerializeField] private SurfaceMaterial GenericSurface;
-    [field: Tooltip("All the Surface Types that the Player can interact with")]
-    private Dictionary<string, SurfaceMaterial> Surfaces = new();
-
     [field: Header("Events")]
     [field: SerializeField] public PlayerEvents Events = new();
     #endregion
 
     #region Private Variables
+
+    #region Public and Hidden Variables
+    [HideInInspector] public bool ClimbingRequested;
+    [HideInInspector] public bool IsClimbing;
+    [HideInInspector] public bool IsJumpingFromClimb;
+    [HideInInspector] public bool FallingFromClimb;
+
+    [HideInInspector] public CharacterController Character;
+    [HideInInspector] public bool IsHidden = false;
+
     [HideInInspector] public Vector3 WarpPosition;
+
+    [HideInInspector] public PipeFunctionality CurrentPipe;
+    [HideInInspector] public PipeSide CurrentPipeSide;
+
+    [HideInInspector] public bool IsJumping;
+    #endregion
+
     private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
 
@@ -126,17 +149,13 @@ public class PlayerSystem : MonoBehaviour
     private float CurrentMoveSpeed = 0.0f;
     private float PreviousMoveSpeed;
 
-    [HideInInspector] public PipeFunctionality CurrentPipe;
-    [HideInInspector] public PipeSide CurrentPipeSide;
-
     private bool CanClimbUp = true, CanClimbDown = true;
     private float SlideTimer = 0.0f;
 
+    private float grabDist;
+
     private bool CanScurry = true;
     private bool JumpButtonIsHeld = false;
-
-
-    [HideInInspector] public bool IsJumping;
 
     private bool IsScurrying, IsGrounded, IsMoving, IsSliding, IsBeingLaunched;
     private bool IsGrabbing, IsPushing, IsPulling;
@@ -151,12 +170,14 @@ public class PlayerSystem : MonoBehaviour
         MoveInput = ctx.ReadValue<Vector2>();
         Events.Moving.Invoke(MoveInput);
     }
+
     public void OnClimbing(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None) return;
         ClimbingRequested = ctx.ReadValueAsButton();
         Events.Climbing.Invoke(ClimbingRequested);
     }
+
     public void OnScurry(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
@@ -169,16 +190,18 @@ public class PlayerSystem : MonoBehaviour
         if (IsScurrying || !CanScurry || !IsMoving) return;
         CanScurry = false;
     }
+
     public void OnJumping(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None) return;
         if ((IsClimbing && CurrentPipeSide == PipeSide.Left && MoveInput.x > 0) ||
-            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0)// ||
-            /*(IsClimbing && MoveInput.x == 0)*/) { return; }
+            (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0) ||
+            (IsGrabbing)) { return; }
 
         IsJumping = ctx.ReadValueAsButton();
         Events.Jumping.Invoke(IsJumping);
     }
+
     public void OnInteracting(InputAction.CallbackContext ctx)
     {
         if (ctx.phase != InputActionPhase.Performed) return;
@@ -198,6 +221,7 @@ public class PlayerSystem : MonoBehaviour
 
     #region Functions - Public
     public Vector2 GetMoveInput() => MoveInput;
+
     public bool IsPlayerMoving() => IsMoving;
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
@@ -205,13 +229,16 @@ public class PlayerSystem : MonoBehaviour
     public bool ToggleDownMovement(bool enable) => CanClimbDown = enable;
     public bool TogglePullState(bool input) => IsGrabbing = input;
     public bool ToggleCharCont(bool enable) => Character.enabled = enable;
+
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
     {
         WarpPosition = NewPosition;
         WarpRotation = NewRotation;
     }
+
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
+
     public MoveType GetMoveType() => MoveType;
     public void SetMoveType(MoveType Type, bool ResetVelocity = false)
     {
@@ -219,12 +246,14 @@ public class PlayerSystem : MonoBehaviour
         if (!ResetVelocity) return;
         SetVelocity(Vector3.zero);
     }
+
     public void ForcePlayerToJump(float forceToApply) => Velocity.y = forceToApply;
     public void ApplyImpulseToPlayer(float accuracy)
     {
         IsBeingLaunched = true;
         Velocity.x = 7 * accuracy;
     }
+    
     public void DeathTriggered()
     {
         /*
@@ -243,8 +272,11 @@ public class PlayerSystem : MonoBehaviour
         DataHandler.Instance.SetCachedData(data);
         bool result = DataHandler.Instance.SaveCachedDataToFile();
 
-        if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
-        else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
+        string msg = result == true
+            ? name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!"
+            : name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(";
+
+        Debug.Log(msg);
 
         GameSystem.Instance.PlayerDiedCallback();
         SpawnAtCheckpoint();
@@ -252,6 +284,7 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Private
+    // TODO: IMPROVE THIS LOGIC
     private void SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
@@ -289,6 +322,7 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.transform.parent.CompareTag(GrabTag)) { grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance(); }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
@@ -305,30 +339,29 @@ public class PlayerSystem : MonoBehaviour
                 touchable.TriggerStay(this);
         }
 
-        if (!other.transform.parent.CompareTag("Grabbable")) { return; }
+        if (!other.transform.parent.CompareTag(GrabTag)) { return; }
         if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
 
-        PullObjPos = other.transform.parent.transform.position;
-        float grabX;
+        PullObjPos = other.transform.parent.position;
 
         // I know this is an atrocious way of checking which side of the object the player is on...
-        if (transform.position.x < other.transform.parent.transform.position.x)
-        {
-            // On the left of the object.
-            grabX = transform.position.x - 0.1f;
-        }
-        else
-        {
-            // On the right of the object.
-            grabX = transform.position.x + 0.1f;
-        }
+        // dw about it, I made it slightly less offensive lol
 
-        other.transform.parent.transform.position = new(grabX - other.transform.localPosition.x, other.transform.parent.transform.position.y, other.transform.parent.transform.position.z);
+        float grabX = transform.position.x < other.transform.parent.position.x 
+            ? transform.position.x + grabDist // Left Side
+            : transform.position.x - grabDist; // Right Side
+
+
+        other.transform.parent.position = new(
+            grabX - other.transform.localPosition.x, 
+            other.transform.parent.position.y, 
+            other.transform.parent.position.z
+        );
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.parent.CompareTag("Grabbable")) { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; }
+        if (other.transform.parent.CompareTag(GrabTag)) { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
@@ -511,13 +544,20 @@ public class PlayerSystem : MonoBehaviour
 
         if (CurrentMoveSpeed < 0.0f) CurrentMoveSpeed = 0.0f;
 
-        if (!IsGrabbing) Character.Move(actualVelocity * Time.fixedDeltaTime);
-        else Character.Move((actualVelocity / PullInhibitMultiplier) * Time.fixedDeltaTime);
+        Vector3 importedVelocity = !IsGrabbing ? actualVelocity : actualVelocity / PullInhibitMultiplier;
+        Character.Move(importedVelocity * Time.fixedDeltaTime);
 
         LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
         else { UsedCoyoteJump = false; CurrentCoyoteTime = 0.0f; }
+
+        if (LockZAxis && MoveType == MoveType.TwoDimensionsOnly)
+        {
+            Vector3 task = Character.transform.position;
+            task.z = ZAxisPlane;
+            Character.transform.position = task;
+        }
 
         if (!IsMoving)
         {
@@ -573,6 +613,7 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
+        // TODO: MODULATE THIS!
         Animator.SetFloat("vSpeed", Character.velocity.y);
         Animator.SetFloat("Speed", CurrentMoveSpeed);
         Animator.SetBool("Jump", IsJumping && !IsGrounded);
@@ -627,6 +668,7 @@ public class PlayerSystem : MonoBehaviour
 
     private void Start()
     {
+        // TODO: REWORK AND SIMPLIFY THIS SYSTEM! (Potentially remove ScriptableObject sub-system since it's not being put to good use!)
         foreach (SurfaceMaterial material in Resources.LoadAll<SurfaceMaterial>(SurfaceMaterialsPath))
         {
             Surfaces.Add(material.Material.name, material);
