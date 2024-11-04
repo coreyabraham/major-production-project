@@ -31,6 +31,7 @@ public class GameSystem : Singleton<GameSystem>
 
     [field: Header("Miscellaneous")]
     public bool GameplayPaused = false;
+    public bool DebugPermitted = false;
 
     [field: Header("Collections")]
     public string[] BlacklistedPauseScenes;
@@ -64,13 +65,7 @@ public class GameSystem : Singleton<GameSystem>
     }
 
     public string GetLevelNameWithIndex() => GetLevelName(GetCurrentSceneBuildIndex());
-
-    public bool IsTargetSceneAValidLevel(Scene Target)
-    {
-        if (Target.buildIndex < Levels.Count || Target.buildIndex > Levels.Count) return false;
-        return Levels[Target.buildIndex] == Target.name;
-    }
-
+    public bool IsTargetSceneAValidLevel(Scene Target) => Levels[Target.buildIndex] != null && Levels[Target.buildIndex] == Target.name;
     public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
 
     public void PlayerDiedCallback()
@@ -185,14 +180,8 @@ public class GameSystem : Singleton<GameSystem>
 
     protected override void Initialize()
     {
-        string CurrentSceneName = SceneManager.GetActiveScene().name;
-
         for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        {
-            string levelName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i));
-            if (levelName == CurrentSceneName) continue;
-            Levels.Add(i, levelName);
-        }
+            Levels.Add(i, System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)));
 
         DataConfirmation = new string[Levels.Count];
 

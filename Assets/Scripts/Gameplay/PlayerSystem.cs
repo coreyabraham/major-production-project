@@ -306,7 +306,6 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Private
-    // TODO: IMPROVE THIS LOGIC
     private void SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
@@ -317,20 +316,21 @@ public class PlayerSystem : MonoBehaviour
 #endif
 
         if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
+        if (GameSystem.Instance.GetLevelNameWithIndex() != data.levelName) return;
 
-        bool CheckpointExists = !string.IsNullOrWhiteSpace(data.checkpointName);
+        PlrCheckpoint Checkpoint = null;
 
-        if (CheckpointExists)
+        if (!string.IsNullOrWhiteSpace(data.checkpointName))
         {
             foreach (PlrCheckpoint checkpoint in FindObjectsOfType<PlrCheckpoint>())
             {
                 if (checkpoint.gameObject.name != data.checkpointName) continue;
-                CheckpointExists = true;
+                Checkpoint = checkpoint;
                 break;
             }
         }
 
-        if (!CheckpointExists || IgnoreCheckpointData == true)
+        if (!Checkpoint || IgnoreCheckpointData == true)
         {
             Warp(OriginalSpawn.position, OriginalSpawn.rotation);
             return;
@@ -338,6 +338,9 @@ public class PlayerSystem : MonoBehaviour
 
         Vector3 Position = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointPosition);
         Quaternion Rotation = Quaternion.Euler(DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointRotation));
+
+        if (Checkpoint.gameObject.transform.position != Position) Position = Checkpoint.gameObject.transform.position;
+        if (Checkpoint.gameObject.transform.rotation != Rotation) Rotation = Checkpoint.gameObject.transform.rotation;
 
         Warp(Position, Rotation);
     }

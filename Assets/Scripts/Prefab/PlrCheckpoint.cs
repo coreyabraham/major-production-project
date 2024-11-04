@@ -8,6 +8,8 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
 
     [field: Header("Trigger Specific")]
     [field: SerializeField] private bool UseSceneName = true;
+    [field: SerializeField] private bool HideOutput = true;
+
     [field: SerializeField] private string OverrideName;
     [field: SerializeField] private Transform OverrideTranform;
 
@@ -17,7 +19,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
 
         if (data.checkpointName == gameObject.name)
         {
-            Debug.LogWarning(name + " | You've already registered a Checkpoint with the name: " + gameObject.name + "! Please use a different Checkpoint to save!");
+            if (!HideOutput) Debug.LogWarning(name + " | You've already registered a Checkpoint with the name: " + gameObject.name + "! Please use a different Checkpoint to save!");
             return;
         }
 
@@ -31,6 +33,8 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
 
         DataHandler.Instance.SetCachedData(data);
         bool result = DataHandler.Instance.SaveCachedDataToFile();
+
+        if (HideOutput) return;
 
         if (result) Debug.Log(name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!");
         else Debug.LogWarning(name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(");
