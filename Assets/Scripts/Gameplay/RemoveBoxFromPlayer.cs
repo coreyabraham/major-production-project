@@ -5,11 +5,16 @@ using UnityEngine;
 /// </summary>
 public class RemoveBoxFromPlayer : MonoBehaviour, ITouchable
 {
+    #region Public Variables
     [field: Header("ITouchable Inheritance")]
     public bool Enabled { get; set; } = true;
     public bool HideOnStartup { get; set; } = false;
+    #endregion
 
+    #region Private Variables
     bool hasTriggeredOnce = false;
+    #endregion
+
 
     public void Entered(PlayerSystem Player)
     {
