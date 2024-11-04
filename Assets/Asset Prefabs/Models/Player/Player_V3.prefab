@@ -133,7 +133,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 1.95
-  ClimbSpeed: 2
   ScurrySpeed: 5
   ScurryLimit: 0.2
   ScurryRecoveryTime: 0.1
@@ -143,27 +142,27 @@ MonoBehaviour:
   UnhookMovement: 1
   EnableCoyoteJump: 1
   CoyoteTimer: 1
-  ClimbingRequested: 0
-  IsClimbing: 0
-  IsJumpingFromClimb: 0
-  FallingFromClimb: 0
   JumpForce: 3.5
   JumpForcePipe: 1.75
   EnableScurryInAir: 1
+  LockZAxis: 0
+  ZAxisPlane: 0
   GravityMultiplier: 1.05
   VelocityYIdle: 0.1
+  ClimbSpeed: 2
+  SlideSpeed: 0
+  TimeBeforeSlide: 0
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
-  Camera: {fileID: 0}
-  Animator: {fileID: 2241944567974914016}
   InteractTag: Interactable
   TouchTag: Touchable
-  Character: {fileID: 0}
-  IsHidden: 0
+  GrabTag: Grabbable
   IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
+  Camera: {fileID: 0}
+  Animator: {fileID: 2241944567974914016}
   Events:
     Moving:
       m_PersistentCalls:
@@ -180,12 +179,17 @@ MonoBehaviour:
     Interacting:
       m_PersistentCalls:
         m_Calls: []
+  ClimbingRequested: 0
+  IsClimbing: 0
+  IsJumpingFromClimb: 0
+  FallingFromClimb: 0
+  Character: {fileID: 0}
+  IsHidden: 0
   WarpPosition: {x: 0, y: 0, z: 0}
   CurrentPipe: {fileID: 0}
-  CurrentPipeMin: 0
-  CurrentPipeMax: 0
   CurrentPipeSide: 0
   IsJumping: 0
+  InteractHeld: 0
 --- !u!143 &1886212965
 CharacterController:
   m_ObjectHideFlags: 0
@@ -198,12 +202,12 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 0
-  m_Radius: 0.05
+  m_Radius: 0.07
   m_SlopeLimit: 45
   m_StepOffset: 0.001
-  m_SkinWidth: 0.14
+  m_SkinWidth: 0.0001
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.175, z: 0}
+  m_Center: {x: 0, y: 0.07, z: 0}
 --- !u!114 &1811432823432441354
 MonoBehaviour:
   m_ObjectHideFlags: 0
