@@ -220,6 +220,7 @@ public class PlayerSystem : MonoBehaviour
 
     public void OnInteracting(InputAction.CallbackContext ctx)
     {
+        InteractHeld = false;
         if (ctx.phase != InputActionPhase.Performed) return;
 
         bool interactResult = ctx.ReadValueAsButton();
