@@ -5,6 +5,20 @@ using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
 {
+    [System.Serializable]
+    public struct IInteractableData
+    {
+        public GameObject Parent;
+        public IInteractable Interactable;
+    }
+
+    [System.Serializable]
+    public struct ITouchableData
+    {
+        public GameObject Parent;
+        public ITouchable Touchable;
+    }
+
     #region Public Variables
     [field: Header("Movement")]
     [field: Tooltip("The speed that the player moves when on the ground.")]
@@ -121,6 +135,7 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public PipeSide CurrentPipeSide;
 
     [HideInInspector] public bool IsJumping;
+    [HideInInspector] public bool InteractHeld = false;
     #endregion
 
     private Quaternion WarpRotation;
@@ -160,8 +175,8 @@ public class PlayerSystem : MonoBehaviour
     private bool IsScurrying, IsGrounded, IsMoving, IsSliding, IsBeingLaunched;
     private bool IsGrabbing, IsPushing, IsPulling;
 
-    private readonly List<GameObject> CachedInteractables = new();
-    private readonly Dictionary<GameObject, ITouchable> CachedTouchables = new();
+    private readonly List<IInteractableData> CachedInteractables = new();
+    private readonly List<ITouchableData> CachedTouchables = new();
     #endregion
 
     #region Functions - Handlers
@@ -194,6 +209,7 @@ public class PlayerSystem : MonoBehaviour
     public void OnJumping(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None) return;
+
         if ((IsClimbing && CurrentPipeSide == PipeSide.Left && MoveInput.x > 0) ||
             (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0) ||
             (IsGrabbing)) { return; }
@@ -209,13 +225,11 @@ public class PlayerSystem : MonoBehaviour
         bool interactResult = ctx.ReadValueAsButton();
         Events.Interacting.Invoke(interactResult);
 
+        InteractHeld = interactResult;
         if (!interactResult) return;
 
-        // TODO: Is this possible to optimize? I don't know how to feel about using .GetComponent() more than necessary!
-        foreach (GameObject interactable in CachedInteractables)
-        {
-            interactable.GetComponent<IInteractable>().Interact(interactable);
-        }
+        foreach (IInteractableData data in CachedInteractables)
+            data.Interactable.Interact(data.Parent, this);
     }
     #endregion
 
@@ -325,22 +339,26 @@ public class PlayerSystem : MonoBehaviour
         if (other.transform.parent.CompareTag(GrabTag)) { grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance(); }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
-        bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
-        if (!result) return;
-
-        touchable.TriggerEnter(this);
+        foreach (ITouchableData data in CachedTouchables)
+        {
+            if (data.Parent != other.gameObject) continue;
+            data.Touchable.TriggerEnter(this);
+        }
     }
 
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag(TouchTag))
         {
-            if (CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable))
-                touchable.TriggerStay(this);
+            foreach (ITouchableData data in CachedTouchables)
+            {
+                if (data.Parent != other.gameObject) continue;
+                data.Touchable.TriggerStay(this);
+            }
         }
 
         if (!other.transform.parent.CompareTag(GrabTag)) { return; }
-        if (!TogglePullState(Input.GetKey(KeyCode.E))) { return; }
+        if (!TogglePullState(InteractHeld)) { return; }
 
         PullObjPos = other.transform.parent.position;
 
@@ -350,7 +368,6 @@ public class PlayerSystem : MonoBehaviour
         float grabX = transform.position.x < other.transform.parent.position.x 
             ? transform.position.x + grabDist // Left Side
             : transform.position.x - grabDist; // Right Side
-
 
         other.transform.parent.position = new(
             grabX - other.transform.localPosition.x, 
@@ -364,10 +381,11 @@ public class PlayerSystem : MonoBehaviour
         if (other.transform.parent.CompareTag(GrabTag)) { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; }
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
-        bool result = CachedTouchables.TryGetValue(other.gameObject, out ITouchable touchable);
-        if (!result) return;
-
-        touchable.TriggerLeave(this);
+        foreach (ITouchableData data in CachedTouchables)
+        {
+            if (data.Parent != other.gameObject) continue;
+            data.Touchable.TriggerLeave(this);
+        }
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -568,20 +586,18 @@ public class PlayerSystem : MonoBehaviour
             if (displacement <= 0) return;
 
             Velocity -= 0.2f * horizonalHitDirection / displacement;
-
-            return;
         }
 
         float radian = Mathf.Atan2(MoveInput.y, MoveDelta.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
-        float rotation = (360.0f + Mathf.Round(degree)) % 360.0f;
+        float rotation = ((360.0f + Mathf.Round(degree)) % 360.0f) + 90.0f;
 
         if (!IsGrabbing)
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
-                !IsClimbing ? rotation + 90.0f : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
-                0.0f // Original: IsClimbing ? 180.0f : 0.0f
+                !IsClimbing ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
+                0.0f // Original: IsClimbing ? 180.0f : 0.0f,
             );
         }
         else
@@ -680,21 +696,31 @@ public class PlayerSystem : MonoBehaviour
             rotation = transform.rotation
         };
 
+        // TODO: This loop repeats logic twice, is this really necessary?
         GameObject[] InteractArray = GameObject.FindGameObjectsWithTag(InteractTag);
         GameObject[] TriggerArray = GameObject.FindGameObjectsWithTag(TouchTag);
 
         foreach (GameObject obj in InteractArray)
         {
-            bool result = obj.TryGetComponent(out IInteractable _);
-            if (!result) continue;
-            CachedInteractables.Add(obj);
+            foreach (IInteractable interactable in obj.GetComponents<IInteractable>())
+            {
+                CachedInteractables.Add(new IInteractableData {
+                    Parent = obj,
+                    Interactable = interactable
+                });
+            }
         }
 
         foreach (GameObject obj in TriggerArray)
         {
-            bool result = obj.TryGetComponent(out ITouchable touchable);
-            if (!result) continue;
-            CachedTouchables.Add(obj, touchable);
+            foreach (ITouchable touchable in obj.GetComponents<ITouchable>())
+            {
+                CachedTouchables.Add(new ITouchableData
+                {
+                    Parent = obj,
+                    Touchable = touchable
+                });
+            }
         }
 
         if (PullInhibitMultiplier < 0) { PullInhibitMultiplier = -PullInhibitMultiplier; }
