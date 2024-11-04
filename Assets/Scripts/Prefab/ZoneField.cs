@@ -32,6 +32,10 @@ public class ZoneField : MonoBehaviour, ITouchable
     private float CurrentValue;
     private float TriggerSize;
 
+    private Vector3 RenderMin;
+    private Vector3 RenderMax;
+    private Vector3 RenderCenter;
+
     private PlayerSystem CachedPlayer;
 
     public void TEST(float Value) => print(Value.ToString());
@@ -54,13 +58,37 @@ public class ZoneField : MonoBehaviour, ITouchable
     {
         if (!CachedPlayer) return;
 
-        float selection = 0.0f;
+        float selection = float.MinValue;
 
-        switch (LocalScaleType)
+        switch (ValueType)
         {
-            case CartesianCoords.X: selection = transform.position.x - CachedPlayer.transform.position.x; break;
-            case CartesianCoords.Y: selection = transform.position.y - CachedPlayer.transform.position.y; break;
-            case CartesianCoords.Z: selection = transform.position.z - CachedPlayer.transform.position.z; break;
+            case ZoneValueType.Start:
+                switch (LocalScaleType)
+                {
+                    case CartesianCoords.X: selection = CachedPlayer.transform.position.x; break;
+                    case CartesianCoords.Y: selection = CachedPlayer.transform.position.y; break;
+                    case CartesianCoords.Z: selection = CachedPlayer.transform.position.z; break;
+                }
+                break;
+            
+            case ZoneValueType.End:
+                switch (LocalScaleType)
+                {
+                    case CartesianCoords.X: selection = CachedPlayer.transform.position.x; break;
+                    case CartesianCoords.Y: selection = CachedPlayer.transform.position.y; break;
+                    case CartesianCoords.Z: selection = CachedPlayer.transform.position.z; break;
+                }
+                break;
+        }
+
+        if (selection <= float.MinValue)
+        {
+            switch (LocalScaleType)
+            {
+                case CartesianCoords.X: selection = transform.position.x - CachedPlayer.transform.position.x; break;
+                case CartesianCoords.Y: selection = transform.position.y - CachedPlayer.transform.position.y; break;
+                case CartesianCoords.Z: selection = transform.position.z - CachedPlayer.transform.position.z; break;
+            }
         }
 
         float distanceFromTriggerCentre = Mathf.Abs(selection);
@@ -70,8 +98,8 @@ public class ZoneField : MonoBehaviour, ITouchable
         {
             case ZoneValueType.Middle: blendAmount = 1 - distanceFromTriggerCentre / TriggerSize; break;
             case ZoneValueType.InverseMiddle: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
-            case ZoneValueType.Start:blendAmount = distanceFromTriggerCentre; break;
-            case ZoneValueType.End: blendAmount = distanceFromTriggerCentre; break;
+            case ZoneValueType.Start: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
+            case ZoneValueType.End: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
         }
 
         CurrentValue = LerpCurve.Evaluate(blendAmount);
@@ -86,5 +114,17 @@ public class ZoneField : MonoBehaviour, ITouchable
             case CartesianCoords.Y: TriggerSize = transform.localScale.y * TransformModifier; break;
             case CartesianCoords.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
+
+        MeshRenderer renderer = GetComponent<MeshRenderer>();
+
+        if (!renderer)
+        {
+            Debug.LogWarning(name + " | No `MeshRenderer` Component is attached! Please make sure there's a Renderer attached so measurements can be properly aligned!");
+            return;
+        }
+
+        RenderMin = renderer.bounds.min;
+        RenderMax = renderer.bounds.max;
+        RenderCenter = renderer.bounds.center;
     }
 }
