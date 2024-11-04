@@ -7,6 +7,7 @@ public class ZoneField : MonoBehaviour, ITouchable
     public enum ZoneValueType
     {
         Middle = 0,
+        InverseMiddle,
         Start,
         End
     }
@@ -63,10 +64,17 @@ public class ZoneField : MonoBehaviour, ITouchable
         }
 
         float distanceFromTriggerCentre = Mathf.Abs(selection);
+        float blendAmount = 0.0f;
 
-        float blendAmount = 1 - distanceFromTriggerCentre / TriggerSize;
+        switch (ValueType)
+        {
+            case ZoneValueType.Middle: blendAmount = 1 - distanceFromTriggerCentre / TriggerSize; break;
+            case ZoneValueType.InverseMiddle: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
+            case ZoneValueType.Start:blendAmount = distanceFromTriggerCentre; break;
+            case ZoneValueType.End: blendAmount = distanceFromTriggerCentre; break;
+        }
+
         CurrentValue = LerpCurve.Evaluate(blendAmount);
-
         ValueUpdated?.Invoke(CurrentValue);
     }
 
