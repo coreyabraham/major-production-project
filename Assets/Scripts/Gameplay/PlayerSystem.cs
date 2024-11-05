@@ -160,6 +160,7 @@ public class PlayerSystem : MonoBehaviour
     private float TimeUntilJumpButtonIsDisabled;
 
     private float SetMoveSpeed = 0.0f;
+    private float MaterialMoveSpeed = 0.0f;
 
     private float CurrentMoveSpeed = 0.0f;
     private float PreviousMoveSpeed;
@@ -253,6 +254,11 @@ public class PlayerSystem : MonoBehaviour
         WarpPosition = NewPosition;
         WarpRotation = NewRotation;
     }
+    public void WarpTarget(CameraTarget NewTarget)
+    {
+        WarpPosition = NewTarget.position;
+        WarpRotation = NewTarget.rotation;
+    }
 
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
 
@@ -301,12 +307,16 @@ public class PlayerSystem : MonoBehaviour
         Debug.Log(msg);
 
         GameSystem.Instance.PlayerDiedCallback();
-        SpawnAtCheckpoint();
+        
+        bool checkpointResult = SpawnAtCheckpoint();
+        if (checkpointResult) return;
+
+        WarpTarget(OriginalSpawn);
     }
     #endregion
 
     #region Functions - Private
-    private void SpawnAtCheckpoint()
+    private bool SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
         bool RunningInEditor = false;
@@ -316,7 +326,7 @@ public class PlayerSystem : MonoBehaviour
 #endif
 
         if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
-        if (GameSystem.Instance.GetLevelNameWithIndex() != data.levelName) return;
+        if (GameSystem.Instance.GetLevelNameWithIndex() != data.levelName) return false;
 
         PlrCheckpoint Checkpoint = null;
 
@@ -332,8 +342,8 @@ public class PlayerSystem : MonoBehaviour
 
         if (!Checkpoint || IgnoreCheckpointData == true)
         {
-            Warp(OriginalSpawn.position, OriginalSpawn.rotation);
-            return;
+            WarpTarget(OriginalSpawn);
+            return false;
         }
 
         Vector3 Position = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointPosition);
@@ -343,6 +353,40 @@ public class PlayerSystem : MonoBehaviour
         if (Checkpoint.gameObject.transform.rotation != Rotation) Rotation = Checkpoint.gameObject.transform.rotation;
 
         Warp(Position, Rotation);
+        return true;
+    }
+
+    private void CalculateFloorMaterial()
+    {
+        if (IsGrounded)
+        {
+            PhysicMaterial physical = null;
+
+            if (Physics.Raycast(new Ray(transform.position, Vector3.down), out RaycastHit hit)) physical = hit.collider.sharedMaterial;
+            if (physical != null) Surfaces.TryGetValue(physical.name, out FloorMaterial);
+            else FloorMaterial = GenericSurface;
+        }
+        else FloorMaterial = null;
+
+        if (!FloorMaterial)
+        {
+            MaterialMoveSpeed = 0.0f;
+            return;
+        }
+
+        if (FloorMaterial.PreventScurrying)
+        {
+            MaterialMoveSpeed = MoveSpeed;
+            CanScurry = false;
+        }
+
+        switch (FloorMaterial.MathUsage)
+        {
+            case MathType.Addition: MaterialMoveSpeed += FloorMaterial.PlayerSpeedModifier; break;
+            case MathType.Subtraction: MaterialMoveSpeed -= FloorMaterial.PlayerSpeedModifier; break;
+            case MathType.Multiplication: MaterialMoveSpeed *= FloorMaterial.PlayerSpeedModifier; break;
+            case MathType.Division: MaterialMoveSpeed /= FloorMaterial.PlayerSpeedModifier; break;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -428,38 +472,17 @@ public class PlayerSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (IsGrounded)
+        CalculateFloorMaterial();
+
+        // TODO: This if statement chain needs to be improved for the sake of clarity!
+        if (MaterialMoveSpeed <= 0.0f)
         {
-            PhysicMaterial physical = null;
-
-            if (Physics.Raycast(new Ray(transform.position, Vector3.down), out RaycastHit hit)) physical = hit.collider.sharedMaterial;
-            if (physical != null) Surfaces.TryGetValue(physical.name, out FloorMaterial);
-            else FloorMaterial = GenericSurface;
+            if ((!IsJumpingFromClimb && !IsScurrying && !IsClimbing)) { SetMoveSpeed = MoveSpeed; }
+            else if (IsJumpingFromClimb) { SetMoveSpeed = JumpForcePipe; }
+            else if (!IsJumpingFromClimb && !IsScurrying && IsClimbing) { SetMoveSpeed = ClimbSpeed; }
+            else { SetMoveSpeed = ScurrySpeed; }
         }
-        else FloorMaterial = null;
-
-        if (FloorMaterial != null)
-        {
-            if (FloorMaterial.PreventScurrying)
-            {
-                SetMoveSpeed = MoveSpeed;
-                CanScurry = false;
-            }
-
-            switch (FloorMaterial.MathUsage)
-            {
-                case MathType.Addition: SetMoveSpeed += FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Subtraction: SetMoveSpeed -= FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Multiplication: SetMoveSpeed *= FloorMaterial.PlayerSpeedModifier; break;
-                case MathType.Division: SetMoveSpeed /= FloorMaterial.PlayerSpeedModifier; break;
-            }
-        }
-
-        //SetMoveSpeed = (!IsScurrying && !IsJumpingFromClimb && !IsClimbing) ? MoveSpeed : ScurrySpeed;
-        if ((!IsJumpingFromClimb && !IsScurrying && !IsClimbing)) { SetMoveSpeed = MoveSpeed; }
-        else if (IsJumpingFromClimb) { SetMoveSpeed = JumpForcePipe; }
-        else if (!IsJumpingFromClimb && !IsScurrying && IsClimbing) { SetMoveSpeed = ClimbSpeed; }
-        else { SetMoveSpeed = ScurrySpeed; }
+        else SetMoveSpeed = MaterialMoveSpeed;
 
         Vector3 right = (!UnhookMovement) ? Camera.main.transform.right : Vector3.right;
         Vector3 forward = (!UnhookMovement) ? Camera.main.transform.forward : Vector3.forward;
@@ -610,12 +633,14 @@ public class PlayerSystem : MonoBehaviour
             horizonalHitDirection.y = 0;
 
             float displacement = horizonalHitDirection.magnitude;
-            if (displacement <= 0) return;
+            if (displacement > 0.0f) Velocity -= 0.2f * horizonalHitDirection / displacement;
 
-            Velocity -= 0.2f * horizonalHitDirection / displacement;
+            return;
         }
 
-        float radian = Mathf.Atan2(MoveInput.y, MoveDelta.x * -1.0f);
+        if (MoveInput.magnitude == 0) return;
+
+        float radian = Mathf.Atan2(MoveInput.y, MoveInput.x * -1.0f);
         float degree = 180.0f * radian / Mathf.PI;
         float rotation = ((360.0f + Mathf.Round(degree)) % 360.0f) + 90.0f;
 
@@ -623,7 +648,8 @@ public class PlayerSystem : MonoBehaviour
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
-                !IsClimbing ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
+                rotation,
+                //!IsClimbing ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f,
             );
         }
