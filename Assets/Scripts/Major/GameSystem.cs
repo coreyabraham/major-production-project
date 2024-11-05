@@ -31,6 +31,7 @@ public class GameSystem : Singleton<GameSystem>
 
     [field: Header("Miscellaneous")]
     public bool GameplayPaused = false;
+    public bool DebugPermitted = false;
 
     [field: Header("Collections")]
     public string[] BlacklistedPauseScenes;
