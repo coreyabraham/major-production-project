@@ -98,7 +98,7 @@ public class MopHandleLaunch : MonoBehaviour
                 if (accuracy < 0.1f) { accuracy = 0.1f; }
 
                 playSys.ForcePlayerToJump(5.0f);
-                playSys.ApplyImpulseToPlayer(accuracy);
+                playSys.LaunchPlayerFromMopBucket(accuracy);
                 attachState = MopHandleStates.Deactivated;
             }
         }

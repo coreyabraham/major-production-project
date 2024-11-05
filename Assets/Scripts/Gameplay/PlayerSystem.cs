@@ -167,6 +167,7 @@ public class PlayerSystem : MonoBehaviour
     private bool CanClimbUp = true, CanClimbDown = true;
     private float SlideTimer = 0.0f;
 
+    private bool canGrab = true;
     private float grabDist;
 
     private bool CanScurry = true;
@@ -196,7 +197,7 @@ public class PlayerSystem : MonoBehaviour
     public void OnScurry(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
-            IsClimbing || IsGrabbing || IsJumpingFromClimb) return;
+            IsClimbing || IsGrabbing) return;
         
         IsScurrying = !IsScurrying;
 
@@ -226,7 +227,7 @@ public class PlayerSystem : MonoBehaviour
         bool interactResult = ctx.ReadValueAsButton();
         Events.Interacting.Invoke(interactResult);
 
-        InteractHeld = interactResult;
+        if (canGrab) { InteractHeld = interactResult; }
         if (!interactResult) return;
 
         foreach (IInteractableData data in CachedInteractables)
@@ -244,6 +245,7 @@ public class PlayerSystem : MonoBehaviour
     public bool ToggleDownMovement(bool enable) => CanClimbDown = enable;
     public bool TogglePullState(bool input) => IsGrabbing = input;
     public bool ToggleCharCont(bool enable) => Character.enabled = enable;
+    public bool ToggleGrabbing(bool enable) => canGrab = enable;
 
     public void Warp(Vector3 NewPosition) => WarpPosition = NewPosition;
     public void Warp(Vector3 NewPosition, Quaternion NewRotation)
@@ -263,10 +265,15 @@ public class PlayerSystem : MonoBehaviour
     }
 
     public void ForcePlayerToJump(float forceToApply) => Velocity.y = forceToApply;
-    public void ApplyImpulseToPlayer(float accuracy)
+    public void LaunchPlayerFromMopBucket(float accuracy)
     {
         IsBeingLaunched = true;
         Velocity.x = 7 * accuracy;
+    }
+
+    public void ApplyImpulseToPlayer(float multiplier)
+    {
+        Velocity.x = 2 * multiplier;
     }
     
     public void DeathTriggered()
@@ -340,7 +347,15 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.parent.CompareTag(GrabTag)) { grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance(); }
+        if (other.transform.parent != null)
+        {
+            if (other.transform.parent.gameObject.CompareTag(GrabTag))
+            {
+                grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance();
+                return;
+            }
+        }
+
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         foreach (ITouchableData data in CachedTouchables)
@@ -361,8 +376,8 @@ public class PlayerSystem : MonoBehaviour
             }
         }
 
-        if (!other.transform.parent.CompareTag(GrabTag)) { return; }
-        if (!TogglePullState(InteractHeld)) { return; }
+        if (other.transform.parent != null) { if (!other.transform.parent.CompareTag(GrabTag)) { return; } }
+        if (!TogglePullState(InteractHeld) || !canGrab) { return; }
 
         PullObjPos = other.transform.parent.position;
 
@@ -382,7 +397,13 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.parent.CompareTag(GrabTag)) { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; }
+        if (other.transform.parent != null)
+        {
+            if (other.transform.parent.CompareTag(GrabTag))
+            { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; return; }
+        }
+        
+
         if (other.gameObject.CompareTag(TouchTag) != true) return;
 
         foreach (ITouchableData data in CachedTouchables)
@@ -450,6 +471,7 @@ public class PlayerSystem : MonoBehaviour
         if (IsJumping)
         {
             SlideTimer = 0;
+            IsSliding = false;
 
             // If IsJumping is true, set JumpButtonIsHeld to true after .05 seconds.
             TimeUntilJumpButtonIsDisabled += Time.fixedDeltaTime;
@@ -461,7 +483,7 @@ public class PlayerSystem : MonoBehaviour
             IsJumpingFromClimb = false;
 
             if (MoveInput.y == 0) { if (SlideTimer < TimeBeforeSlide) { SlideTimer += Time.fixedDeltaTime; } }
-            else { SlideTimer = 0; }
+            else { SlideTimer = 0; IsSliding = false; }
             
             if (SlideTimer >= TimeBeforeSlide)
             {
@@ -503,6 +525,7 @@ public class PlayerSystem : MonoBehaviour
         if (!IsClimbing)
         {
             SlideTimer = 0;
+            IsSliding = false;
 
             if (!IsBeingLaunched)
             {
@@ -639,6 +662,8 @@ public class PlayerSystem : MonoBehaviour
         Animator.SetBool("Jump", IsJumping && !IsGrounded);
         Animator.SetBool("Climb", IsClimbing);
         Animator.SetBool("IsGrounded", IsGrounded);
+
+        if (!canGrab) { InteractHeld = false; }
 
         if (IsScurrying)
         {
