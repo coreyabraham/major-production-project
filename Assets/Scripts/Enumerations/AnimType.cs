@@ -5,8 +5,10 @@
 public enum AnimType
 {
     Custom = 0,
-    Moving,
+    HorizontalSpeed,
+    VerticalSpeed,
     Jumping,
     Climbing,
-    Scurrying
+    Sliding,
+    Idle
 }

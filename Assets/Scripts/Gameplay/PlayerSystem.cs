@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
 {
+    // TODO: MOVE THESE TO THEIR OWN DATA FILE(S)!
     [System.Serializable]
     public struct IInteractableData
     {
@@ -17,6 +18,15 @@ public class PlayerSystem : MonoBehaviour
     {
         public GameObject Parent;
         public ITouchable Touchable;
+    }
+
+    [System.Serializable]
+    public struct PlayerAnimation
+    {
+        public string Name;
+        public AnimType InternalAnimType;
+        public AnimValueType CustomValueType;
+        public string CustomValue;
     }
 
     #region Public Variables
@@ -114,7 +124,8 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
     public Animator Animator;
 
-    [field: Header("Events")]
+    [field: Header("Collections")]
+    [field: SerializeField] public PlayerAnimation[] PlayerAnimations;
     [field: SerializeField] public PlayerEvents Events = new();
     #endregion
 
@@ -648,8 +659,7 @@ public class PlayerSystem : MonoBehaviour
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
-                rotation,
-                //!IsClimbing ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
+                !IsClimbing ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f,
             );
         }
@@ -682,12 +692,45 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
-        // TODO: MODULATE THIS!
-        Animator.SetFloat("vSpeed", Character.velocity.y);
-        Animator.SetFloat("Speed", CurrentMoveSpeed);
-        Animator.SetBool("Jump", IsJumping && !IsGrounded);
-        Animator.SetBool("Climb", IsClimbing);
-        Animator.SetBool("IsGrounded", IsGrounded);
+        foreach (PlayerAnimation anim in PlayerAnimations)
+        {
+            if (anim.InternalAnimType != AnimType.Custom)
+            {
+                switch (anim.InternalAnimType)
+                {
+                    case AnimType.HorizontalSpeed: Animator.SetFloat(anim.Name, Character.velocity.y); break;
+                    case AnimType.VerticalSpeed: Animator.SetFloat(anim.Name, CurrentMoveSpeed); break;
+                    case AnimType.Jumping: Animator.SetBool(anim.Name, IsJumping && !IsGrounded); break;
+                    case AnimType.Climbing: Animator.SetBool(anim.Name, IsClimbing); break;
+                    case AnimType.Sliding: Animator.SetBool(anim.Name, IsSliding); break;
+                    case AnimType.Idle: Animator.SetBool(anim.Name, IsGrounded); break;
+                }
+
+                continue;
+            }
+
+            switch (anim.CustomValueType)
+            {
+                case AnimValueType.None:
+                    Debug.LogWarning(name + " | Tried using Custom Value Parameter for Animation: " + anim.Name + ", however, the Custom Value Type was set to None!");
+                    return;
+
+                case AnimValueType.Integer:
+                    if (!int.TryParse(anim.CustomValue, out int resultInt)) return;
+                    Animator.SetInteger(anim.Name, resultInt);
+                    break;
+                
+                case AnimValueType.Float:
+                    if (!float.TryParse(anim.CustomValue, out float resultFloat)) return;
+                    Animator.SetFloat(anim.Name, resultFloat);
+                    break;
+                
+                case AnimValueType.Boolean:
+                    if (!bool.TryParse(anim.CustomValue, out bool resultBool)) return;
+                    Animator.SetBool(anim.Name, resultBool);
+                    break;
+            }
+        }
 
         if (!canGrab) { InteractHeld = false; }
 
