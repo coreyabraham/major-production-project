@@ -3,6 +3,11 @@ using UnityEngine;
 public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
 {
     #region Public Variables
+    [field: Header("IInteractable Inheritence")]
+    [field: SerializeField] public float InteractionRange { get; set; } = 1.0f;
+    [field: SerializeField] public bool IgnoreInteractionRange { get; set; } = false;
+
+    [field: Header("Dependencies")]
     [field: SerializeField] GameObject takeawayBox;
 
     [field: Header("Position and Rotation")]
@@ -10,10 +15,6 @@ public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
     [field: SerializeField] Vector3 posOnPlayer;
     [field: Tooltip("The rotation that the box will apply to itself when interacted with by the Player.\n\nNote that the box will become a child of the Player, so the Quaternion provided should be based around that.")]
     [field: SerializeField] Quaternion rotOnPlayer;
-
-    [field: Header("IInteractable Inheritence")]
-    public float InteractionRange { get; set; } = 1.0f;
-    public bool IgnoreInteractionRange { get; set; } = false;
     #endregion
 
     #region Functions - Private

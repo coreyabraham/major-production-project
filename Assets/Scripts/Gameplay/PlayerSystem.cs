@@ -7,20 +7,6 @@ public class PlayerSystem : MonoBehaviour
 {
     // TODO: MOVE THESE TO THEIR OWN DATA FILE(S)!
     [System.Serializable]
-    public struct IInteractableData
-    {
-        public GameObject Parent;
-        public IInteractable Interactable;
-    }
-
-    [System.Serializable]
-    public struct ITouchableData
-    {
-        public GameObject Parent;
-        public ITouchable Touchable;
-    }
-
-    [System.Serializable]
     public struct PlayerAnimation
     {
         public string Name;
@@ -101,12 +87,6 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private float PushForce;
 
     [field: Header("Interacting")]
-    [field: Tooltip("The GameObject Tag used to identify ALL Interactable GameObjects within the current scene.")]
-    [field: SerializeField] private string InteractTag = "Interactable";
-
-    [field: Tooltip("The GameObject Tag used to identify ALL Touchable GameObjects within the current scene.")]
-    [field: SerializeField] private string TouchTag = "Touchable";
-
     [field: Tooltip("The GameObject Tag used to identify ALL Grabbable GameObjects within the current scene.")]
     [field: SerializeField] private string GrabTag = "Grabbable";
 
@@ -131,7 +111,7 @@ public class PlayerSystem : MonoBehaviour
 
     #region Private Variables
 
-    #region Public and Hidden Variables
+    #region Public + Hidden Variables
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public bool IsJumpingFromClimb;
@@ -187,9 +167,6 @@ public class PlayerSystem : MonoBehaviour
 
     private bool IsScurrying, IsGrounded, IsMoving, IsSliding, IsBeingLaunched;
     private bool IsGrabbing, IsPushing, IsPulling;
-
-    private readonly List<IInteractableData> CachedInteractables = new();
-    private readonly List<ITouchableData> CachedTouchables = new();
     #endregion
 
     #region Functions - Handlers
@@ -242,8 +219,11 @@ public class PlayerSystem : MonoBehaviour
         if (canGrab) { InteractHeld = interactResult; }
         if (!interactResult) return;
 
-        foreach (IInteractableData data in CachedInteractables)
+        for (int i = 0; i < GameSystem.Instance.CachedInteractables.Count; i++)
+        {
+            GameSystem.IInteractableData data = GameSystem.Instance.CachedInteractables[i];
             data.Interactable.Interact(data.Parent, this);
+        }
     }
     #endregion
 
@@ -411,10 +391,12 @@ public class PlayerSystem : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag(TouchTag) != true) return;
+        if (other.gameObject.CompareTag(GameSystem.Instance.TouchTag) != true) return;
 
-        foreach (ITouchableData data in CachedTouchables)
+        for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
         {
+            GameSystem.ITouchableData data = GameSystem.Instance.CachedTouchables[i];
+
             if (data.Parent != other.gameObject) continue;
             data.Touchable.TriggerEnter(this);
         }
@@ -422,10 +404,12 @@ public class PlayerSystem : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.CompareTag(TouchTag))
+        if (other.gameObject.CompareTag(GameSystem.Instance.TouchTag))
         {
-            foreach (ITouchableData data in CachedTouchables)
+            for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
             {
+                GameSystem.ITouchableData data = GameSystem.Instance.CachedTouchables[i];
+
                 if (data.Parent != other.gameObject) continue;
                 data.Touchable.TriggerStay(this);
             }
@@ -458,11 +442,12 @@ public class PlayerSystem : MonoBehaviour
             { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; return; }
         }
         
+        if (other.gameObject.CompareTag(GameSystem.Instance.TouchTag) != true) return;
 
-        if (other.gameObject.CompareTag(TouchTag) != true) return;
-
-        foreach (ITouchableData data in CachedTouchables)
+        for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
         {
+            GameSystem.ITouchableData data = GameSystem.Instance.CachedTouchables[i];
+
             if (data.Parent != other.gameObject) continue;
             data.Touchable.TriggerLeave(this);
         }
@@ -698,11 +683,14 @@ public class PlayerSystem : MonoBehaviour
             {
                 switch (anim.InternalAnimType)
                 {
-                    case AnimType.HorizontalSpeed: Animator.SetFloat(anim.Name, Character.velocity.y); break;
-                    case AnimType.VerticalSpeed: Animator.SetFloat(anim.Name, CurrentMoveSpeed); break;
+                    case AnimType.VerticalSpeed: Animator.SetFloat(anim.Name, Character.velocity.y); break;
+                    case AnimType.HorizontalSpeed: Animator.SetFloat(anim.Name, CurrentMoveSpeed); break;
                     case AnimType.Jumping: Animator.SetBool(anim.Name, IsJumping && !IsGrounded); break;
+                    case AnimType.Scurrying: Animator.SetBool(anim.Name, IsScurrying); break;
                     case AnimType.Climbing: Animator.SetBool(anim.Name, IsClimbing); break;
                     case AnimType.Sliding: Animator.SetBool(anim.Name, IsSliding); break;
+                    case AnimType.Pushing: Animator.SetBool(anim.Name, IsPulling); break;
+                    case AnimType.Pulling: Animator.SetBool(anim.Name, IsPushing); break;
                     case AnimType.Idle: Animator.SetBool(anim.Name, IsGrounded); break;
                 }
 
@@ -782,7 +770,6 @@ public class PlayerSystem : MonoBehaviour
 
     private void Start()
     {
-        // TODO: REWORK AND SIMPLIFY THIS SYSTEM! (Potentially remove ScriptableObject sub-system since it's not being put to good use!)
         foreach (SurfaceMaterial material in Resources.LoadAll<SurfaceMaterial>(SurfaceMaterialsPath))
         {
             Surfaces.Add(material.Material.name, material);
@@ -793,33 +780,6 @@ public class PlayerSystem : MonoBehaviour
             position = transform.position,
             rotation = transform.rotation
         };
-
-        // TODO: This loop repeats logic twice, is this really necessary?
-        GameObject[] InteractArray = GameObject.FindGameObjectsWithTag(InteractTag);
-        GameObject[] TriggerArray = GameObject.FindGameObjectsWithTag(TouchTag);
-
-        foreach (GameObject obj in InteractArray)
-        {
-            foreach (IInteractable interactable in obj.GetComponents<IInteractable>())
-            {
-                CachedInteractables.Add(new IInteractableData {
-                    Parent = obj,
-                    Interactable = interactable
-                });
-            }
-        }
-
-        foreach (GameObject obj in TriggerArray)
-        {
-            foreach (ITouchable touchable in obj.GetComponents<ITouchable>())
-            {
-                CachedTouchables.Add(new ITouchableData
-                {
-                    Parent = obj,
-                    Touchable = touchable
-                });
-            }
-        }
 
         if (PullInhibitMultiplier < 0) { PullInhibitMultiplier = -PullInhibitMultiplier; }
 

@@ -25,6 +25,21 @@ public class GameSystem : Singleton<GameSystem>
         public UnityEvent<Scene, Scene> SceneChanged;
     }
 
+    [System.Serializable]
+    public struct IInteractableData
+    {
+        public GameObject Parent;
+        public IInteractable Interactable;
+    }
+
+    [System.Serializable]
+    public struct ITouchableData
+    {
+        public GameObject Parent;
+        public ITouchable Touchable;
+    }
+
+    #region Public Variables
     [field: Header("Externals")]
     public PlayerSystem Player;
     public CameraSystem Camera;
@@ -36,12 +51,21 @@ public class GameSystem : Singleton<GameSystem>
     [field: Header("Privates")]
     [field: SerializeField] private float SceneLoadingModifier = 0.01f;
 
+    [field: Header("Interacting")]
+    [field: Tooltip("The GameObject Tag used to identify ALL Interactable GameObjects within the current scene.")]
+    public string InteractTag = "Interactable";
+
+    [field: Tooltip("The GameObject Tag used to identify ALL Touchable GameObjects within the current scene.")]
+    public string TouchTag = "Touchable";
+
     [field: Header("Collections")]
     public string[] BlacklistedPauseScenes;
 
     [field: Header("Events")]
     public GameEvents Events;
+    #endregion
 
+    #region Private Variables
     private readonly Dictionary<int, string> Levels = new();
     private string[] DataConfirmation;
 
@@ -54,6 +78,11 @@ public class GameSystem : Singleton<GameSystem>
 
     private AsyncOperation SceneLoadingOperation;
 
+    public readonly List<IInteractableData> CachedInteractables = new();
+    public readonly List<ITouchableData> CachedTouchables = new();
+    #endregion
+
+    #region Public Methods
     public float GetElapsedPlaytime() => ElapsedPlaytime;
     public void SetPausedState(bool State) => GameplayPaused = State;
 
@@ -83,6 +112,53 @@ public class GameSystem : Singleton<GameSystem>
         if (Camera == null) Camera = FindFirstObjectByType<CameraSystem>();
 
         Events.ExternalsCached?.Invoke(Player, Camera);
+
+        // PROTOTYPE SEARCHING ALGORITHM
+        // TODO: PLEASE OPTIMIZE BEFORE LAST GOLD BUILD!
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(InteractTag))
+        {
+            foreach (IInteractable interactable in obj.GetComponents<IInteractable>())
+            {
+                bool found = false;
+
+                foreach (IInteractableData data in CachedInteractables)
+                {
+                    found = data.Interactable == interactable;
+                    if (found) break;
+                }
+
+                if (found) continue;
+
+                CachedInteractables.Add(new IInteractableData
+                {
+                    Parent = obj,
+                    Interactable = interactable
+                });
+            }
+        }
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(TouchTag))
+        {
+            foreach (ITouchable touchable in obj.GetComponents<ITouchable>())
+            {
+                bool found = false;
+
+                foreach (ITouchableData data in CachedTouchables)
+                {
+                    found = data.Touchable == touchable;
+                    if (found) break;
+                }
+
+                if (found) continue;
+
+                CachedTouchables.Add(new ITouchableData
+                {
+                    Parent = obj,
+                    Touchable = touchable
+                });
+            }
+        }
     }
 
     public void RequestLoadScene(string SceneName)
@@ -117,8 +193,10 @@ public class GameSystem : Singleton<GameSystem>
         TargetSceneName = string.Empty;
         SceneRequested = false;
     }
+    #endregion
 
-    IEnumerator LoadSceneInBackground(string SceneName)
+    #region Private Methods
+    private IEnumerator LoadSceneInBackground(string SceneName)
     {
         SceneLoadingOperation = SceneManager.LoadSceneAsync(SceneName);
         SceneLoadingOperation.allowSceneActivation = false;
@@ -136,7 +214,7 @@ public class GameSystem : Singleton<GameSystem>
         Events.LoadingFinished?.Invoke();
     }
 
-    IEnumerator TrackLoadingOperation()
+    private IEnumerator TrackLoadingOperation()
     {
         while (!SceneLoadingOperation.isDone)
         {
@@ -148,7 +226,7 @@ public class GameSystem : Singleton<GameSystem>
         SceneLoadingProgress = 0.0f;
     }
 
-    IEnumerator UnloadPreviouScene(Scene Previous)
+    private IEnumerator UnloadPreviouScene(Scene Previous)
     {
         yield return SceneManager.UnloadSceneAsync(Previous);
     }
@@ -200,4 +278,5 @@ public class GameSystem : Singleton<GameSystem>
 
         Events.LoadingUIFinished.AddListener(LoadScene);
     }
+    #endregion
 }

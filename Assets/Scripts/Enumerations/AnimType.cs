@@ -9,6 +9,9 @@ public enum AnimType
     VerticalSpeed,
     Jumping,
     Climbing,
+    Scurrying,
     Sliding,
+    Pushing,
+    Pulling,
     Idle
 }
