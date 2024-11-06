@@ -101,22 +101,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ffb82ec49249f14fa414fbe259f89e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerTag: Player
-  CameraTag: Camera
   Player: {fileID: 0}
   Camera: {fileID: 0}
   GameplayPaused: 0
-  SceneEntries:
-  - name: Title Screen
-    index: 0
-  - name: Level_Alleyway_Changes
-    index: 1
-  - name: Level_Kitchen_Declan
-    index: 2
-  - name: Level_Burrow
-    index: 3
-  - name: Level_End
-    index: 4
+  DebugPermitted: 0
+  SceneLoadingModifier: 0.01
   BlacklistedPauseScenes:
   - Title Screen
   Events:
@@ -406,35 +395,6 @@ MonoBehaviour:
     Contrast: 0.5
     Brightness: 0.5
     ColourAccessibility: Default
-    AnalogMoveAction:
-    - <Gamepad>/leftStick/up
-    - <Gamepad>/leftStick/down
-    - <Gamepad>/leftStick/left
-    - <Gamepad>/leftStick/right
-    DigitalMoveAction:
-    - <Keyboard>/w
-    - <Keyboard>/a
-    - <Keyboard>/s
-    - <Keyboard>/d
-    - <Gamepad>/dpad/up
-    - <Gamepad>/dpad/left
-    - <Gamepad>/dpad/down
-    - <Gamepad>/dpad/right
-    JumpAction:
-    - <Keyboard>/space
-    - <Gamepad>/buttonSouth
-    ScurryAction:
-    - <Keyboard>/leftShift
-    - <Gamepad>/leftTrigger
-    ClimbAction:
-    - <Keyboard>/q
-    - <Gamepad>/buttonNorth
-    InteractAction:
-    - <Keyboard>/e
-    - '<Gamepad>/buttonNorth '
-    PauseAction:
-    - <Keyboard>/leftShift
-    - <Gamepad>/buttonWest
   Initialized:
     m_PersistentCalls:
       m_Calls: []
@@ -573,6 +533,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6975320980592092749}
     m_Modifications:
+    - target: {fileID: 271475221810869748, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: JsonHandler
+      value: 
+      objectReference: {fileID: 8337814683459291855}
     - target: {fileID: 1716769708677270423, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -621,6 +585,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2573604027227143283, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: JsonHandler
+      value: 
+      objectReference: {fileID: 8337814683459291855}
+    - target: {fileID: 2573604027227143283, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: PromptHandler
+      value: 
+      objectReference: {fileID: 5859645675728531488}
     - target: {fileID: 3070676829403038581, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: m_Name
       value: PauseMenu
@@ -628,6 +600,14 @@ PrefabInstance:
     - target: {fileID: 4641272938538745316, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: m_SortingOrder
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7027463735235068040, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7027463735235068040, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7033943551672774518, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
       propertyPath: JsonHandler
@@ -648,6 +628,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 786e80d160e4e674d94c0e6822067593, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5859645675728531488 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3209023361384256157, guid: c33071f8c328f184ba0b60a1fa1e3516, type: 3}
+  m_PrefabInstance: {fileID: 9068306868183425725}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7753e501fddb2d419941d359265bb7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &7486792386640882602 stripped

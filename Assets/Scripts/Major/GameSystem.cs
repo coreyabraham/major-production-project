@@ -29,9 +29,12 @@ public class GameSystem : Singleton<GameSystem>
     public PlayerSystem Player;
     public CameraSystem Camera;
 
-    [field: Header("Miscellaneous")]
+    [field: Header("Public")]
     public bool GameplayPaused = false;
     public bool DebugPermitted = false;
+
+    [field: Header("Privates")]
+    [field: SerializeField] private float SceneLoadingModifier = 0.01f;
 
     [field: Header("Collections")]
     public string[] BlacklistedPauseScenes;
@@ -48,7 +51,6 @@ public class GameSystem : Singleton<GameSystem>
     private bool SceneRequested = false;
 
     private float SceneLoadingProgress = 0.0f;
-    private float SceneLoadingModifier = 0.01f;
 
     private AsyncOperation SceneLoadingOperation;
 
@@ -67,6 +69,7 @@ public class GameSystem : Singleton<GameSystem>
     public string GetLevelNameWithIndex() => GetLevelName(GetCurrentSceneBuildIndex());
     public bool IsTargetSceneAValidLevel(Scene Target) => Levels[Target.buildIndex] != null && Levels[Target.buildIndex] == Target.name;
     public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
+    public int GetLevelCount() => Levels.Count;
 
     public void PlayerDiedCallback()
     {
