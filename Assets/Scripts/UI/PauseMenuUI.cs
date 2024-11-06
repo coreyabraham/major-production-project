@@ -125,10 +125,10 @@ public class PauseMenuUI : MonoBehaviour
     {
         Frame.SetActive(false);
 
-        ResumeBtn.Button.onClick.AddListener(ResumeClicked);
-        SettingsBtn.Button.onClick.AddListener(SettingsClicked);
-        ExitBtn.Button.onClick.AddListener(ExitClicked);
+        ResumeBtn.ClickedEvent.AddListener(ResumeClicked);
+        SettingsBtn.ClickedEvent.AddListener(SettingsClicked);
+        ExitBtn.ClickedEvent.AddListener(ExitClicked);
 
-        SettingsBackBtn.Button.onClick.AddListener(SettingsBackBtnClicked);
+        SettingsBackBtn.ClickedEvent.AddListener(SettingsBackBtnClicked);
     }
 }

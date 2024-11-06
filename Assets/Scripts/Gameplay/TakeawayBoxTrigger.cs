@@ -28,5 +28,7 @@ public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
 
         Player.IsHidden = true;
     }
+
+    private void OnEnable() => GameSystem.Instance.CacheInteractable(gameObject, GetComponent<IInteractable>());
     #endregion
 }

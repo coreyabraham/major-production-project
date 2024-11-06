@@ -112,53 +112,6 @@ public class GameSystem : Singleton<GameSystem>
         if (Camera == null) Camera = FindFirstObjectByType<CameraSystem>();
 
         Events.ExternalsCached?.Invoke(Player, Camera);
-
-        // PROTOTYPE SEARCHING ALGORITHM
-        // TODO: PLEASE OPTIMIZE BEFORE LAST GOLD BUILD!
-
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(InteractTag))
-        {
-            foreach (IInteractable interactable in obj.GetComponents<IInteractable>())
-            {
-                bool found = false;
-
-                foreach (IInteractableData data in CachedInteractables)
-                {
-                    found = data.Interactable == interactable;
-                    if (found) break;
-                }
-
-                if (found) continue;
-
-                CachedInteractables.Add(new IInteractableData
-                {
-                    Parent = obj,
-                    Interactable = interactable
-                });
-            }
-        }
-
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(TouchTag))
-        {
-            foreach (ITouchable touchable in obj.GetComponents<ITouchable>())
-            {
-                bool found = false;
-
-                foreach (ITouchableData data in CachedTouchables)
-                {
-                    found = data.Touchable == touchable;
-                    if (found) break;
-                }
-
-                if (found) continue;
-
-                CachedTouchables.Add(new ITouchableData
-                {
-                    Parent = obj,
-                    Touchable = touchable
-                });
-            }
-        }
     }
 
     public void RequestLoadScene(string SceneName)
@@ -192,6 +145,32 @@ public class GameSystem : Singleton<GameSystem>
 
         TargetSceneName = string.Empty;
         SceneRequested = false;
+    }
+
+    public bool CacheInteractable(GameObject Parent, IInteractable Interactable)
+    {
+        foreach (IInteractableData data in CachedInteractables)
+            if (data.Interactable == Interactable && data.Parent == Parent) return false;
+
+        CachedInteractables.Add(new IInteractableData {
+            Parent = Parent,
+            Interactable = Interactable
+        });
+
+        return true;
+    }
+
+    public bool CacheTouchable(GameObject Parent, ITouchable Touchable)
+    {
+        foreach (ITouchableData data in CachedTouchables)
+            if (data.Touchable == Touchable && data.Parent == Parent) return false;
+
+        CachedTouchables.Add(new ITouchableData {
+            Parent = Parent,
+            Touchable = Touchable
+        });
+
+        return true;
     }
     #endregion
 
@@ -253,6 +232,35 @@ public class GameSystem : Singleton<GameSystem>
         Events.SceneChanged ??= new();
     }
 
+    private void PrecacheInteractions()
+    {
+        // This logic could be combined and slimmed down, think about this and try some ideas out before the end of Gold!
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(InteractTag))
+        {
+            foreach (IInteractable interactable in obj.GetComponents<IInteractable>())
+            {
+                CachedInteractables.Add(new IInteractableData
+                {
+                    Parent = obj,
+                    Interactable = interactable
+                });
+            }
+        }
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(TouchTag))
+        {
+            foreach (ITouchable touchable in obj.GetComponents<ITouchable>())
+            {
+                CachedTouchables.Add(new ITouchableData
+                {
+                    Parent = obj,
+                    Touchable = touchable
+                });
+            }
+        }
+    }
+
     private void Update()
     {
         if (GameplayPaused) return;
@@ -271,6 +279,7 @@ public class GameSystem : Singleton<GameSystem>
 
         LoadEvents();
         RefreshCachedExternals();
+        PrecacheInteractions();
 
         SceneManager.activeSceneChanged += ActiveSceneChanged;
         SceneManager.sceneLoaded += SceneLoaded;
