@@ -18,5 +18,10 @@ public class NavigatorButton : MonoBehaviour
     public UnityEvent ClickedEvent;
 
     private void ButtonClicked() => ClickedEvent?.Invoke();
-    private void Awake() => Button.onClick.AddListener(ButtonClicked);
+
+    private void Awake()
+    {
+        Button.onClick.RemoveAllListeners();
+        Button.onClick.AddListener(ButtonClicked);
+    }
 }

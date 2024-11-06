@@ -69,6 +69,7 @@ public class GameSystem : Singleton<GameSystem>
     public string GetLevelNameWithIndex() => GetLevelName(GetCurrentSceneBuildIndex());
     public bool IsTargetSceneAValidLevel(Scene Target) => Levels[Target.buildIndex] != null && Levels[Target.buildIndex] == Target.name;
     public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
+    public int GetLevelCount() => Levels.Count;
 
     public void PlayerDiedCallback()
     {

@@ -74,41 +74,4 @@ public class PlayerSettings
     /// </summary>
     public string ColourAccessibility;
     #endregion
-
-    #region Input
-    /// <summary>
-    /// [ANALOG] The 2D Vector Action that's responsible for housing all movement bindings.
-    /// </summary>
-    public string[] AnalogMoveAction;
-
-    /// <summary>
-    /// [DIGITAL] The 2D Vector Action that's responsible for housing all movement bindings.
-    /// </summary>
-    public string[] DigitalMoveAction;
-
-    /// <summary>
-    /// The Jump Action that's responsible for housing the buttons necessary to activate a jump.
-    /// </summary>
-    public string[] JumpAction;
-
-    /// <summary>
-    /// The Scurry Action that's responsible for housing the buttons necessary to activate a scurry.
-    /// </summary>
-    public string[] ScurryAction;
-
-    /// <summary>
-    /// The Climb Action that's responsible for housing the buttons necessary to activate a pipe climb.
-    /// </summary>
-    public string[] ClimbAction;
-
-    /// <summary>
-    /// The Interact Action that's responsible for housing the buttons necessary to interact with nearby objects.
-    /// </summary>
-    public string[] InteractAction;
-
-    /// <summary>
-    /// The Pause Action that's responsible for housing the buttons necessary to toggle the Pause Menu.
-    /// </summary>
-    public string[] PauseAction;
-    #endregion
 }

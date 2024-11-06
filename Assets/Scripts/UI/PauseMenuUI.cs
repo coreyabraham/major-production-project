@@ -102,6 +102,7 @@ public class PauseMenuUI : MonoBehaviour
 
     private void SettingsBackBtnClicked()
     {
+        if (!PausingPermitted) return;
         Settings.gameObject.SetActive(false);
         Frame.SetActive(true);
     }
