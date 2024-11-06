@@ -72,8 +72,8 @@ public class FallingObjectSpawner : MonoBehaviour
             posToSpawnAt = new(transform.position.x, transform.position.y + 0.6f, j - 0.1f);
         }
 
-        if (useKnifeAngle && axisToSpawnAlong == PipeAxis.X) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x, 0, -75)); }
-        else if (useKnifeAngle && axisToSpawnAlong == PipeAxis.Z) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x, -90, -75)); }
+        if (useKnifeAngle && axisToSpawnAlong == PipeAxis.X) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x -75, 0, 0)); }
+        else if (useKnifeAngle && axisToSpawnAlong == PipeAxis.Z) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x -75, -90, 0)); }
         else { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x, 0, 0)); }
 
         objToSpawn.tag = "SpawnedPrefab";
