@@ -18,6 +18,6 @@ public class SurfaceMaterial : ScriptableObject
     [Tooltip("Prevents the Player from scurrying when on this surface.")]
     public bool PreventScurrying;
 
-    //[Tooltip("The Members who are exempt from this Surface Material Instance.")]
-    //public GameObject[] BlacklistMembers;
+    [Tooltip("The Footstep Sounds that'll play at random whenever you move on this surface.")]
+    public AudioClip[] Footsteps;
 }
