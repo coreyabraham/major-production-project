@@ -13,7 +13,7 @@ public class AudioHandler : Singleton<AudioHandler>
     [field: SerializeField] private JSONData JsonHandler;
 
     [field: Header("Lists and Arrays")]
-    public List<AudioSource> Sources = new();
+    [field: SerializeField] private List<AudioSource> Sources = new();
 
     public void AddSource(AudioSource Source) => Sources.Add(Source);
     public bool RemoveSource(AudioSource Source) => Sources.Remove(Source);
@@ -50,7 +50,7 @@ public class AudioHandler : Singleton<AudioHandler>
         return found;
     }
 
-    public AudioSource CreateGlobalSource(AudioClip Clip, bool DoNotAssignMixer = false)
+    public AudioSource CreateGlobalSource(AudioClip Clip, AudioType AudioType)
     {
         GameObject container = new();
         container.name = Clip.name;
@@ -58,10 +58,25 @@ public class AudioHandler : Singleton<AudioHandler>
 
         AudioSource source = container.AddComponent<AudioSource>();
 
+        source.name = Clip.name;
         source.clip = Clip;
         source.playOnAwake = false;
 
-        if (!DoNotAssignMixer) source.outputAudioMixerGroup = GetMixerReference(AudioType.Sound).AudioMixerGroup;
+        if (AudioType != AudioType.None) source.outputAudioMixerGroup = GetMixerReference(AudioType).AudioMixerGroup;
+
+        AddSource(source);
+        return source;
+    }
+
+    public AudioSource CreateSourceOnObject(GameObject Container, AudioClip Clip, AudioType AudioType)
+    {
+        AudioSource source = Container.AddComponent<AudioSource>();
+
+        source.name = Clip.name;
+        source.clip = Clip;
+        source.playOnAwake = false;
+
+        if (AudioType != AudioType.None) source.outputAudioMixerGroup = GetMixerReference(AudioType).AudioMixerGroup;
 
         AddSource(source);
         return source;

@@ -270,7 +270,7 @@ public class SettingsUI : MonoBehaviour
 
         ChangeSubFrame(Groups[VisibleIndexOnStartup].Frame);
 
-        SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip);
+        SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip, AudioType.Sound);
         Debug.Log("Sound Test Created!", SoundTest);
     }
     #endregion
