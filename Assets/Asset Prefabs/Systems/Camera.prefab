@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4394460686850306268}
   - component: {fileID: 376966422495632110}
+  - component: {fileID: 1963302004}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Camera
@@ -50,18 +51,64 @@ MonoBehaviour:
   IgnoreAnticipationOffset: 0
   IgnoreCurrentOffset: 0
   CurrentOffset:
-    position: {x: 0, y: 0.4, z: -2}
+    position: {x: 0.5, y: 0.4, z: -4}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  AnticipationOffset: 10
-  FieldOfView: 80
-  CameraLerpSpeed: 5
+  AnticipationOffset: 15
+  FieldOfView: 25
+  CameraLerpSpeed: 2.5
   VFXLerpSpeed: 4
-  AnticipationSpeed: 3
+  AnticipationSpeed: 1.5
   EasingStyle: 2
-  CameraType: 1
+  CameraType: 5
   DepthOfFieldData:
     Volume: {fileID: 0}
     Active: 0
+    FocusMode:
+      m_OverrideState: 0
+      m_Value: 0
+    NearRangeStart:
+      m_OverrideState: 0
+      m_Value: 0
+    NearRangeEnd:
+      m_OverrideState: 0
+      m_Value: 0
+    FarRangeStart:
+      m_OverrideState: 0
+      m_Value: 0
+    FarRangeEnd:
+      m_OverrideState: 0
+      m_Value: 0
+    Quality:
+      ignoreOverride: 0
+      quality: 0
+    NearSampleCount: 0
+    FarSampleCount: 0
+    NearMaxBlur: 0
+    FarMaxBlur: 0
+  CameraSubject: {fileID: 0}
+  main: {fileID: 2926394252594028053}
+  Events:
+    CutsceneStarted:
+      m_PersistentCalls:
+        m_Calls: []
+    CutsceneFinished:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &1963302004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7710265781069425638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9547333ad363ace44afcb881b2c578ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DepthOfFieldData:
+    Volume: {fileID: 0}
+    Active: 1
     FocusMode:
       m_OverrideState: 1
       m_Value: 2
@@ -70,29 +117,24 @@ MonoBehaviour:
       m_Value: 0
     NearRangeEnd:
       m_OverrideState: 1
-      m_Value: 1
+      m_Value: 5
     FarRangeStart:
       m_OverrideState: 1
-      m_Value: 2
+      m_Value: 7.5
     FarRangeEnd:
       m_OverrideState: 1
-      m_Value: 6
+      m_Value: 30
     Quality:
-      ignoreOverride: 0
-      quality: 0
-    NearSampleCount: 8
-    FarSampleCount: 7
-    NearMaxBlur: 14
-    FarMaxBlur: 13
-  CameraSubject: {fileID: 0}
-  main: {fileID: 0}
-  Events:
-    CutsceneStarted:
-      m_PersistentCalls:
-        m_Calls: []
-    CutsceneFinished:
-      m_PersistentCalls:
-        m_Calls: []
+      ignoreOverride: 1
+      quality: 1
+    NearSampleCount: 5
+    FarSampleCount: 4
+    NearMaxBlur: 7
+    FarMaxBlur: 8
+  _cameraPos: {fileID: 9170917592866041194}
+  _player: {fileID: 0}
+  focalPlaneRange: 1
+  VFXLerpSpeed: 1
 --- !u!1 &9170917592866041194
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,7 +239,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   volumeAnchorOverride: {fileID: 0}
-  antialiasing: 0
+  antialiasing: 2
   SMAAQuality: 2
   dithering: 0
   stopNaNs: 0

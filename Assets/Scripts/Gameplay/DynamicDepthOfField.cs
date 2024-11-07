@@ -36,7 +36,7 @@ public class DynamicDepthOfField : MonoBehaviour
         focalDistance = Mathf.Abs(_cameraPos.transform.position.z - _player.transform.position.z);
 		
 		DOF.nearFocusEnd.value = focalDistance - focalPlaneRange;
-		DOF.farFocusStart.value = focalDistance - focalPlaneRange;
+		DOF.farFocusStart.value = focalDistance + focalPlaneRange;
 		
 		ModifyDepthOfField();
     }
