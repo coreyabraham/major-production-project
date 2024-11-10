@@ -29,12 +29,8 @@ public class ZoneField : MonoBehaviour, ITouchable
     [field: Header("Events")]
     public UnityEvent<float> ValueUpdated;
 
-    private float CurrentValue;
-    private float TriggerSize;
-
-    private Vector3 RenderMin;
-    private Vector3 RenderMax;
-    private Vector3 RenderCenter;
+    private float CurrentValue, TriggerSize;
+    private Vector3 Start, End;
 
     private PlayerSystem CachedPlayer;
 
@@ -65,19 +61,23 @@ public class ZoneField : MonoBehaviour, ITouchable
             case ZoneValueType.Start:
                 switch (LocalScaleType)
                 {
-                    case CartesianCoords.X: selection = CachedPlayer.transform.position.x; break;
-                    case CartesianCoords.Y: selection = CachedPlayer.transform.position.y; break;
-                    case CartesianCoords.Z: selection = CachedPlayer.transform.position.z; break;
+                    case CartesianCoords.X: selection = Start.x - CachedPlayer.transform.position.x; break;
+                    case CartesianCoords.Y: selection = Start.y - CachedPlayer.transform.position.y; break;
+                    case CartesianCoords.Z: selection = Start.z - CachedPlayer.transform.position.z; break;
                 }
+
+                selection /= 2;
                 break;
             
             case ZoneValueType.End:
                 switch (LocalScaleType)
                 {
-                    case CartesianCoords.X: selection = CachedPlayer.transform.position.x; break;
-                    case CartesianCoords.Y: selection = CachedPlayer.transform.position.y; break;
-                    case CartesianCoords.Z: selection = CachedPlayer.transform.position.z; break;
+                    case CartesianCoords.X: selection = End.x - CachedPlayer.transform.position.x; break;
+                    case CartesianCoords.Y: selection = End.y - CachedPlayer.transform.position.y; break;
+                    case CartesianCoords.Z: selection = End.z - CachedPlayer.transform.position.z; break;
                 }
+
+                selection /= 2;
                 break;
         }
 
@@ -115,16 +115,38 @@ public class ZoneField : MonoBehaviour, ITouchable
             case CartesianCoords.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
 
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        BoxCollider collider = GetComponent<BoxCollider>();
 
-        if (!renderer)
+        if (!collider)
         {
-            Debug.LogWarning(name + " | No `MeshRenderer` Component is attached! Please make sure there's a Renderer attached so measurements can be properly aligned!");
+            Debug.LogWarning(name + " | No `BoxCollider` Component is attached! Please make sure there's a Box Collider attached so measurements can be properly aligned!");
             return;
         }
 
-        RenderMin = renderer.bounds.min;
-        RenderMax = renderer.bounds.max;
-        RenderCenter = renderer.bounds.center;
+        Vector3 Center = collider.bounds.center;
+
+        Start = new() 
+        {
+            x = collider.bounds.min.x,
+            y = Center.y,
+            z = Center.z
+        };
+
+        End = new()
+        {
+            x = collider.bounds.max.x,
+            y = Center.y,
+            z = Center.z
+        };
+
+        GameObject startPointer = new();
+        startPointer.name = "Start";
+        startPointer.transform.SetParent(gameObject.transform);
+        startPointer.transform.position = Start;
+
+        GameObject endPointer = new();
+        endPointer.name = "End";
+        endPointer.transform.SetParent(gameObject.transform);
+        endPointer.transform.position = End;
     }
 }
