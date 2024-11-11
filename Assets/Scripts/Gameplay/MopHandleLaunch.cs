@@ -8,6 +8,7 @@ public class MopHandleLaunch : MonoBehaviour
         PlayerAttached,
         PlayerJumpFromMop,
         PlayerTimeout,
+        Rewind,
         Deactivated
     }
 
@@ -18,6 +19,8 @@ public class MopHandleLaunch : MonoBehaviour
     [field: SerializeField] GameObject mopPoint;
     [field: Tooltip("How quickly the mop will build up speed when the player attaches to it.")]
     [field: SerializeField] float acceleration;
+    [field: Tooltip("Should the mop automatically reset itself after two seconds?")]
+    [field: SerializeField] bool resetMopAfterJump = true;
 
     [field: Header("Target Values")]
 
@@ -35,12 +38,27 @@ public class MopHandleLaunch : MonoBehaviour
 
     #region Private Variables
     bool doMopMove = false;
+    float rotateTimer = 0, rewindTimer = 0;
     Transform parentOfThis;
+
     PlayerSystem playSys;
-    float rotateTimer = 0;
+    
+    Quaternion mopRotOrigin;
     #endregion
 
-    #region Functions
+    #region Public Functions
+    public void ResetMopBucket()
+    {
+        playSys = null;
+        doMopMove = false;
+        parentOfThis.rotation = mopRotOrigin;
+        rotateTimer = 0;
+        rewindTimer = 0;
+        attachState = MopHandleStates.WaitForPlayer;
+    }
+    #endregion
+
+    #region Private Functions
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) { return; }
@@ -58,7 +76,13 @@ public class MopHandleLaunch : MonoBehaviour
             parentOfThis.rotation = Quaternion.Euler(parentOfThis.rotation.x, parentOfThis.rotation.y, rotate);
         }
 
-        if (!playSys || attachState == MopHandleStates.Deactivated) { return; }
+        if (attachState == MopHandleStates.Rewind && resetMopAfterJump)
+        {
+            rewindTimer += Time.deltaTime;
+            if (rewindTimer >= 1.8f) { ResetMopBucket(); }
+        }
+
+        if (!playSys) { return; }
 
         if (attachState == MopHandleStates.WaitForPlayer)
         {
@@ -99,14 +123,16 @@ public class MopHandleLaunch : MonoBehaviour
 
                 playSys.ForcePlayerToJump(5.0f);
                 playSys.LaunchPlayerFromMopBucket(accuracy);
-                attachState = MopHandleStates.Deactivated;
             }
+
+            attachState = MopHandleStates.Rewind;
         }
     }
 
     private void Start()
     {
         parentOfThis = gameObject.transform.parent;
+        mopRotOrigin = parentOfThis.rotation;
     }
     #endregion
 }
