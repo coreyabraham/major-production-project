@@ -65,7 +65,7 @@ public class PromptUI : Singleton<PromptUI>
         Prompt.SetActive(false);
         SetupPrompt(DefaultData);
 
-        AcceptInteract.Button.onClick.AddListener(() => NavigatorInteracted(true));
-        DenyInteract.Button.onClick.AddListener(() => NavigatorInteracted(false));
+        AcceptInteract.ClickedEvent.AddListener(() => NavigatorInteracted(true));
+        DenyInteract.ClickedEvent.AddListener(() => NavigatorInteracted(false));
     }
 }

@@ -213,11 +213,6 @@ public class SettingsUI : MonoBehaviour
             strings = currentResolution.Split('x');
         }
 
-        for (int i = 0; i < strings.Length; i++)
-        {
-            print("Index: " + i.ToString() + ", Value: " + strings[i]);
-        }
-
         int.TryParse(strings[0], out int width);
         int.TryParse(strings[1], out int height);
 
@@ -275,7 +270,8 @@ public class SettingsUI : MonoBehaviour
 
         ChangeSubFrame(Groups[VisibleIndexOnStartup].Frame);
 
-        SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip);
+        SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip, AudioType.Sound);
+        Debug.Log("Sound Test Created!", SoundTest);
     }
     #endregion
 }

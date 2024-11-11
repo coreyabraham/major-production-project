@@ -3,7 +3,8 @@
 /// </summary>
 public enum AnimValueType
 {
-    Integer = 0,
+    None = 0,
+    Integer,
     Float,
     Boolean,
 }

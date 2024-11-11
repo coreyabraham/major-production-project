@@ -524,11 +524,14 @@ public class CameraSystem : MonoBehaviour
 
         ModifyDepthOfField();
 
-        IgnoreCameraJumping = CameraJumpsWithPlayer
-            && !ActivePlayer.IsPlayerGrounded()
-            && !ActivePlayer.IsClimbing
-            && !ActivePlayer.IsJumpingFromClimb
-            && !ActivePlayer.FallingFromClimb;
+        if (ActivePlayer != null)
+        {
+            IgnoreCameraJumping = CameraJumpsWithPlayer
+                && !ActivePlayer.IsPlayerGrounded()
+                && !ActivePlayer.IsClimbing
+                && !ActivePlayer.IsJumpingFromClimb
+                && !ActivePlayer.FallingFromClimb;
+        }
 
         CameraTarget Target = !CutsceneRunning ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
 

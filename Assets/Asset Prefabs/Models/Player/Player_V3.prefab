@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &173777745
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 173777746}
+  m_Layer: 0
+  m_Name: CrowFlyAim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &173777746
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 173777745}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.333, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7361319312834398904}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1640778887
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,6 +42,9 @@ GameObject:
   - component: {fileID: 1640778888}
   - component: {fileID: 1640778891}
   - component: {fileID: 1640778890}
+  - component: {fileID: 1279708051}
+  - component: {fileID: 8997726204540972907}
+  - component: {fileID: 5600575974192439613}
   m_Layer: 0
   m_Name: RatTrack
   m_TagString: Untagged
@@ -26,7 +60,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1640778887}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.7671003, z: -4.382002}
+  m_LocalPosition: {x: -0, y: 5.7671003, z: -34.45}
   m_LocalScale: {x: 0.15757, y: 13.364054, z: 130.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -83,6 +117,42 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1279708051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640778887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8997726204540972907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640778887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5600575974192439613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640778887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6246030398808792733
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,7 +165,9 @@ GameObject:
   - component: {fileID: 590231323864142498}
   - component: {fileID: 1886212965}
   - component: {fileID: 1811432823432441354}
-  - component: {fileID: 3113076812229893370}
+  - component: {fileID: 1464405252}
+  - component: {fileID: 1471723638447717435}
+  - component: {fileID: 6706767207240783775}
   m_Layer: 0
   m_Name: Player_V3
   m_TagString: Player
@@ -133,7 +205,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 1.95
-  ClimbSpeed: 2
   ScurrySpeed: 5
   ScurryLimit: 0.2
   ScurryRecoveryTime: 0.1
@@ -143,27 +214,58 @@ MonoBehaviour:
   UnhookMovement: 1
   EnableCoyoteJump: 1
   CoyoteTimer: 1
-  ClimbingRequested: 0
-  IsClimbing: 0
-  IsJumpingFromClimb: 0
-  FallingFromClimb: 0
   JumpForce: 3.5
-  JumpForcePipe: 1.75
+  JumpForcePipe: 2
   EnableScurryInAir: 1
+  LockZAxis: 1
+  ZAxisPlane: 0.23
   GravityMultiplier: 1.05
   VelocityYIdle: 0.1
+  ClimbSpeed: 2
+  SlideSpeed: 0
+  TimeBeforeSlide: 0
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
-  Camera: {fileID: 0}
-  Animator: {fileID: 2241944567974914016}
-  InteractTag: Interactable
-  TouchTag: Touchable
-  Character: {fileID: 0}
-  IsHidden: 0
+  GrabTag: Grabbable
   IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
+  Camera: {fileID: 0}
+  Animator: {fileID: 2241944567974914016}
+  PlayerAnimations:
+  - Name: IsGrounded
+    InternalAnimType: 9
+    CustomValueType: 0
+    CustomValue: 
+  - Name: Speed
+    InternalAnimType: 1
+    CustomValueType: 0
+    CustomValue: 
+  - Name: vSpeed
+    InternalAnimType: 2
+    CustomValueType: 0
+    CustomValue: 
+  - Name: Jump
+    InternalAnimType: 3
+    CustomValueType: 0
+    CustomValue: 
+  - Name: Climb
+    InternalAnimType: 4
+    CustomValueType: 0
+    CustomValue: 
+  - Name: Slide
+    InternalAnimType: 5
+    CustomValueType: 0
+    CustomValue: 
+  - Name: IsPushing
+    InternalAnimType: 6
+    CustomValueType: 0
+    CustomValue: 
+  - Name: IsPulling
+    InternalAnimType: 7
+    CustomValueType: 0
+    CustomValue: 
   Events:
     Moving:
       m_PersistentCalls:
@@ -180,12 +282,17 @@ MonoBehaviour:
     Interacting:
       m_PersistentCalls:
         m_Calls: []
+  ClimbingRequested: 0
+  IsClimbing: 0
+  IsJumpingFromClimb: 0
+  FallingFromClimb: 0
+  Character: {fileID: 0}
+  IsHidden: 0
   WarpPosition: {x: 0, y: 0, z: 0}
   CurrentPipe: {fileID: 0}
-  CurrentPipeMin: 0
-  CurrentPipeMax: 0
   CurrentPipeSide: 0
   IsJumping: 0
+  InteractHeld: 0
 --- !u!143 &1886212965
 CharacterController:
   m_ObjectHideFlags: 0
@@ -198,12 +305,12 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 0
-  m_Radius: 0.05
+  m_Radius: 0.073
   m_SlopeLimit: 45
   m_StepOffset: 0.001
-  m_SkinWidth: 0.14
+  m_SkinWidth: 0.0001
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.175, z: 0}
+  m_Center: {x: 0, y: 0.07, z: 0}
 --- !u!114 &1811432823432441354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,102 +425,138 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!82 &3113076812229893370
-AudioSource:
+--- !u!114 &1464405252
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6246030398808792733}
   m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: -8211331919460887159, guid: 142fccf1582619749aa7b932b853062f, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 649ed2a397638fd468619317e17e719e, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NotificationBehavior: 0
+  m_MaxPlayerCount: -1
+  m_AllowJoining: 1
+  m_JoinBehavior: 0
+  m_PlayerJoinedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_PlayerLeftEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JoinAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: 
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: d6f5d1c6-d3b7-409c-a7ff-db818e68ebb8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  m_PlayerPrefab: {fileID: 0}
+  m_SplitScreen: 0
+  m_MaintainAspectRatioInSplitScreen: 0
+  m_FixedNumberOfSplitScreens: -1
+  m_SplitScreenRect:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!114 &1471723638447717435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246030398808792733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NotificationBehavior: 0
+  m_MaxPlayerCount: -1
+  m_AllowJoining: 1
+  m_JoinBehavior: 0
+  m_PlayerJoinedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_PlayerLeftEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JoinAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: 
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: d6f5d1c6-d3b7-409c-a7ff-db818e68ebb8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  m_PlayerPrefab: {fileID: 0}
+  m_SplitScreen: 0
+  m_MaintainAspectRatioInSplitScreen: 0
+  m_FixedNumberOfSplitScreens: -1
+  m_SplitScreenRect:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!114 &6706767207240783775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246030398808792733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NotificationBehavior: 0
+  m_MaxPlayerCount: -1
+  m_AllowJoining: 1
+  m_JoinBehavior: 0
+  m_PlayerJoinedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_PlayerLeftEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JoinAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: 
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: d6f5d1c6-d3b7-409c-a7ff-db818e68ebb8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  m_PlayerPrefab: {fileID: 0}
+  m_SplitScreen: 0
+  m_MaintainAspectRatioInSplitScreen: 0
+  m_FixedNumberOfSplitScreens: -1
+  m_SplitScreenRect:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!1001 &7035204898497686867
 PrefabInstance:
   m_ObjectHideFlags: 0

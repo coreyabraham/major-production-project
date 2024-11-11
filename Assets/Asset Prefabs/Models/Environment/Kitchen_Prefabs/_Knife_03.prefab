@@ -11,11 +11,13 @@ GameObject:
   - component: {fileID: 5834866817942348860}
   - component: {fileID: 7446218068233415577}
   - component: {fileID: 4661982801882849107}
-  - component: {fileID: 6634086014868375475}
   - component: {fileID: 6558705636281044731}
+  - component: {fileID: 1230065630215981209}
+  - component: {fileID: -7711230336294845415}
+  - component: {fileID: 6147998489648844308}
   m_Layer: 0
   m_Name: _Knife_03
-  m_TagString: Untagged
+  m_TagString: SpawnedPrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,14 +29,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6607428095003246214}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.60876137, y: 0, z: 0, w: 0.7933534}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -75, y: 0, z: 0}
 --- !u!33 &7446218068233415577
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -85,7 +87,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!54 &6634086014868375475
+--- !u!65 &6558705636281044731
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6607428095003246214}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.031370316, y: 0.150882, z: 0.6367517}
+  m_Center: {x: 0.00000021792948, y: -0.0438081, z: -0.17535183}
+--- !u!54 &1230065630215981209
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,7 +116,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &6558705636281044731
+--- !u!65 &-7711230336294845415
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -109,8 +124,25 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6607428095003246214}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.031370316, y: 0.150882, z: 0.6367517}
-  m_Center: {x: 0.00000021792948, y: -0.0438081, z: -0.17535183}
+  m_Size: {x: 0.031370316, y: 0.15088199, z: 0.63675165}
+  m_Center: {x: 0.00000021792948, y: -0.043808095, z: -0.17535181}
+--- !u!114 &6147998489648844308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6607428095003246214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useCrowSound: 0
+  useSnap: 0
+  crowCaw: {fileID: 0}
+  crowSwoop: {fileID: 0}
+  snap: {fileID: 0}

@@ -1,23 +1,15 @@
-using System;
 using TMPro;
-
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayUI : MonoBehaviour
 {
     [field: Header("Miscellaneous")]
-    [field: SerializeField] private string[] LevelEntries;
+    [field: SerializeField] private int StartingLevelIndex;
 
     [field: Header("Parents")]
     [field: SerializeField] private GameObject SavesParent;
     [field: SerializeField] private GameObject ChosenParent;
     [field: SerializeField] private GameObject ButtonsParent;
-
-    [field: Space(5.0f)]
-
-    [field: SerializeField] private GameObject SceneSelector;
-    [field: SerializeField] private GameObject ScenesParent;
 
     [field: Header("Templates")]
     [field: SerializeField] private SaveFileUI SaveTemplate;
@@ -34,36 +26,13 @@ public class PlayUI : MonoBehaviour
     [field: SerializeField] private string NonSelectedText = "Selected File: N / A";
 
     [field: Header("Prompter")]
-    [field: SerializeField] private PromptUI PromptSystem;
+    public PromptUI PromptSystem;
     [field: SerializeField] private PromptDataUI ClearData;
 
     private SaveFileUI[] CachedFiles;
     private int SaveFileUI_Index = -1;
 
-    private string[] SceneNames;
-
     private bool Initialized = false;
-
-    public void TestBtnClicked()
-    {
-        if (SceneSelector.activeSelf)
-        {
-            SavesParent.SetActive(true);
-            ButtonsParent.SetActive(true);
-            SelectLabel.enabled = true;
-
-            SceneSelector.SetActive(false);
-
-            return;
-        }
-
-        SavesParent.SetActive(false);
-        ChosenParent.SetActive(false);
-        ButtonsParent.SetActive(false);
-        SelectLabel.enabled = false;
-
-        SceneSelector.SetActive(true);
-    }
 
     public void PlayButtonPressed()
     {
@@ -71,16 +40,10 @@ public class PlayUI : MonoBehaviour
         SaveData targetData = CachedFiles[SaveFileUI_Index].GetData();
 
        if (string.IsNullOrWhiteSpace(targetData.levelName))
-       {
-            targetData.levelName = LevelEntries[0];
-            DataHandler.Instance.SetCachedData(targetData);
-            SceneManager.LoadScene(targetData.levelName);
-            
-            return;
-       }
-        
+            targetData.levelName = GameSystem.Instance.GetLevelName(StartingLevelIndex);
+
         DataHandler.Instance.SetCachedData(targetData);
-        SceneManager.LoadScene(targetData.levelName);
+        GameSystem.Instance.RequestLoadScene(targetData.levelName);
     }
 
     public void ClearButtonPressed()
@@ -98,10 +61,10 @@ public class PlayUI : MonoBehaviour
         DataHandler.Instance.DestroyFileData(filename);
         CachedFiles[SaveFileUI_Index].AssignData(DataHandler.Instance.LoadSaveFile(filename));
 
-        print("Refresh User Interface Here!");
+        OnDisable();
     }
 
-    private void SceneButtonClicked(int SceneIndex) => SceneManager.LoadScene(SceneIndex, LoadSceneMode.Single);
+    private void SceneButtonClicked(int SceneIndex) => GameSystem.Instance.RequestLoadScene(GameSystem.Instance.GetLevelName(SceneIndex));
 
     private void UpdateSaveFileIndex(SaveFileUI file)
     {
@@ -166,25 +129,6 @@ public class PlayUI : MonoBehaviour
             clone.Button.onClick.AddListener(() => SaveFileSelected(clone));
 
             CachedFiles[i] = clone;
-        }
-
-        int sceneCount = SceneManager.sceneCountInBuildSettings;
-        SceneNames = new string[sceneCount];
-
-        for (int i = 0; i < sceneCount; i++)
-        {
-            int index = i;
-
-            SceneNames[index] = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(index));
-
-            NavigatorButton clone = Instantiate(SceneTemplate);
-            clone.transform.SetParent(ScenesParent.transform, false);
-
-            clone.name = SceneNames[index];
-            clone.Text.text = "Scene " + (i + 1).ToString() + ": " + clone.name;
-
-            clone.gameObject.SetActive(true);
-            clone.Button.onClick.AddListener(() => SceneButtonClicked(index));
         }
 
         Initialized = true;
