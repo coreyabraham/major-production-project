@@ -25,20 +25,6 @@ public class GameSystem : Singleton<GameSystem>
         public UnityEvent<Scene, Scene> SceneChanged;
     }
 
-    [System.Serializable]
-    public struct IInteractableData
-    {
-        public GameObject Parent;
-        public IInteractable Interactable;
-    }
-
-    [System.Serializable]
-    public struct ITouchableData
-    {
-        public GameObject Parent;
-        public ITouchable Touchable;
-    }
-
     #region Public Variables
     [field: Header("Externals")]
     public PlayerSystem Player;

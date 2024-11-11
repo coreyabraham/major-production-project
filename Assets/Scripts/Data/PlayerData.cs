@@ -1,5 +1,14 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
+
+[System.Serializable]
+public struct PlayerAnimation
+{
+    public string Name;
+    public AnimType InternalAnimType;
+    public AnimValueType CustomValueType;
+    public string CustomValue;
+}
 
 [System.Serializable]
 public struct PlayerEvents

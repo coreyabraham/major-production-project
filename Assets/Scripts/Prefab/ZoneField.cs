@@ -3,15 +3,6 @@ using UnityEngine.Events;
 
 public class ZoneField : MonoBehaviour, ITouchable
 {
-    // TEMPORARY ENUM PLACEMENT, PLACE IN ANOTHER ENUM SCRIPT!
-    public enum ZoneValueType
-    {
-        Middle = 0,
-        InverseMiddle,
-        Start,
-        End
-    }
-
     [field: Header("ITouchable Inheritance")]
     [field: SerializeField] public bool Enabled { get; set; } = true;
     [field: SerializeField] public bool HideOnStartup { get; set; }
@@ -38,8 +29,6 @@ public class ZoneField : MonoBehaviour, ITouchable
     private Vector3 Start, End;
 
     private PlayerSystem CachedPlayer;
-
-    public void TEST(float Value) => print(Value.ToString());
 
     public void Entered(PlayerSystem Player)
     {
