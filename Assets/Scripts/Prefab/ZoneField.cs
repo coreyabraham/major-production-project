@@ -72,15 +72,10 @@ public class ZoneField : MonoBehaviour, ITouchable
         }
         
         float distanceFromTriggerCentre = Mathf.Abs(selection);
-        float blendAmount = 0.0f;
+        float blendAmount = distanceFromTriggerCentre / TriggerSize;
 
-        switch (ValueType)
-        {
-            case ZoneValueType.Middle: blendAmount = 1 - distanceFromTriggerCentre / TriggerSize; break;
-            case ZoneValueType.InverseMiddle: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
-            case ZoneValueType.Start: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
-            case ZoneValueType.End: blendAmount = distanceFromTriggerCentre / TriggerSize; break;
-        }
+        if (ValueType == ZoneValueType.Middle)
+            blendAmount = 1 - distanceFromTriggerCentre / TriggerSize;
 
         CurrentValue = LerpCurve.Evaluate(blendAmount);
         ValueUpdated?.Invoke(CurrentValue);
@@ -88,6 +83,8 @@ public class ZoneField : MonoBehaviour, ITouchable
 
     private void Awake()
     {
+        GetComponent<ITouchable>().SetupTrigger(gameObject);
+
         switch (LocalScaleType)
         {
             case CartesianCoords.X: TriggerSize = transform.localScale.x * TransformModifier; break;
