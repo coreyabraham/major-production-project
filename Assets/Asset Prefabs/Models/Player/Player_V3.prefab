@@ -149,6 +149,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6765966995821839399}
+  - component: {fileID: 7786731294836190087}
   - component: {fileID: 590231323864142498}
   - component: {fileID: 1886212965}
   - component: {fileID: 1811432823432441354}
@@ -178,6 +179,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7786731294836190087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246030398808792733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd38c792891152d43a38888c68fc2a1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walk: {fileID: 0}
 --- !u!114 &590231323864142498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,8 +227,6 @@ MonoBehaviour:
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
-  InteractTag: Interactable
-  TouchTag: Touchable
   GrabTag: Grabbable
   IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
