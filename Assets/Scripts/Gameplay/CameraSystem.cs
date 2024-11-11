@@ -131,6 +131,21 @@ public class CameraSystem : MonoBehaviour
     public void SetCameraType(CameraType Enumeration) => CameraType = Enumeration;
     public void RevertCameraType() => CameraType = PreviousCameraType;
 
+    public void ForceCameraTarget(CameraTarget Target) => main.transform.SetPositionAndRotation(Target.position, Target.rotation);
+    public void ForceCameraTarget()
+    {
+        CameraTarget target = GetFollowTransformation();
+
+        switch (CameraType)
+        {
+            case CameraType.Tracking: target = GetTrackingTransformation(); break;
+            case CameraType.OffsetState: target = GetOffsetTransformation(); break;
+            case CameraType.TargetState: target = GetTargetTransformation(); break;
+        }
+
+        ForceCameraTarget(target);
+    }
+
     public void LerpCameraTransform(Vector3 Position, Quaternion Rotation, float CustomLerpSpeed = float.MinValue)
     {
         float DefaultLerpSpeed = CameraLerpSpeed * Time.fixedDeltaTime;
@@ -142,9 +157,6 @@ public class CameraSystem : MonoBehaviour
         {
             switch (EasingStyle)
             {
-                // TODO: Fix this method, something isn't adding up properly when lerping since `Rotation` is always zero'd (it's meant to be that way)
-                // and yet it still doesn't lerp properly to said zero'd value!
-
                 case EasingStyle.Basic:
                     {
                         Position = Vector3.MoveTowards(main.transform.position, Position, LerpValue);
