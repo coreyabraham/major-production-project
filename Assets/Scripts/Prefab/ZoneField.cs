@@ -3,15 +3,6 @@ using UnityEngine.Events;
 
 public class ZoneField : MonoBehaviour, ITouchable
 {
-    // TEMPORARY ENUM PLACEMENT, PLACE IN ANOTHER ENUM SCRIPT!
-    public enum ZoneValueType
-    {
-        Middle = 0,
-        InverseMiddle,
-        Start,
-        End
-    }
-
     [field: Header("ITouchable Inheritance")]
     [field: SerializeField] public bool Enabled { get; set; } = true;
     [field: SerializeField] public bool HideOnStartup { get; set; }
@@ -25,20 +16,19 @@ public class ZoneField : MonoBehaviour, ITouchable
 
     [field: Header("Miscellaneous")]
     [field: SerializeField] private AnimationCurve LerpCurve;
+    [field: SerializeField] private bool PlaceDebugVisuals;
+
+    [field: Header("Debug")]
+    [field: SerializeField] private Mesh DebugMesh;
+    [field: SerializeField] private Material DebugMaterial;
 
     [field: Header("Events")]
     public UnityEvent<float> ValueUpdated;
 
-    private float CurrentValue;
-    private float TriggerSize;
-
-    private Vector3 RenderMin;
-    private Vector3 RenderMax;
-    private Vector3 RenderCenter;
+    private float CurrentValue, TriggerSize;
+    private Vector3 Start, End;
 
     private PlayerSystem CachedPlayer;
-
-    public void TEST(float Value) => print(Value.ToString());
 
     public void Entered(PlayerSystem Player)
     {
@@ -59,38 +49,28 @@ public class ZoneField : MonoBehaviour, ITouchable
         if (!CachedPlayer) return;
 
         float selection = float.MinValue;
+        Vector3 selector = Vector3.zero;
 
         switch (ValueType)
         {
             case ZoneValueType.Start:
-                switch (LocalScaleType)
-                {
-                    case CartesianCoords.X: selection = CachedPlayer.transform.position.x; break;
-                    case CartesianCoords.Y: selection = CachedPlayer.transform.position.y; break;
-                    case CartesianCoords.Z: selection = CachedPlayer.transform.position.z; break;
-                }
+                selector = (Start - CachedPlayer.transform.position) / 2;
                 break;
             
             case ZoneValueType.End:
-                switch (LocalScaleType)
-                {
-                    case CartesianCoords.X: selection = CachedPlayer.transform.position.x; break;
-                    case CartesianCoords.Y: selection = CachedPlayer.transform.position.y; break;
-                    case CartesianCoords.Z: selection = CachedPlayer.transform.position.z; break;
-                }
+                selector = (End - CachedPlayer.transform.position) / 2;
                 break;
         }
 
-        if (selection <= float.MinValue)
-        {
-            switch (LocalScaleType)
-            {
-                case CartesianCoords.X: selection = transform.position.x - CachedPlayer.transform.position.x; break;
-                case CartesianCoords.Y: selection = transform.position.y - CachedPlayer.transform.position.y; break;
-                case CartesianCoords.Z: selection = transform.position.z - CachedPlayer.transform.position.z; break;
-            }
-        }
+        if (selector == Vector3.zero) selector = transform.position - CachedPlayer.transform.position;
 
+        switch (LocalScaleType)
+        {
+            case CartesianCoords.X: selection = selector.x; break;
+            case CartesianCoords.Y: selection = selector.y; break;
+            case CartesianCoords.Z: selection = selector.z; break;
+        }
+        
         float distanceFromTriggerCentre = Mathf.Abs(selection);
         float blendAmount = 0.0f;
 
@@ -115,16 +95,55 @@ public class ZoneField : MonoBehaviour, ITouchable
             case CartesianCoords.Z: TriggerSize = transform.localScale.z * TransformModifier; break;
         }
 
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        BoxCollider collider = GetComponent<BoxCollider>();
 
-        if (!renderer)
+        if (!collider)
         {
-            Debug.LogWarning(name + " | No `MeshRenderer` Component is attached! Please make sure there's a Renderer attached so measurements can be properly aligned!");
+            Debug.LogWarning(name + " | No `BoxCollider` Component is attached! Please make sure there's a Box Collider attached so measurements can be properly aligned!");
             return;
         }
 
-        RenderMin = renderer.bounds.min;
-        RenderMax = renderer.bounds.max;
-        RenderCenter = renderer.bounds.center;
+        Vector3 Center = collider.bounds.center;
+
+        Start = new() 
+        {
+            x = collider.bounds.min.x,
+            y = Center.y,
+            z = Center.z
+        };
+
+        End = new()
+        {
+            x = collider.bounds.max.x,
+            y = Center.y,
+            z = Center.z
+        };
+
+        if (!PlaceDebugVisuals) return;
+
+        GameObject startPointer = new();
+        startPointer.name = "Start";
+        startPointer.transform.SetParent(gameObject.transform);
+        startPointer.transform.position = Start;
+
+        GameObject endPointer = new();
+        endPointer.name = "End";
+        endPointer.transform.SetParent(gameObject.transform);
+        endPointer.transform.position = End;
+
+        GameObject[] objs = new GameObject[2];
+        objs[0] = startPointer;
+        objs[1] = endPointer;
+
+        foreach (GameObject obj in objs)
+        {
+            MeshFilter meshFilter = obj.AddComponent<MeshFilter>();
+            meshFilter.mesh = DebugMesh;
+
+            MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
+            meshRenderer.material = DebugMaterial;
+
+            obj.transform.localScale = new(0.015f, 0.1f, 0.1f);
+        }
     }
 }

@@ -1,20 +1,11 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
 {
-    // TODO: MOVE THESE TO THEIR OWN DATA FILE(S)!
-    [System.Serializable]
-    public struct PlayerAnimation
-    {
-        public string Name;
-        public AnimType InternalAnimType;
-        public AnimValueType CustomValueType;
-        public string CustomValue;
-    }
-
     #region Public Variables
     [field: Header("Movement")]
     [field: Tooltip("The speed that the player moves when on the ground.")]
@@ -221,7 +212,7 @@ public class PlayerSystem : MonoBehaviour
 
         for (int i = 0; i < GameSystem.Instance.CachedInteractables.Count; i++)
         {
-            GameSystem.IInteractableData data = GameSystem.Instance.CachedInteractables[i];
+            IInteractableData data = GameSystem.Instance.CachedInteractables[i];
             data.Interactable.Interact(data.Parent, this);
         }
     }
@@ -385,17 +376,14 @@ public class PlayerSystem : MonoBehaviour
         if (other.transform.parent != null)
         {
             if (other.transform.parent.gameObject.CompareTag(GrabTag))
-            {
                 grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance();
-                return;
-            }
         }
 
         if (other.gameObject.CompareTag(GameSystem.Instance.TouchTag) != true) return;
 
         for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
         {
-            GameSystem.ITouchableData data = GameSystem.Instance.CachedTouchables[i];
+            ITouchableData data = GameSystem.Instance.CachedTouchables[i];
 
             if (data.Parent != other.gameObject) continue;
             data.Touchable.TriggerEnter(this);
@@ -408,7 +396,7 @@ public class PlayerSystem : MonoBehaviour
         {
             for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
             {
-                GameSystem.ITouchableData data = GameSystem.Instance.CachedTouchables[i];
+                ITouchableData data = GameSystem.Instance.CachedTouchables[i];
 
                 if (data.Parent != other.gameObject) continue;
                 data.Touchable.TriggerStay(this);
@@ -446,7 +434,7 @@ public class PlayerSystem : MonoBehaviour
 
         for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
         {
-            GameSystem.ITouchableData data = GameSystem.Instance.CachedTouchables[i];
+            ITouchableData data = GameSystem.Instance.CachedTouchables[i];
 
             if (data.Parent != other.gameObject) continue;
             data.Touchable.TriggerLeave(this);

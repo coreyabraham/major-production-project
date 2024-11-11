@@ -18,7 +18,14 @@ public class ExitUI : MonoBehaviour
             gameObject.SetActive(false);
             
             TitleUI title = FindObjectOfType<TitleUI>();
-            if (title != null) title.SubTitle.text = title.SubTitleText + " | " + "Main Menu";
+
+            if (title != null)
+            {
+                string combo = title.SubTitleText + " | ";
+                if (string.IsNullOrWhiteSpace(title.SubTitleText)) combo = string.Empty;
+
+                title.SubTitle.text = combo + "Main Menu";
+            }
 
             return;
         }
