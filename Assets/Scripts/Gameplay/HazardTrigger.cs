@@ -5,15 +5,15 @@ using UnityEngine;
 // The player can avoid being seen if their "IsHidden" bool is enabled.
 public class HazardTrigger : MonoBehaviour, ITouchable
 {
-    float resetTimer = 0;
-
-    public bool useCrowSound, useSnap;
-
     #region Private Variables
+    [SerializeField] private bool useCrowSound, useSnap;
+
+    [SerializeField] private AudioSource crowCaw;
+    [SerializeField] private AudioSource crowSwoop;
+    [SerializeField] private AudioSource snap;
+
+    private float resetTimer = 0;
     private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
-    public AudioSource crowCaw;
-    public AudioSource crowSwoop;
-    public AudioSource snap;
 
     public bool Enabled { get; set; } = true;
     public bool HideOnStartup { get; set; } = false;
@@ -42,6 +42,7 @@ public class HazardTrigger : MonoBehaviour, ITouchable
 
     public void Entered(PlayerSystem Player)
     {
+        if (Player.IsHidden) return;
         if (!HasPlayerBeenSpotted(Player))
         PlayerIsSpotted(Player);
     }
@@ -50,6 +51,8 @@ public class HazardTrigger : MonoBehaviour, ITouchable
 
     public void Staying(PlayerSystem Player)
     {
+        Debug.Log("WWHIUS");
+        if (Player.IsHidden) return;
         if (!HasPlayerBeenSpotted(Player)) return;
         PlayerIsSpotted(Player);
     }
