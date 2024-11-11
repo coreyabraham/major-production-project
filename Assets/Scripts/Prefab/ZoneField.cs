@@ -25,6 +25,11 @@ public class ZoneField : MonoBehaviour, ITouchable
 
     [field: Header("Miscellaneous")]
     [field: SerializeField] private AnimationCurve LerpCurve;
+    [field: SerializeField] private bool PlaceDebugVisuals;
+
+    [field: Header("Debug")]
+    [field: SerializeField] private Mesh DebugMesh;
+    [field: SerializeField] private Material DebugMaterial;
 
     [field: Header("Events")]
     public UnityEvent<float> ValueUpdated;
@@ -55,42 +60,28 @@ public class ZoneField : MonoBehaviour, ITouchable
         if (!CachedPlayer) return;
 
         float selection = float.MinValue;
+        Vector3 selector = Vector3.zero;
 
         switch (ValueType)
         {
             case ZoneValueType.Start:
-                switch (LocalScaleType)
-                {
-                    case CartesianCoords.X: selection = Start.x - CachedPlayer.transform.position.x; break;
-                    case CartesianCoords.Y: selection = Start.y - CachedPlayer.transform.position.y; break;
-                    case CartesianCoords.Z: selection = Start.z - CachedPlayer.transform.position.z; break;
-                }
-
-                selection /= 2;
+                selector = (Start - CachedPlayer.transform.position) / 2;
                 break;
             
             case ZoneValueType.End:
-                switch (LocalScaleType)
-                {
-                    case CartesianCoords.X: selection = End.x - CachedPlayer.transform.position.x; break;
-                    case CartesianCoords.Y: selection = End.y - CachedPlayer.transform.position.y; break;
-                    case CartesianCoords.Z: selection = End.z - CachedPlayer.transform.position.z; break;
-                }
-
-                selection /= 2;
+                selector = (End - CachedPlayer.transform.position) / 2;
                 break;
         }
 
-        if (selection <= float.MinValue)
-        {
-            switch (LocalScaleType)
-            {
-                case CartesianCoords.X: selection = transform.position.x - CachedPlayer.transform.position.x; break;
-                case CartesianCoords.Y: selection = transform.position.y - CachedPlayer.transform.position.y; break;
-                case CartesianCoords.Z: selection = transform.position.z - CachedPlayer.transform.position.z; break;
-            }
-        }
+        if (selector == Vector3.zero) selector = transform.position - CachedPlayer.transform.position;
 
+        switch (LocalScaleType)
+        {
+            case CartesianCoords.X: selection = selector.x; break;
+            case CartesianCoords.Y: selection = selector.y; break;
+            case CartesianCoords.Z: selection = selector.z; break;
+        }
+        
         float distanceFromTriggerCentre = Mathf.Abs(selection);
         float blendAmount = 0.0f;
 
@@ -139,6 +130,8 @@ public class ZoneField : MonoBehaviour, ITouchable
             z = Center.z
         };
 
+        if (!PlaceDebugVisuals) return;
+
         GameObject startPointer = new();
         startPointer.name = "Start";
         startPointer.transform.SetParent(gameObject.transform);
@@ -148,5 +141,20 @@ public class ZoneField : MonoBehaviour, ITouchable
         endPointer.name = "End";
         endPointer.transform.SetParent(gameObject.transform);
         endPointer.transform.position = End;
+
+        GameObject[] objs = new GameObject[2];
+        objs[0] = startPointer;
+        objs[1] = endPointer;
+
+        foreach (GameObject obj in objs)
+        {
+            MeshFilter meshFilter = obj.AddComponent<MeshFilter>();
+            meshFilter.mesh = DebugMesh;
+
+            MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
+            meshRenderer.material = DebugMaterial;
+
+            obj.transform.localScale = new(0.015f, 0.1f, 0.1f);
+        }
     }
 }

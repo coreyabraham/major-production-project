@@ -385,10 +385,7 @@ public class PlayerSystem : MonoBehaviour
         if (other.transform.parent != null)
         {
             if (other.transform.parent.gameObject.CompareTag(GrabTag))
-            {
                 grabDist = other.GetComponentInParent<BoxScript>().GetGrabDistance();
-                return;
-            }
         }
 
         if (other.gameObject.CompareTag(GameSystem.Instance.TouchTag) != true) return;
