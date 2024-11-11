@@ -71,7 +71,7 @@ public class LerpingObject : MonoBehaviour, ITouchable
         if (startPos == Vector3.zero) 
             startPos = transform.localPosition;
         
-        transform.position = startPos;
+        transform.localPosition = startPos;
     }
 
     public void Entered(PlayerSystem Player)
