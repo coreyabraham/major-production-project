@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 1640778890}
   - component: {fileID: 1279708051}
   - component: {fileID: 8997726204540972907}
+  - component: {fileID: 5600575974192439613}
   m_Layer: 0
   m_Name: RatTrack
   m_TagString: Untagged
@@ -140,6 +141,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5600575974192439613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640778887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6246030398808792733
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,6 +167,7 @@ GameObject:
   - component: {fileID: 1811432823432441354}
   - component: {fileID: 1464405252}
   - component: {fileID: 1471723638447717435}
+  - component: {fileID: 6706767207240783775}
   m_Layer: 0
   m_Name: Player_V3
   m_TagString: Player
@@ -213,8 +227,6 @@ MonoBehaviour:
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
-  InteractTag: Interactable
-  TouchTag: Touchable
   GrabTag: Grabbable
   IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
@@ -223,15 +235,15 @@ MonoBehaviour:
   Animator: {fileID: 2241944567974914016}
   PlayerAnimations:
   - Name: IsGrounded
-    InternalAnimType: 6
+    InternalAnimType: 9
     CustomValueType: 0
     CustomValue: 
   - Name: Speed
-    InternalAnimType: 2
+    InternalAnimType: 1
     CustomValueType: 0
     CustomValue: 
   - Name: vSpeed
-    InternalAnimType: 1
+    InternalAnimType: 2
     CustomValueType: 0
     CustomValue: 
   - Name: Jump
@@ -458,6 +470,50 @@ MonoBehaviour:
     width: 1
     height: 1
 --- !u!114 &1471723638447717435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246030398808792733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NotificationBehavior: 0
+  m_MaxPlayerCount: -1
+  m_AllowJoining: 1
+  m_JoinBehavior: 0
+  m_PlayerJoinedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_PlayerLeftEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JoinAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: 
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: d6f5d1c6-d3b7-409c-a7ff-db818e68ebb8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  m_PlayerPrefab: {fileID: 0}
+  m_SplitScreen: 0
+  m_MaintainAspectRatioInSplitScreen: 0
+  m_FixedNumberOfSplitScreens: -1
+  m_SplitScreenRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!114 &6706767207240783775
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
