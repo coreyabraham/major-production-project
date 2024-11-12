@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Effectors: []
 --- !u!114 &376626970
 MonoBehaviour:
@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 0
+  m_Weight: 1
   m_Data:
     m_ConstrainedObject: {fileID: 3844258193417877302}
     m_SourceObjects:
@@ -1704,7 +1704,7 @@ MonoBehaviour:
   m_InnerSpotPercent: 79
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
-  m_VolumetricDimmer: 11.2
+  m_VolumetricDimmer: 3.27
   m_LightUnit: 4
   m_FadeDistance: 10000
   m_VolumetricFadeDistance: 10000
@@ -2123,6 +2123,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c44a5b5aa23c56543878927eb414afe6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MultiPositions:
+  - {fileID: 376626970}
+  - {fileID: 1326055034}
+  MultiAims:
+  - {fileID: 376626972}
 --- !u!1 &5312805504706215813
 GameObject:
   m_ObjectHideFlags: 0
