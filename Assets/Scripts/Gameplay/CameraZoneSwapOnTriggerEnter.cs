@@ -12,8 +12,8 @@ public class CameraZoneSwapOnTriggerEnter : MonoBehaviour
 	{
 		if(other.gameObject.CompareTag("Player"))
 		{
-			swapOut.enabled = false;
-			swapIn.enabled = true;
+			if(swapOut != null) { swapOut.enabled = false; }
+			if(swapIn != null) { swapIn.enabled = true; }
 		}
 	}
 }

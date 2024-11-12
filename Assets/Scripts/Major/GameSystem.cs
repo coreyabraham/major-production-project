@@ -11,7 +11,7 @@ public class GameSystem : Singleton<GameSystem>
     public class GameEvents
     {
         public UnityEvent<PlayerSystem, CameraSystem> ExternalsCached;
-        public UnityEvent PlayerDied;
+        public UnityEvent<PlayerSystem> PlayerDied;
 
         public UnityEvent RequestLoadingUI;
         [HideInInspector] public UnityEvent LoadingUIFinished;
@@ -86,11 +86,8 @@ public class GameSystem : Singleton<GameSystem>
     public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
     public int GetLevelCount() => Levels.Count;
 
-    public void PlayerDiedCallback()
-    {
-        // TODO: Reset all interactable / moveable objects the Player interacts with in the level they're currently in during the death transition!
-        Events.PlayerDied?.Invoke();
-    }
+    // TODO: Reset all interactable / moveable objects the Player interacts with in the level they're currently in during the death transition!
+    public void PlayerDiedCallback() => Events.PlayerDied?.Invoke(Player);
 
     public void RefreshCachedExternals()
     {
