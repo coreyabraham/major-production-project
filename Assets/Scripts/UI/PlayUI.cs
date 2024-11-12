@@ -36,6 +36,12 @@ public class PlayUI : MonoBehaviour
 
     public void PlayButtonPressed()
     {
+        if (SaveFileUI_Index < 0 || SaveFileUI_Index > CachedFiles.Length || CachedFiles[SaveFileUI_Index] == null)
+        {
+            Debug.LogWarning(name + " | Cannot Play from Save File with Index: " + SaveFileUI_Index.ToString() + "!");
+            return;
+        }
+
         DataHandler.Instance.SetCurrentSaveFileIndex((uint)SaveFileUI_Index);
         SaveData targetData = CachedFiles[SaveFileUI_Index].GetData();
 
