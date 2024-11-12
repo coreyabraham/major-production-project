@@ -198,6 +198,8 @@ public class GameSystem : Singleton<GameSystem>
     private void ActiveSceneChanged(Scene Old, Scene New)
     {
         RefreshCachedExternals();
+        PrecacheInteractions();
+
         Events.SceneChanged?.Invoke(Old, New);
     }
 
@@ -218,6 +220,12 @@ public class GameSystem : Singleton<GameSystem>
     private void PrecacheInteractions()
     {
         // This logic could be combined and slimmed down, think about this and try some ideas out before the end of Gold!
+
+        if (CachedInteractables.Count != 0)
+            CachedInteractables.Clear();
+
+        if (CachedTouchables.Count != 0)
+            CachedTouchables.Clear();
 
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag(InteractTag))
         {
