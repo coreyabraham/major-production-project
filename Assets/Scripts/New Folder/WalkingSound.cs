@@ -11,7 +11,12 @@ public class WalkingSound : MonoBehaviour
     void PlaySteps()
     {      
             walk.Play();
-            Debug.Log("PLAY");
-              
+            Debug.Log("PLAY"); 
+    }
+
+    void StopSteps()
+    {
+        walk.Stop();
+        Debug.Log("STOP");
     }
 }
