@@ -1,8 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
 public class FallingObjectSpawner : MonoBehaviour
 {
+    [System.Serializable]
+    public class ClonedObject
+    {
+        public GameObject Object;
+        public Material Material;
+
+        public float CurrentLifetime;
+        public float CurrentFadeOut;
+    }
+
     #region Public Variables
     [field: Header("Overrides")]
 
@@ -18,11 +29,13 @@ public class FallingObjectSpawner : MonoBehaviour
     [field: Tooltip("The objects that the spawner will instantiate.")]
     [field: SerializeField] GameObject[] objects;
     [field: Tooltip("The speed at which the prefabs will be instantiated.")]
-    [field: SerializeField] float spawnrate;
+    [field: SerializeField] float spawnRate;
     [field: Tooltip("The amount of time in seconds between instantiations.")]
     [field: SerializeField] float spawnDelay;
     [field: Tooltip("The amount of prefabs that are allowed to be spawned before the spawner stops.\n\nSet to 0 for unlimited spawning.")]
     [field: SerializeField] int spawnLimit;
+    [field: Tooltip("The amount of time in seconds that the newly spawned object lasts for before deletion.")]
+    [field: SerializeField] float lifetime;
 
     [field: Header("Rotation")]
 
@@ -38,14 +51,14 @@ public class FallingObjectSpawner : MonoBehaviour
     BoxCollider box;
     Vector3 posToSpawnAt;
     Quaternion angToSpawnAt;
-    [HideInInspector] public int amountSpawned = 0;
+    [field: SerializeField] List<ClonedObject> clonedObjects = new();
     #endregion
 
 
     #region Public Functions
     public void ToggleActiveState(bool setActive)
     {
-        if (isActive && (spawnLimit != 0 && amountSpawned >= spawnLimit))
+        if (isActive && (spawnLimit != 0 && clonedObjects.Count >= spawnLimit))
         {
             Debug.LogWarning("You're attempting to activate a Falling Object Spawner that has already reached its Spawn Limit! Nothing will spawn if it's activated!"); return;
         }
@@ -81,17 +94,62 @@ public class FallingObjectSpawner : MonoBehaviour
         if (autoAddRigidbody && !objToSpawn.GetComponent<Rigidbody>()) { objToSpawn.AddComponent<Rigidbody>(); }
         //{ Debug.LogError("Prefab doesn't have a rigidbody component! It needs a rigidbody to work properly!"); isActive = false; return; }
 
-        Instantiate(objToSpawn, posToSpawnAt, angToSpawnAt);
-        amountSpawned++;
+        GameObject clone = Instantiate(objToSpawn, posToSpawnAt, angToSpawnAt);
+        Material material = null;
+
+        bool result = clone.TryGetComponent<MeshRenderer>(out MeshRenderer renderer);
+        if (result) material = renderer.material;
+
+        clonedObjects.Add(new ClonedObject {
+            Object = clone,
+            Material = material,
+            CurrentLifetime = 0.0f,
+            CurrentFadeOut = 0.0f
+        });
 
         timer = 0;
     }
 
+    private bool FadeObjectOut(ClonedObject Clone)
+    {
+        if (Clone.CurrentFadeOut < lifetime && Clone.Material != null)
+        {
+            Clone.CurrentFadeOut += Time.deltaTime;
+
+            Color targetColor = new(
+                Clone.Material.color.r,
+                Clone.Material.color.g,
+                Clone.Material.color.b,
+                0.0f
+            );
+
+            Clone.Material.color = Color.Lerp(Clone.Material.color, targetColor, Time.deltaTime);
+
+            return false;
+        }
+
+        return true;
+    }
 
     private void Update()
     {
-        timer += Time.deltaTime * spawnrate;
-        if (objects.Length <= 0 || !isActive || (spawnLimit != 0 && amountSpawned >= spawnLimit)) { return; }
+        foreach (ClonedObject clone in clonedObjects)
+        {
+            if (clone.CurrentLifetime < lifetime)
+            {
+                clone.CurrentLifetime += Time.deltaTime;
+                continue;
+            }
+
+            bool current = FadeObjectOut(clone);
+            if (!current) continue;
+
+            Destroy(clone.Object);
+            clonedObjects.Remove(clone);
+        }
+
+        timer += Time.deltaTime * spawnRate;
+        if (objects.Length <= 0 || !isActive || (spawnLimit != 0 && clonedObjects.Count >= spawnLimit)) { return; }
 
         if (timer >= spawnDelay)
         {
@@ -106,7 +164,7 @@ public class FallingObjectSpawner : MonoBehaviour
     {
         box = GetComponent<BoxCollider>();
 
-        if (spawnrate < 0) { spawnrate = -spawnrate; }
+        if (spawnRate < 0) { spawnRate = -spawnRate; }
         if (spawnDelay < 0) { spawnDelay = -spawnDelay; }
         if (spawnLimit < 0) { spawnLimit = 0; }
     }
