@@ -46,13 +46,13 @@ public class AudioPlay : MonoBehaviour
         void PlaySteps()
         {
             walk.Play();
-            Debug.Log("PLAY");
+         //   Debug.Log("PLAY");
 
         }
     void StopSteps()
     {
         walk.Stop();
-        Debug.Log("STOP");
+     //   Debug.Log("STOP");
 
     }
 }
