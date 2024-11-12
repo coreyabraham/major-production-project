@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using UnityEngine.SceneManagement;
 
 public class FadeTransition : MonoBehaviour
 {
@@ -87,6 +87,23 @@ public class FadeTransition : MonoBehaviour
         Frame.color = TrueStartColor;
     }
 
+    private void UpdateUsability()
+    {
+        string current = GameSystem.Instance.GetLevelNameWithIndex();
+        bool canUse = true;
+
+        foreach (string str in GameSystem.Instance.BlacklistedPauseScenes)
+        {
+            if (current != str) continue;
+            canUse = false;
+            break;
+        }
+
+        Frame.gameObject.SetActive(canUse);
+    }
+
+    private void SceneChanged(Scene Previous, Scene New) => UpdateUsability();
+
     private void PlayerDied(PlayerSystem Player) => RunTransition = true;
 
     private void Start()
@@ -99,6 +116,10 @@ public class FadeTransition : MonoBehaviour
         );
 
         Frame.color = TrueStartColor;
+
         GameSystem.Instance.Events.PlayerDied.AddListener(PlayerDied);
+        GameSystem.Instance.Events.SceneChanged.AddListener(SceneChanged);
+
+        UpdateUsability();
     }
 }
