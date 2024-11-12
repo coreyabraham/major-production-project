@@ -26,13 +26,14 @@ public class TitleUI : MonoBehaviour
     private void GetButtons()
     {
         GameObject[] objs = GameObject.FindGameObjectsWithTag(ButtonTag);
+
         foreach (GameObject obj in objs)
         {
             NavigatorButton navigator = obj.GetComponent<NavigatorButton>();
 
             if (!navigator) continue;
 
-            navigator.ClickedEvent.AddListener(() => ButtonClicked(navigator));
+            navigator.ClickedEvent.AddListener(() => ToggleFrames(navigator.TargetFrame));
         }
     }
 
@@ -66,15 +67,6 @@ public class TitleUI : MonoBehaviour
 
         GetButtons();
     }
-
-    private void ButtonClicked(NavigatorButton Button)
-    {
-        //Button.ClickedEvent?.Invoke();
-        ToggleFrames(Button.TargetFrame);
-    }
-
-    private void Start()
-    {
-        ToggleFrames(Groups[0].Frame);
-    }
+    
+    private void Start() => ToggleFrames(Groups[0].Frame);
 }
