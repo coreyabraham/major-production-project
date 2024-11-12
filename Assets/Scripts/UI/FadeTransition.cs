@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class FadeTransition : MonoBehaviour
 {
@@ -22,12 +23,13 @@ public class FadeTransition : MonoBehaviour
     private bool InMiddlePoint = false;
 
     private float Current = 0.0f;
+    private Color TrueStartColor;
 
     private bool CalculateTime(float Max)
     {
         if (Current < Max)
         {
-            Current += Time.deltaTime;
+            Current += IntervalModifier * Time.deltaTime;
             return false;
         }
 
@@ -41,7 +43,7 @@ public class FadeTransition : MonoBehaviour
             TargetColor.r,
             TargetColor.g,
             TargetColor.b,
-            !FadeState ? 0.0f : 1.0f
+            FadeState ? 0.0f : 1.0f
         );
 
         return Color.Lerp(Frame.color, targetColor, IntervalModifier * Time.deltaTime);
@@ -58,29 +60,45 @@ public class FadeTransition : MonoBehaviour
 
             InMiddlePoint = FadeState;
             
+            if (InMiddlePoint)
+                Frame.color = TargetColor;
+
             return;
         }
 
         if (InMiddlePoint)
         {
             if (CalculateTime(HoldInterval))
+            {
                 InMiddlePoint = false;
+                GameSystem.Instance.Camera.ForceCameraTarget();
+            }
 
             return;
         }
 
         Frame.color = GetColorLerp();
+
         if (!CalculateTime(FadeOutTime)) return;
 
         FadeState = false;
         RunTransition = false;
+
+        Frame.color = TrueStartColor;
     }
 
     private void PlayerDied(PlayerSystem Player) => RunTransition = true;
 
     private void Start()
     {
-        Frame.color = StartColor;
+        TrueStartColor = new(
+            StartColor.r,
+            StartColor.g,
+            StartColor.b,
+            0.0f
+        );
+
+        Frame.color = TrueStartColor;
         GameSystem.Instance.Events.PlayerDied.AddListener(PlayerDied);
     }
 }
