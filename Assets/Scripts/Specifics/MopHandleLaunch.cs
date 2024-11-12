@@ -106,7 +106,7 @@ public class MopHandleLaunch : MonoBehaviour
                 playSys.SetMoveType(MoveType.TwoDimensionsOnly);
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) && rotateTimer <= maxTime) { attachState = MopHandleStates.PlayerJumpFromMop; }
+            if (playSys.JumpingRequested && rotateTimer <= maxTime) { attachState = MopHandleStates.PlayerJumpFromMop; }
             else if (rotateTimer > maxTime) { attachState = MopHandleStates.PlayerTimeout; }
         }
 

@@ -32,7 +32,7 @@ public class TitleUI : MonoBehaviour
 
             if (!navigator) continue;
 
-            navigator.Button.onClick.AddListener(() => ButtonClicked(navigator));
+            navigator.ClickedEvent.AddListener(() => ButtonClicked(navigator));
         }
     }
 
@@ -69,7 +69,7 @@ public class TitleUI : MonoBehaviour
 
     private void ButtonClicked(NavigatorButton Button)
     {
-        Button.ClickedEvent?.Invoke();
+        //Button.ClickedEvent?.Invoke();
         ToggleFrames(Button.TargetFrame);
     }
 
