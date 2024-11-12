@@ -14,7 +14,8 @@ public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
     [field: Tooltip("The position that the box will apply to itself when interacted with by the Player.\n\nNote that the box will become a child of the Player, so the coordinates provided should be relatively close to (0, 0, 0).")]
     [field: SerializeField] Vector3 posOnPlayer;
     [field: Tooltip("The rotation that the box will apply to itself when interacted with by the Player.\n\nNote that the box will become a child of the Player, so the Quaternion provided should be based around that.")]
-    [field: SerializeField] Quaternion rotOnPlayer;
+    [field: SerializeField] Vector3 rotOnPlayer;
+    //[field: SerializeField] Quaternion rotOnPlayer;
     #endregion
 
     #region Functions - Private
@@ -23,7 +24,7 @@ public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
         if (Player.IsHidden) return;
 
         transform.parent.parent = Player.gameObject.transform;
-        transform.parent.SetLocalPositionAndRotation(posOnPlayer, rotOnPlayer);
+        transform.parent.SetLocalPositionAndRotation(posOnPlayer, Quaternion.Euler(rotOnPlayer));
 
         if (GetComponent<BoxCollider>()) { Destroy(GetComponent<BoxCollider>()); }
 
