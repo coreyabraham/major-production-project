@@ -117,6 +117,7 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public PipeSide CurrentPipeSide;
 
     [HideInInspector] public bool IsJumping;
+    [HideInInspector] public bool JumpingRequested;
     [HideInInspector] public bool InteractHeld = false;
     #endregion
 
@@ -189,13 +190,15 @@ public class PlayerSystem : MonoBehaviour
 
     public void OnJumping(InputAction.CallbackContext ctx)
     {
+        JumpingRequested = ctx.ReadValueAsButton();
+
         if (MoveType == MoveType.None) return;
 
         if ((IsClimbing && CurrentPipeSide == PipeSide.Left && MoveInput.x > 0) ||
             (IsClimbing && CurrentPipeSide == PipeSide.Right && MoveInput.x < 0) ||
             (IsGrabbing)) { return; }
 
-        IsJumping = ctx.ReadValueAsButton();
+        IsJumping = JumpingRequested;
         Events.Jumping.Invoke(IsJumping);
     }
 
