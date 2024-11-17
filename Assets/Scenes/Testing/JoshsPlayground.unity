@@ -1278,6 +1278,103 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &332775849
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 332775850}
+  - component: {fileID: 332775854}
+  - component: {fileID: 332775853}
+  - component: {fileID: 332775852}
+  m_Layer: 0
+  m_Name: FreezePlane
+  m_TagString: FreezePlane
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &332775850
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332775849}
+  m_LocalRotation: {x: -0, y: 0.000000014901159, z: -0, w: 1}
+  m_LocalPosition: {x: 3.375, y: -0.120000005, z: 0.2}
+  m_LocalScale: {x: 2.75, y: 0.25, z: 0.46107}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2011953439}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &332775852
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332775849}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &332775853
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332775849}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 257
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: c56df420604dde84f8368b6080fc96b5, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &332775854
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332775849}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &345378692
 GameObject:
   m_ObjectHideFlags: 0
@@ -1331,12 +1428,13 @@ MonoBehaviour:
   - {fileID: 525237446}
   - {fileID: 1706611596}
   - {fileID: 428022710}
-  spawnrate: 1
+  spawnRate: 0
   spawnDelay: 0.5
   spawnLimit: 6
+  lifetime: 0
   useKnifeAngle: 1
   axisToSpawnAlong: 0
-  amountSpawned: 0
+  clonedObjects: []
 --- !u!65 &345378695
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6529,8 +6627,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableSceneReloading: 1
-  enableSetCycling: 0
-  startIndex: 0
+  enableSetCycling: 1
+  startIndex: 3
   objectReferences:
   - {fileID: 2058716523}
   - {fileID: 524218409}
@@ -7191,12 +7289,13 @@ MonoBehaviour:
   autoAddRigidbody: 0
   objects:
   - {fileID: 1936662021}
-  spawnrate: 1
+  spawnRate: 0
   spawnDelay: 1
   spawnLimit: 0
+  lifetime: 0
   useKnifeAngle: 0
   axisToSpawnAlong: 0
-  amountSpawned: 0
+  clonedObjects: []
 --- !u!65 &1651944708
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9213,6 +9312,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2117548567}
+  - {fileID: 332775850}
   m_Father: {fileID: 419729763}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10074,12 +10174,13 @@ MonoBehaviour:
   - {fileID: 469475679254754270, guid: 8459a120092fd5f4a90849eee4d929ae, type: 3}
   - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
   - {fileID: 6607428095003246214, guid: d77f5139c6e66354b81671ebd0a11f99, type: 3}
-  spawnrate: 1
+  spawnRate: 0
   spawnDelay: 1
   spawnLimit: 25
+  lifetime: 0
   useKnifeAngle: 1
   axisToSpawnAlong: 1
-  amountSpawned: 0
+  clonedObjects: []
 --- !u!65 &2117548569
 BoxCollider:
   m_ObjectHideFlags: 0
