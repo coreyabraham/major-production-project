@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
 
@@ -16,33 +14,13 @@ public class DynamicDepthOfField : MonoBehaviour
 	
 	public float VFXLerpSpeed;
 	
-    void Start()
-    {
-		if (!DepthOfFieldData.Volume) return;
-
-        bool result = DepthOfFieldData.Volume.profile.TryGet(out DepthOfField component);
-
-        if (!result)
-        {
-            Debug.LogWarning(name + " | Couldn't get Depth of Field Processing Effect!");
-            return;
-        }
-		
-		DOF = component;
-    }
-	
-    void Update()
+    private void Update()
     {
         focalDistance = Mathf.Abs(_cameraPos.transform.position.z - _player.transform.position.z);
 		
 		DOF.nearFocusEnd.value = focalDistance - focalPlaneRange;
 		DOF.farFocusStart.value = focalDistance + focalPlaneRange;
-		
-		ModifyDepthOfField();
-    }
-	
-	private void ModifyDepthOfField()
-    {
+
         if (!DOF) return;
 
         DOF.active = DepthOfFieldData.Active;
@@ -60,7 +38,7 @@ public class DynamicDepthOfField : MonoBehaviour
 
         DOF.nearMaxBlur = Mathf.Lerp(DOF.nearMaxBlur, DepthOfFieldData.NearMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
         DOF.farMaxBlur = Mathf.Lerp(DOF.farMaxBlur, DepthOfFieldData.FarMaxBlur, Time.fixedDeltaTime * VFXLerpSpeed);
-        
+
 
         DOF.nearFocusStart.overrideState = DepthOfFieldData.NearRangeStart.overrideState;
         DOF.nearFocusEnd.overrideState = DepthOfFieldData.NearRangeEnd.overrideState;
@@ -71,5 +49,22 @@ public class DynamicDepthOfField : MonoBehaviour
         DOF.focusMode = DepthOfFieldData.FocusMode;
 
         DOF.quality.levelAndOverride = ((int)DepthOfFieldData.Quality.quality, DepthOfFieldData.Quality.ignoreOverride);
+    }
+
+    private void Start()
+    {
+        if (!_player) _player = GameSystem.Instance.Player.gameObject;
+
+        if (!DepthOfFieldData.Volume) return;
+
+        bool result = DepthOfFieldData.Volume.profile.TryGet(out DepthOfField component);
+
+        if (!result)
+        {
+            Debug.LogWarning(name + " | Couldn't get Depth of Field Processing Effect!");
+            return;
+        }
+
+        DOF = component;
     }
 }
