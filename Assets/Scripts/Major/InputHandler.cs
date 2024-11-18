@@ -3,14 +3,11 @@ using UnityEngine.InputSystem;
 
 public class InputHandler : Singleton<InputHandler>
 {
-    // Heavily reduced in size due to `PlayerInput` Instances being used instead,
-    // this is used for global input settings now!
+    [field: Header("External References")]
+    [field: SerializeField] private InputActionAsset Actions;
 
     [field: Header("Settings")]
-    [field: SerializeField] private InputActionAsset Actions;
     [field: SerializeField] private string ActionMap = "Player";
-
-    [field: Header("Generic")]
     public bool InputUsability = true;
 
     private InputActionMap InputActionMap;

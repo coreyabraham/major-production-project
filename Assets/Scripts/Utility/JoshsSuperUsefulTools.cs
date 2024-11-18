@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 
@@ -15,13 +16,11 @@ public class JoshsSuperUsefulTools : MonoBehaviour
 
     [Header("Set Cycling")]
 
-    [Tooltip("Which element in the below array will be enabled on start.\n\nIgnored if Enable Set Cycling is false.")]
-    [SerializeField] int startIndex;
     [Tooltip("References to sets that can be toggled. They need to be manually set.\n\nIgnored if Enable Set Cycling is false.")]
     [SerializeField] GameObject[] objectReferences;
 
 
-    int storedIndex;
+    int storedIndex = -1;
     #endregion
 
 
@@ -117,11 +116,7 @@ public class JoshsSuperUsefulTools : MonoBehaviour
 
     private void Start()
     {
-        // Correct startIndex's value if set incorrectly.
-        if (startIndex > objectReferences.Length) { startIndex = objectReferences.Length; }
-        else if (startIndex < 0) { startIndex = 0; }
-
-        // Set all referenced parents to false if they don't equal startIndex.
+        // Set all referenced parents to false if they don't equal 0.
         if (enableSetCycling && objectReferences.Length > 0)
         {
             switch (objectReferences.Length)
@@ -132,13 +127,13 @@ public class JoshsSuperUsefulTools : MonoBehaviour
                 default:
                     for (int i = 0; i < objectReferences.Length; i++)
                     {
-                        if (i != startIndex) { objectReferences[i].SetActive(false); }
-                        else { objectReferences[i].SetActive(true); }
+                        if (objectReferences[i].activeSelf && storedIndex == -1) { storedIndex = i; objectReferences[i].SetActive(true); }
+                        else { objectReferences[i].SetActive(false); }
                     }
                     break;
             }
 
-            storedIndex = startIndex;
+            if (storedIndex == -1) { enableSetCycling = false; }
         }
     }
     #endregion

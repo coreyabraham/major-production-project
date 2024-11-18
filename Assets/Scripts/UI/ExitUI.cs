@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class ExitUI : MonoBehaviour
 {
+    [field: Header("Private Externals")]
     [field: SerializeField] private GameObject Main;
+
+    [field: Header("Public References")]
     public PromptUI PromptUI;
 
-    [field: Space(5.0f)]
-
+    [field: Header("Lists and Arrays")]
     [field: SerializeField] private PromptDataUI PromptData;
 
     private void PromptFinished(bool result)
@@ -16,16 +18,6 @@ public class ExitUI : MonoBehaviour
         {
             Main.SetActive(true);
             gameObject.SetActive(false);
-            
-            TitleUI title = FindObjectOfType<TitleUI>();
-
-            if (title != null)
-            {
-                string combo = title.SubTitleText + " | ";
-                if (string.IsNullOrWhiteSpace(title.SubTitleText)) combo = string.Empty;
-
-                title.SubTitle.text = combo + "Main Menu";
-            }
 
             return;
         }
@@ -33,7 +25,6 @@ public class ExitUI : MonoBehaviour
 #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
 #endif
-
         Application.Quit();
     }
 
