@@ -6,11 +6,18 @@ using UnityEngine;
 public class HazardTrigger : MonoBehaviour, ITouchable
 {
     #region Private Variables
-    [SerializeField] private bool useCrowSound, useSnap;
+    [field: Header("Timer")]
+    [field: Tooltip("The amount of time in seconds before the player is considered \"dead\".")]
+    [field: SerializeField] private float deathDelayTimer;
 
-    [SerializeField] private AudioSource crowCaw;
-    [SerializeField] private AudioSource crowSwoop;
-    [SerializeField] private AudioSource snap;
+    [field: Header("Bools")]
+    [field: SerializeField] private bool useCrowSound;
+    [field: SerializeField] private bool useSnap;
+
+    [field: Header("Audio Sources")]
+    [field: SerializeField] private AudioSource crowCaw;
+    [field: SerializeField] private AudioSource crowSwoop;
+    [field: SerializeField] private AudioSource snap;
 
     private float resetTimer = 0;
     private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
@@ -37,6 +44,8 @@ public class HazardTrigger : MonoBehaviour, ITouchable
             snap.enabled = true;
         }
 
+        // Put timer delay
+
         Player.DeathTriggered();
     }
 
@@ -51,7 +60,6 @@ public class HazardTrigger : MonoBehaviour, ITouchable
 
     public void Staying(PlayerSystem Player)
     {
-        Debug.Log("WWHIUS");
         if (Player.IsHidden) return;
         if (!HasPlayerBeenSpotted(Player)) return;
         PlayerIsSpotted(Player);

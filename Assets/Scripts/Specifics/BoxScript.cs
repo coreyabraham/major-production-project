@@ -9,10 +9,10 @@ public class BoxScript : MonoBehaviour
     [field: SerializeField] float grabDistanceFromPlayer;
     #endregion
 
-
     #region Functions - Public
     public float GetGrabDistance() => grabDistanceFromPlayer / 10f;
     #endregion
+
 
     #region Functions - Private
     private void Start()
