@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerSystem : MonoBehaviour
@@ -108,6 +107,8 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public bool IsJumpingFromClimb;
     [HideInInspector] public bool FallingFromClimb;
 
+     public bool IsOnMop;
+
     [HideInInspector] public CharacterController Character;
     [HideInInspector] public bool IsHidden = false;
 
@@ -164,6 +165,7 @@ public class PlayerSystem : MonoBehaviour
     #region Functions - Handlers
     public void OnMove(InputAction.CallbackContext ctx)
     {
+        if (IsOnMop) { return; }
         MoveInput = ctx.ReadValue<Vector2>();
         Events.Moving.Invoke(MoveInput);
     }
@@ -178,7 +180,7 @@ public class PlayerSystem : MonoBehaviour
     public void OnScurry(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
-            IsClimbing || IsGrabbing) return;
+            IsClimbing || IsOnMop || IsGrabbing) return;
         
         IsScurrying = !IsScurrying;
 
@@ -464,9 +466,10 @@ public class PlayerSystem : MonoBehaviour
         // TODO: This if statement chain needs to be improved for the sake of clarity!
         if (MaterialMoveSpeed <= 0.0f)
         {
-            if ((!IsJumpingFromClimb && !IsScurrying && !IsClimbing)) { SetMoveSpeed = MoveSpeed; }
+            if ((!IsJumpingFromClimb && !IsScurrying && (!IsClimbing || !IsOnMop))) { SetMoveSpeed = MoveSpeed; }
             else if (IsJumpingFromClimb) { SetMoveSpeed = JumpForcePipe; }
             else if (!IsJumpingFromClimb && !IsScurrying && IsClimbing) { SetMoveSpeed = ClimbSpeed; }
+            else if (IsOnMop) { SetMoveSpeed = 0; }
             else { SetMoveSpeed = ScurrySpeed; }
         }
         else SetMoveSpeed = MaterialMoveSpeed;
@@ -505,7 +508,6 @@ public class PlayerSystem : MonoBehaviour
             }
 
             if (IsBeingLaunched) { IsBeingLaunched = false; }
-
             if (IsScurrying) { IsScurrying = false; }
 
             if (!IsJumping && JumpButtonIsHeld)
@@ -531,9 +533,16 @@ public class PlayerSystem : MonoBehaviour
             }
         }
 
+        if (IsOnMop)
+        {
+            IsJumpingFromClimb = false;
+
+            if (IsBeingLaunched) { IsBeingLaunched = false; }
+        }
+
         Vector3 actualVelocity;
 
-        if (!IsClimbing)
+        if (!IsClimbing && !IsOnMop)
         {
             SlideTimer = 0;
             IsSliding = false;
@@ -604,7 +613,7 @@ public class PlayerSystem : MonoBehaviour
         Vector3 importedVelocity = !IsGrabbing ? actualVelocity : actualVelocity / PullInhibitMultiplier;
         Character.Move(importedVelocity * Time.fixedDeltaTime);
 
-        LastFrameVelocity = (!IsClimbing) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
+        LastFrameVelocity = (!IsClimbing || !IsOnMop) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
         else { UsedCoyoteJump = false; CurrentCoyoteTime = 0.0f; }
@@ -637,7 +646,7 @@ public class PlayerSystem : MonoBehaviour
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
-                !IsClimbing ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
+                !IsClimbing || !IsOnMop ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f,
             );
         }
@@ -664,7 +673,7 @@ public class PlayerSystem : MonoBehaviour
             case MoveType.None: MoveInput = Vector2.zero; break;
             case MoveType.LockToLeftRight: MoveInput.y = 0.0f; break;
             case MoveType.LockToForwardBack: MoveInput.x = 0.0f; break;
-            case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing) ? 0.0f : MoveInput.y; break;
+            case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing || !IsOnMop) ? 0.0f : MoveInput.y; break;
         }
 
         IsGrounded = Character.isGrounded;
