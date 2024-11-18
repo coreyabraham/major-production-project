@@ -33,7 +33,7 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Tooltip("Allows the player to jump for a short period of time after falling from a ledge.")]
     [field: SerializeField] private bool EnableCoyoteJump = true;
-    
+
     [field: Tooltip("The duration of time that the player can fall for and coyote jump.")]
     [field: SerializeField] private float CoyoteTimer = 1.0f;
 
@@ -107,7 +107,7 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public bool IsJumpingFromClimb;
     [HideInInspector] public bool FallingFromClimb;
 
-     public bool IsOnMop;
+    [HideInInspector] public bool IsOnMop;
 
     [HideInInspector] public CharacterController Character;
     [HideInInspector] public bool IsHidden = false;
@@ -181,7 +181,7 @@ public class PlayerSystem : MonoBehaviour
     {
         if (MoveType == MoveType.None || !ctx.ReadValueAsButton() || ctx.phase != InputActionPhase.Performed ||
             IsClimbing || IsOnMop || IsGrabbing) return;
-        
+
         IsScurrying = !IsScurrying;
 
         Events.Scurrying.Invoke(IsScurrying);
@@ -225,10 +225,10 @@ public class PlayerSystem : MonoBehaviour
 
     #region Functions - Public
     public Vector2 GetMoveInput() => MoveInput;
-
     public bool IsPlayerMoving() => IsMoving;
     public bool IsPlayerJumping() => IsJumping;
     public bool IsPlayerGrounded() => IsGrounded;
+    public bool IsPlayerGrabbing() => IsGrabbing;
     public bool ToggleUpMovement(bool enable) => CanClimbUp = enable;
     public bool ToggleDownMovement(bool enable) => CanClimbDown = enable;
     public bool TogglePullState(bool input) => IsGrabbing = input;
@@ -268,7 +268,7 @@ public class PlayerSystem : MonoBehaviour
     {
         Velocity.x = 2 * multiplier;
     }
-    
+
     public void DeathTriggered()
     {
         /*
@@ -294,7 +294,9 @@ public class PlayerSystem : MonoBehaviour
         Debug.Log(msg);
 
         GameSystem.Instance.PlayerDiedCallback();
-        
+
+        RevertPlayerValues();
+
         bool checkpointResult = SpawnAtCheckpoint();
         if (checkpointResult) return;
 
@@ -303,6 +305,8 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Private
+    private void RevertPlayerValues() => IsBeingLaunched = IsClimbing = IsGrabbing = IsHidden = IsJumping = IsJumpingFromClimb = IsMoving = IsOnMop = IsPulling = IsPushing = IsScurrying = IsSliding = false;
+
     private bool SpawnAtCheckpoint()
     {
         SaveData data = DataHandler.Instance.RefreshCachedData();
@@ -416,15 +420,18 @@ public class PlayerSystem : MonoBehaviour
         // I know this is an atrocious way of checking which side of the object the player is on...
         // dw about it, I made it slightly less offensive lol
 
-        float grabX = transform.position.x < other.transform.parent.position.x 
+        float grabX = transform.position.x < other.transform.parent.position.x
             ? transform.position.x + grabDist // Left Side
             : transform.position.x - grabDist; // Right Side
 
-        other.transform.parent.position = new(
-            grabX - other.transform.localPosition.x, 
-            other.transform.parent.position.y, 
-            other.transform.parent.position.z
-        );
+        if ((CharacterRotation.eulerAngles.y <= 360f && CharacterRotation.eulerAngles.y > 180f && transform.position.x <= PullObjPos.x) ||
+            (CharacterRotation.eulerAngles.y <= 180f && CharacterRotation.eulerAngles.y > 0f && transform.position.x > PullObjPos.x))
+        {
+            other.transform.parent.position = new(
+            grabX - other.transform.localPosition.x,
+            other.transform.parent.position.y,
+            other.transform.parent.position.z);
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -434,7 +441,7 @@ public class PlayerSystem : MonoBehaviour
             if (other.transform.parent.CompareTag(GrabTag))
             { PullObjPos = Vector3.zero; IsPushing = false; IsPulling = false; IsGrabbing = false; return; }
         }
-        
+
         if (other.gameObject.CompareTag(GameSystem.Instance.TouchTag) != true) return;
 
         for (int i = 0; i < GameSystem.Instance.CachedTouchables.Count; i++)
@@ -498,7 +505,7 @@ public class PlayerSystem : MonoBehaviour
 
             if (MoveInput.y == 0) { if (SlideTimer < TimeBeforeSlide) { SlideTimer += Time.fixedDeltaTime; } }
             else { SlideTimer = 0; IsSliding = false; SlideForce = 0; }
-            
+
             if (SlideTimer >= TimeBeforeSlide)
             {
                 // Begin sliding downwards
@@ -709,12 +716,12 @@ public class PlayerSystem : MonoBehaviour
                     if (!int.TryParse(anim.CustomValue, out int resultInt)) return;
                     Animator.SetInteger(anim.Name, resultInt);
                     break;
-                
+
                 case AnimValueType.Float:
                     if (!float.TryParse(anim.CustomValue, out float resultFloat)) return;
                     Animator.SetFloat(anim.Name, resultFloat);
                     break;
-                
+
                 case AnimValueType.Boolean:
                     if (!bool.TryParse(anim.CustomValue, out bool resultBool)) return;
                     Animator.SetBool(anim.Name, resultBool);
