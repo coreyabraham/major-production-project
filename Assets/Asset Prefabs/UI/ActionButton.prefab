@@ -50,12 +50,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5843b5008d2b24a93253672addaa64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InputModule: {fileID: 0}
   TargetFrame: {fileID: 0}
   Button: {fileID: 8694597740488101018}
   Text: {fileID: 3280167464699663805}
   ClickedEvent:
     m_PersistentCalls:
       m_Calls: []
+  ActionNames:
+  - Submit
+  - Click
 --- !u!1 &5437025566207974522
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,7 +153,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 53.7
+  m_fontSize: 26.85
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

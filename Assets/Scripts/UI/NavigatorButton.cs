@@ -6,22 +6,13 @@ using UnityEngine.Events;
 
 public class NavigatorButton : MonoBehaviour
 {
+    [field: Header("Externals")]
     public GameObject TargetFrame;
 
-    [field: Space(5.0f)]
-    
+    [field: Header("Assets")]
     public Button Button;
     public TMP_Text Text;
 
-    [field: Space(5.0f)]
-
+    [field: Header("Event(s) and Array(s)")]
     public UnityEvent ClickedEvent;
-
-    private void ButtonClicked() => ClickedEvent?.Invoke();
-
-    private void Awake()
-    {
-        Button.onClick.RemoveAllListeners();
-        Button.onClick.AddListener(ButtonClicked);
-    }
 }
