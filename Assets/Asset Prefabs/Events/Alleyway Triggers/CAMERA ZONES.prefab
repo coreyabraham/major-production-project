@@ -7377,8 +7377,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 377648114717833992}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -37.76, y: 0.168, z: 0.073}
-  m_LocalScale: {x: 10.111618, y: 2.5567, z: 1}
+  m_LocalPosition: {x: -39.13, y: 0.168, z: 0.073}
+  m_LocalScale: {x: 5.0659666, y: 2.5567, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 377648115545397676}
@@ -7467,7 +7467,7 @@ MonoBehaviour:
   TransformModifier: 0.5
   UsePositionOffset: 1
   UseRotationOffset: 1
-  UseFOVAdjustment: 0
+  UseFOVAdjustment: 1
   OverridePreviousPosition: 0
   OverridePreviousRotation: 0
   OverridePreviousFOV: 0
@@ -7477,7 +7477,7 @@ MonoBehaviour:
   TargetPosition: {x: 0, y: 0, z: 0}
   TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   TargetObject: {fileID: 377648115797303408}
-  TargetFOV: 15
+  TargetFOV: 20
   SumDerivedFOV: 0
   ZoneBlending: 1
   LerpCurve:
@@ -7493,6 +7493,15 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
+      time: 0.8
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
       time: 1
       value: 1
       inSlope: 0
@@ -7504,7 +7513,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  BlendType: 0
+  BlendType: 1
   TriggerSize: 0
 --- !u!1 &377648115001836786
 GameObject:
@@ -8547,8 +8556,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 377648115797303411}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -37.76, y: 0.5412782, z: -6.975}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -39.144, y: 1.276, z: -9.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8580,7 +8589,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 15
+  field of view: 20
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
