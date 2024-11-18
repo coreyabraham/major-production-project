@@ -306,7 +306,7 @@ GameObject:
   - component: {fileID: 1626773060074795765}
   - component: {fileID: 7142696449066659507}
   m_Layer: 0
-  m_Name: VFX_Steam
+  m_Name: VFX_AcSteam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -320,7 +320,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 464400900547733780}
   m_LocalRotation: {x: -0.6772414, y: -0, z: -0, w: 0.7357609}
-  m_LocalPosition: {x: 30.423227, y: 7.119807, z: 0.707}
+  m_LocalPosition: {x: 30.423227, y: 7.091, z: 0.705}
   m_LocalScale: {x: 2.2109, y: 2.2109, z: 2.2109}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -347,7 +347,10 @@ VisualEffect:
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 0, y: 0.7, z: 0}
+        m_Name: SteamVelocity
+        m_Overridden: 1
     m_Vector4f:
       m_Array: []
     m_Uint:
@@ -357,13 +360,48 @@ VisualEffect:
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
-      m_Array: []
+      m_Array:
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.25
+            value: 0.25
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.9718775
+            value: 0.25058967
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: SizeOverLifetime
+        m_Overridden: 1
     m_Gradient:
       m_Array:
       - m_Value:
           serializedVersion: 2
           key0: {r: 0, g: 0, b: 0, a: 0}
-          key1: {r: 16.020939, g: 16.020939, b: 16.020939, a: 0.12156863}
+          key1: {r: 17.61261, g: 17.61261, b: 17.61261, a: 0.44705883}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}
           key4: {r: 0, g: 0, b: 0, a: 0}
