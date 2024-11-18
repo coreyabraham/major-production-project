@@ -3,17 +3,13 @@ using UnityEngine;
 
 public class PlayUI : MonoBehaviour
 {
-    [field: Header("Miscellaneous")]
-    [field: SerializeField] private int StartingLevelIndex;
+    [field: Header("Templates")]
+    [field: SerializeField] private SaveFileUI SaveTemplate;
 
     [field: Header("Parents")]
     [field: SerializeField] private GameObject SavesParent;
     [field: SerializeField] private GameObject ChosenParent;
     [field: SerializeField] private GameObject ButtonsParent;
-
-    [field: Header("Templates")]
-    [field: SerializeField] private SaveFileUI SaveTemplate;
-    [field: SerializeField] private NavigatorButton SceneTemplate;
 
     [field: Header("Labels")]
     [field: SerializeField] private TMP_Text SelectLabel;
@@ -21,9 +17,9 @@ public class PlayUI : MonoBehaviour
     [field: SerializeField] private TMP_Text DeathLabel;
     [field: SerializeField] private TMP_Text ProgressLabel;
 
-    [field: Space(5.0f)]
-
-    [field: SerializeField] private string NonSelectedText = "Selected File: N / A";
+    [field: Header("Miscellaneous")]
+    [field: SerializeField] private int StartingLevelIndex;
+    [field: SerializeField] private string NonSelectedText;
 
     [field: Header("Prompter")]
     public PromptUI PromptSystem;
@@ -69,8 +65,6 @@ public class PlayUI : MonoBehaviour
 
         OnDisable();
     }
-
-    private void SceneButtonClicked(int SceneIndex) => GameSystem.Instance.RequestLoadScene(GameSystem.Instance.GetLevelName(SceneIndex));
 
     private void UpdateSaveFileIndex(SaveFileUI file)
     {
