@@ -149,7 +149,7 @@ public class PlayerSystem : MonoBehaviour
     private float PreviousMoveSpeed;
 
     private bool CanClimbUp = true, CanClimbDown = true;
-    private float SlideTimer = 0.0f;
+    private float SlideTimer = 0.0f, SlideForce = 0.0f;
 
     private bool canGrab = true;
     private float grabDist;
@@ -482,6 +482,7 @@ public class PlayerSystem : MonoBehaviour
         {
             SlideTimer = 0;
             IsSliding = false;
+            SlideForce = 0;
 
             // If IsJumping is true, set JumpButtonIsHeld to true after .05 seconds.
             TimeUntilJumpButtonIsDisabled += Time.fixedDeltaTime;
@@ -493,14 +494,14 @@ public class PlayerSystem : MonoBehaviour
             IsJumpingFromClimb = false;
 
             if (MoveInput.y == 0) { if (SlideTimer < TimeBeforeSlide) { SlideTimer += Time.fixedDeltaTime; } }
-            else { SlideTimer = 0; IsSliding = false; }
+            else { SlideTimer = 0; IsSliding = false; SlideForce = 0; }
             
             if (SlideTimer >= TimeBeforeSlide)
             {
                 // Begin sliding downwards
                 IsSliding = true;
-
-                Debug.Log("Should be sliding right now.");
+                if (SlideForce > -2) { SlideForce -= Time.fixedDeltaTime; }
+                MoveDelta.z = SlideForce;
             }
 
             if (IsBeingLaunched) { IsBeingLaunched = false; }
@@ -536,6 +537,7 @@ public class PlayerSystem : MonoBehaviour
         {
             SlideTimer = 0;
             IsSliding = false;
+            SlideForce = 0;
 
             if (!IsBeingLaunched)
             {

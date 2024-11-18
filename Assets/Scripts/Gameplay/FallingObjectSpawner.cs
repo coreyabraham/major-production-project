@@ -76,20 +76,20 @@ public class FallingObjectSpawner : MonoBehaviour
         float j;
         if (axisToSpawnAlong == PipeAxis.X)
         {
-            j = Random.Range(box.bounds.min.x, box.bounds.max.x);
-            posToSpawnAt = new(j - 0.1f, transform.position.y + 0.6f, transform.position.z);
-        }
-        else
-        {
             j = Random.Range(box.bounds.min.z, box.bounds.max.z);
             posToSpawnAt = new(transform.position.x, transform.position.y + 0.6f, j - 0.1f);
         }
+        else
+        {
+            j = Random.Range(box.bounds.min.x, box.bounds.max.x);
+            posToSpawnAt = new(j - 0.1f, transform.position.y + 0.6f, transform.position.z);
+        }
 
-        if (useKnifeAngle && axisToSpawnAlong == PipeAxis.X) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x -75, 0, 0)); }
-        else if (useKnifeAngle && axisToSpawnAlong == PipeAxis.Z) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x -75, -90, 0)); }
+        if (useKnifeAngle && axisToSpawnAlong == PipeAxis.X) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x - 75, 0, 0)); }
+        else if (useKnifeAngle && axisToSpawnAlong == PipeAxis.Z) { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x - 75, -90, 0)); }
         else { angToSpawnAt = Quaternion.Euler(new(angToSpawnAt.x, 0, 0)); }
 
-        objToSpawn.tag = "SpawnedPrefab";
+        objToSpawn.tag = "Touchable";
 
         if (autoAddRigidbody && !objToSpawn.GetComponent<Rigidbody>()) { objToSpawn.AddComponent<Rigidbody>(); }
         //{ Debug.LogError("Prefab doesn't have a rigidbody component! It needs a rigidbody to work properly!"); isActive = false; return; }
