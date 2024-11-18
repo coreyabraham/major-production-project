@@ -37,7 +37,7 @@ public class MopHandleLaunch : MonoBehaviour
     #endregion
 
     #region Private Variables
-    bool doMopMove = false;
+    bool doMopMove = false, requireButtonRelease = false;
     float rotateTimer = 0, rewindTimer = 0;
     Transform parentOfThis;
 
@@ -63,6 +63,8 @@ public class MopHandleLaunch : MonoBehaviour
     {
         if (!other.CompareTag("Player")) { return; }
         playSys = GameSystem.Instance.Player;
+
+        if (playSys.IsJumping) { requireButtonRelease = true; }
     }
 
 
@@ -86,7 +88,7 @@ public class MopHandleLaunch : MonoBehaviour
 
         if (attachState == MopHandleStates.WaitForPlayer)
         {
-            playSys.IsClimbing = true;
+            playSys.IsOnMop = true;
             playSys.IsJumpingFromClimb = false;
             playSys.SetMoveType(MoveType.None, true);
 
@@ -106,6 +108,9 @@ public class MopHandleLaunch : MonoBehaviour
                 playSys.SetMoveType(MoveType.TwoDimensionsOnly);
             }
 
+            if (!playSys.IsJumping) { requireButtonRelease = false; }
+            if (requireButtonRelease) { return; }
+
             if (playSys.JumpingRequested && rotateTimer <= maxTime) { attachState = MopHandleStates.PlayerJumpFromMop; }
             else if (rotateTimer > maxTime) { attachState = MopHandleStates.PlayerTimeout; }
         }
@@ -114,7 +119,7 @@ public class MopHandleLaunch : MonoBehaviour
         {
             playSys.gameObject.transform.parent = null;
             playSys.ToggleCharCont(true);
-            playSys.IsClimbing = false;
+            playSys.IsOnMop = false;
 
             if (attachState == MopHandleStates.PlayerJumpFromMop)
             {
