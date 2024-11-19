@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 
 using UnityEngine.EventSystems;
@@ -61,17 +62,21 @@ public class TitleUI : MonoBehaviour
 
         for (int i = 0; i < Groups.Length; i++)
         {
+            if (Groups[i].Frame == null) continue;
+
             if (Groups[i].Frame == Frame)
             {
-                Frame.SetActive(true);
+                Groups[i].Frame.SetActive(true);
 
                 GameObject selection = Groups[i].FirstSelection;
-                EventSystem.firstSelectedGameObject = selection;
+                
+                EventSystem.current.firstSelectedGameObject = selection;
+                //EventSystem.current.SetSelectedGameObject(selection);
                 
                 continue;
             }
 
-            Groups[i].Frame?.SetActive(false);
+            Groups[i].Frame.SetActive(false);
         }
 
         GetButtons();

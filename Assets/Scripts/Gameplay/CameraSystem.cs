@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering.HighDefinition;
 
 public class CameraSystem : MonoBehaviour
 {
@@ -41,8 +40,6 @@ public class CameraSystem : MonoBehaviour
     #endregion
 
     #region Private Variables
-    private CameraState CurrentState;
-
     private CameraTarget PreviousOffset;
     private CameraTarget DefaultOffset;
 
@@ -70,13 +67,9 @@ public class CameraSystem : MonoBehaviour
 
     private PlayerSystem ActivePlayer = null;
     private GameObject PreviousCameraSubject = null;
-
-    private DepthOfField DOF;
     #endregion
 
     #region Getter and Setter Methods
-    public CameraState GetCameraState() => CurrentState;
-
     public void OverrideCameraOffset(CameraTarget Offset) => CurrentOffset = Offset;
     public void OverrideCameraOffset(Vector3 Position, Quaternion Rotation)
     {
@@ -233,7 +226,6 @@ public class CameraSystem : MonoBehaviour
         }
 
         CameraType = CameraType.Scriptable;
-        CurrentState = CameraState.Cutscene;
 
         CurrentInterval = 0.0f;
         MaxInterval = TimeInterval;
@@ -295,7 +287,6 @@ public class CameraSystem : MonoBehaviour
         CutsceneIndex = 0;
         CutscenePoints = null;
 
-        CurrentState = CameraState.Generic;
         (PreviousCameraType, CameraType) = (CameraType, PreviousCameraType);
 
         if (ActivePlayer) ActivePlayer.SetMoveType(PreviousMoveType, true);
@@ -356,7 +347,6 @@ public class CameraSystem : MonoBehaviour
 
     private float GetOffsetAndTargetEvaluation()
     {
-        // Get distance between triggerzone and player
         Vector3 tarPos = CameraSubject != null ? CameraSubject.transform.position : GroundCameraPosition;
         float selection = 0.0f;
 
@@ -369,11 +359,9 @@ public class CameraSystem : MonoBehaviour
 
         float distanceFromTriggerCentre = Mathf.Abs(selection);
 
-        // Get blend amount
         float blendAmount = 1 - distanceFromTriggerCentre / ActiveZoneTrigger.TriggerSize;
         float curveEvaluation = ActiveZoneTrigger.LerpCurve.Evaluate(blendAmount);
 
-        // Return blend amount
         return curveEvaluation;
     }
 

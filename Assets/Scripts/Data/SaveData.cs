@@ -21,11 +21,6 @@ public class SaveData
     public int deaths;
 
     /// <summary>
-    /// How much progress (0% - 100%) the Player has for this specific Save File.
-    /// </summary>
-    public float gameProgress;
-
-    /// <summary>
     /// The name of the checkpoint `GameObject`, used to validate if the target checkpoint has already been registered or not.
     /// </summary>
     public string checkpointName;

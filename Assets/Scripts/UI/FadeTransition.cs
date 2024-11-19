@@ -89,7 +89,7 @@ public class FadeTransition : MonoBehaviour
 
     private void UpdateUsability()
     {
-        string current = GameSystem.Instance.GetLevelNameWithIndex();
+        string current = GameSystem.Instance.GetCurrentLevelName();
         bool canUse = true;
 
         foreach (string str in GameSystem.Instance.BlacklistedPauseScenes)
