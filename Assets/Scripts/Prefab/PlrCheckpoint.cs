@@ -23,7 +23,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
             return;
         }
 
-        if (UseSceneName && GameSystem.Instance.IsCurrentSceneAValidLevel()) data.levelName = GameSystem.Instance.GetLevelNameWithIndex();
+        if (UseSceneName && GameSystem.Instance.IsCurrentSceneAValidLevel()) data.levelName = GameSystem.Instance.GetCurrentLevelName();
 
         data.checkpointName = (!string.IsNullOrWhiteSpace(OverrideName)) ? OverrideName : gameObject.name;
 

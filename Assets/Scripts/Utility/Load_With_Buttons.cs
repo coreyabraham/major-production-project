@@ -8,7 +8,7 @@ public class Load_With_Buttons : MonoBehaviour
     {
         if (SwitchingScenes) return;
         
-        string levelName = GameSystem.Instance.GetLevelName(index);
+        string levelName = GameSystem.Instance.GetLevelNameWithIndex(index);
         if (string.IsNullOrWhiteSpace(levelName)) return;
 
         GameSystem.Instance.RequestLoadScene(levelName);
