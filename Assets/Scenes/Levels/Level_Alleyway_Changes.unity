@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 884.34155, g: 518.06006, b: 383.65674, a: 1}
+  m_IndirectSpecularColor: {r: 884.1819, g: 517.98145, b: 383.63135, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1096,6 +1096,7 @@ GameObject:
   - component: {fileID: 25134181}
   - component: {fileID: 25134180}
   - component: {fileID: 25134185}
+  - component: {fileID: 25134186}
   m_Layer: 0
   m_Name: Crow Sight Trigger
   m_TagString: Touchable
@@ -1130,7 +1131,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathDelayTimer: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -1255,6 +1255,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &25134186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25134178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeathType: 1
+  PrintMessages: 0
+  DeathDelayTime: 0.5
+  DisableControlOnDeath: 1
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!4 &31654866 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1698697846624809748, guid: 050c8a3da79c2ce4f8d84bdf29b777e2, type: 3}
@@ -6608,7 +6628,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 155993141}
   m_LocalRotation: {x: -0.7071068, y: -0.7071068, z: -0, w: 0}
-  m_LocalPosition: {x: 0.17579153, y: 0.13739778, z: 0.3866254}
+  m_LocalPosition: {x: -0, y: 0.077, z: 0}
   m_LocalScale: {x: 0.48299924, y: 0.5234767, z: 1.0633872}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6629,8 +6649,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <InteractionRange>k__BackingField: 1
   <IgnoreInteractionRange>k__BackingField: 0
-  posOnPlayer: {x: 0, y: 0.38, z: -0.025}
-  rotOnPlayer: {x: 180, y: 0, z: 0}
+  posOnPlayer: {x: 0, y: 0.32, z: -0.025}
+  rotOnPlayer: {x: 178, y: 0, z: 0}
 --- !u!65 &155993144
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6643,7 +6663,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.9999991, y: 0.42180663, z: 0.34729767}
-  m_Center: {x: 0, y: -0.28909662, z: 0.32635105}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &155993145
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7536,6 +7556,18 @@ PrefabInstance:
     - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
       propertyPath: m_RootOrder
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
       propertyPath: m_LocalPosition.x
@@ -13855,6 +13887,7 @@ GameObject:
   - component: {fileID: 336352213}
   - component: {fileID: 336352212}
   - component: {fileID: 336352211}
+  - component: {fileID: 336352215}
   m_Layer: 0
   m_Name: Sight Trigger
   m_TagString: Touchable
@@ -13889,7 +13922,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathDelayTimer: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
@@ -13958,6 +13990,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 336352209}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &336352215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336352209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeathType: 1
+  PrintMessages: 0
+  DeathDelayTime: 0.5
+  DisableControlOnDeath: 1
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!1 &336627071
 GameObject:
   m_ObjectHideFlags: 0
@@ -23464,8 +23516,8 @@ Transform:
   m_GameObject: {fileID: 605101870}
   m_LocalRotation: {x: 0.7071068, y: 0.7071068, z: -0, w: 0}
   m_LocalPosition: {x: 242.5152, y: 0.10741693, z: 21.38125}
-  m_LocalScale: {x: 2, y: 2, z: 2}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 2, y: 2, z: 2.3}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 155993142}
   m_Father: {fileID: 1277534779}
@@ -32799,6 +32851,7 @@ GameObject:
   - component: {fileID: 821940789}
   - component: {fileID: 821940788}
   - component: {fileID: 821940791}
+  - component: {fileID: 821940793}
   m_Layer: 0
   m_Name: WetConcrete
   m_TagString: Touchable
@@ -32909,12 +32962,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathDelayTimer: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
   crowSwoop: {fileID: 0}
   snap: {fileID: 0}
+--- !u!114 &821940793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821940786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeathType: 3
+  PrintMessages: 0
+  DeathDelayTime: 0.5
+  DisableControlOnDeath: 1
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!1001 &822999724
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43506,6 +43578,7 @@ GameObject:
   - component: {fileID: 1096462988}
   - component: {fileID: 1096462990}
   - component: {fileID: 1096462991}
+  - component: {fileID: 1096462992}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Touchable
@@ -43553,12 +43626,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathDelayTimer: 0
   useCrowSound: 0
   useSnap: 0
   crowCaw: {fileID: 0}
   crowSwoop: {fileID: 0}
   snap: {fileID: 0}
+--- !u!114 &1096462992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096462987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeathType: 0
+  PrintMessages: 0
+  DeathDelayTime: 0.5
+  DisableControlOnDeath: 1
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!4 &1098664737 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1698697846624809748, guid: 050c8a3da79c2ce4f8d84bdf29b777e2, type: 3}
@@ -75473,24 +75565,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1711460590664839741, guid: 13139c4b6f05fcc469666a71926e2b88, type: 3}
   m_PrefabInstance: {fileID: 1958023206}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1958023208 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2056883866032416903, guid: 13139c4b6f05fcc469666a71926e2b88, type: 3}
-  m_PrefabInstance: {fileID: 1958023206}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1958023209
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958023208}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.7393897, y: 1.069197, z: 0.73938996}
-  m_Center: {x: -0.000007599592, y: 0.5345978, z: 0.000000461936}
 --- !u!1 &1959082892
 GameObject:
   m_ObjectHideFlags: 0
@@ -82335,6 +82409,10 @@ PrefabInstance:
       value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
+      propertyPath: ZAxisPlane
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 590231323864142498, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: CoyoteTimer
       value: 0.1
       objectReference: {fileID: 0}
@@ -82356,7 +82434,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.537
+      value: -36.152
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_LocalPosition.y
