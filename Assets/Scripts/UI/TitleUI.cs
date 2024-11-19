@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
+
 using UnityEngine.EventSystems;
+
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.UI;
 
 public class TitleUI : MonoBehaviour
 {
@@ -30,11 +32,12 @@ public class TitleUI : MonoBehaviour
     [field: Header("Lists and Arrays")]
     [field: SerializeField] private FrameGroup[] Groups;
     
-    [field: SerializeField]
-    private string[] ActionNames = {
+    [field: SerializeField] private string[] ActionNames = {
         "Submit",
         "Click"
     };
+
+    [field: SerializeField] private List<NavigatorButton> CachedButons;
 
     private void GetButtons()
     {
@@ -45,8 +48,10 @@ public class TitleUI : MonoBehaviour
             NavigatorButton navigator = obj.GetComponent<NavigatorButton>();
 
             if (!navigator) continue;
+            if (CachedButons.Contains(navigator)) continue;
 
             navigator.ClickedEvent.AddListener(() => ToggleFrames(navigator.TargetFrame));
+            CachedButons.Add(navigator);
         }
     }
 
@@ -74,6 +79,8 @@ public class TitleUI : MonoBehaviour
 
     private void InputReceived(InputAction.CallbackContext ctx)
     {
+        if (ctx.phase != InputActionPhase.Performed) return;
+
         GameObject currentSelection = EventSystem.current.currentSelectedGameObject;
         if (!currentSelection) return;
 
@@ -83,7 +90,9 @@ public class TitleUI : MonoBehaviour
         navigatorButton.ClickedEvent?.Invoke();
     }
 
-    private void Start()
+    private void Start() => ToggleFrames(Groups[StartingGroupIndex].Frame);
+
+    private void OnEnable()
     {
         var map = InputModule.actionsAsset.FindActionMap("UI");
 
@@ -91,11 +100,7 @@ public class TitleUI : MonoBehaviour
         {
             var action = map.FindAction(str);
             if (action == null) continue;
-
-            action.performed -= InputReceived;
             action.performed += InputReceived;
         }
-
-        ToggleFrames(Groups[StartingGroupIndex].Frame);
     }
 }
