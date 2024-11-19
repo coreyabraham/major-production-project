@@ -31,7 +31,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
 
     [field: Header("Transformations")]
     public Vector3 TargetPosition;
-    public Quaternion TargetRotation;
+    public Vector3 TargetRotation;
     [field: SerializeField] private Transform TargetObject;
 
     [field: Header("FOV Adjustments")]
@@ -100,13 +100,14 @@ public class ZoneCamera : MonoBehaviour, ITouchable
             }
 
             //Get rotation of target and set in newRotOffset
-            if (DeriveRotation) TargetRotation = TargetObject.transform.rotation;
+            if (DeriveRotation) TargetRotation = TargetObject.transform.rotation.eulerAngles;
         }
 
         if (DeriveFieldOfView)
         {
             float originalTargetFOV = TargetFOV;
-            TargetFOV = GameSystem.Instance.Camera.FieldOfView;
+            //TargetFOV = GameSystem.Instance.Camera.FieldOfView;
+            TargetFOV = TargetObject.gameObject.GetComponent<Camera>().fieldOfView;
             if (SumDerivedFOV) TargetFOV += originalTargetFOV;
         }
 
