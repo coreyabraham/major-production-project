@@ -4,13 +4,15 @@ using UnityEngine;
 public class PlrDeathState : MonoBehaviour, ITouchable
 {
     #region Inspector Variables
-    [field: Header("Settings // Debouncing")]
-    [field: SerializeField] private bool UseDebounce = true;
-    [field: SerializeField] private float DebounceTime = 1.0f;
-
     [field: Header("Settings // Standard")]
     [field: SerializeField] private DeathType DeathType = DeathType.Default;
     [field: SerializeField] private bool PrintMessages = false;
+    [field: SerializeField] private float DeathDelayTime = 0.5f;
+    [field: SerializeField] private bool DisableControlOnDeath = false;
+
+    [field: Header("Settings // Debouncing")]
+    [field: SerializeField] private bool UseDebounce = true;
+    [field: SerializeField] private float DebounceTime = 1.0f;
 
     [field: Header("Inherited from `ITouchable`")]
     [field: SerializeField] public bool Enabled { get; set; } = true;
@@ -19,7 +21,11 @@ public class PlrDeathState : MonoBehaviour, ITouchable
 
     #region Private Variables
     private float CurrentDebounceTime = 0.0f;
+    private float CurrentDelayTime = 0.0f;
     private bool DebounceStarted = false;
+    private bool DelayStarted = false;
+
+    private PlayerSystem PlaySys;
 
     readonly private Dictionary<DeathType, System.Action> MethodLookup = new();
     #endregion
@@ -47,8 +53,25 @@ public class PlrDeathState : MonoBehaviour, ITouchable
     {
         if (!Player || DebounceStarted) return;
 
-        DebounceStarted = true;
+        PlaySys = Player; 
+        DebounceStarted = DelayStarted = true;
+    }
 
+    public void Left(PlayerSystem Player) { }
+
+    public void Staying(PlayerSystem Player)
+    {
+        if (CurrentDelayTime < DeathDelayTime) { return; }
+
+        Debug.Log("Yo");
+
+        Player.DeathTriggered();
+    }
+    #endregion
+
+
+    private void TriggerDeath(PlayerSystem Player)
+    {
         bool result = MethodLookup.TryGetValue(DeathType, out System.Action method);
 
         if (!result && PrintMessages) Debug.Log(name + " | There was no `DeathType` Method found for DeathType: " + DeathType.GetName(typeof(DeathType), DeathType) + "!");
@@ -57,14 +80,23 @@ public class PlrDeathState : MonoBehaviour, ITouchable
         Player.DeathTriggered();
     }
 
-    public void Left(PlayerSystem Player) { }
-
-    public void Staying(PlayerSystem Player) { }
-    #endregion
 
     #region Unity Methods
     private void Update()
     {
+        if (DelayStarted)
+        {
+            CurrentDelayTime += Time.deltaTime;
+            if (DisableControlOnDeath) { PlaySys.SetMoveType(MoveType.None, false); }
+            if (CurrentDelayTime >= DeathDelayTime)
+            {
+                TriggerDeath(PlaySys);
+
+                CurrentDelayTime = 0.0f;
+                DelayStarted = false;
+            }
+        }
+
         if (!UseDebounce || !DebounceStarted) return;
 
         if (CurrentDebounceTime < DebounceTime)
