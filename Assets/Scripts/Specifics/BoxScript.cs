@@ -19,7 +19,7 @@ public class BoxScript : MonoBehaviour
     public float GetGrabDistance() => grabDistanceFromPlayer / 10f;
     public void FreezeBox()
     {
-        rb.constraints = RigidbodyConstraints.FreezeAll;
+        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     }
     public void UnfreezeBox()
     {
@@ -32,7 +32,7 @@ public class BoxScript : MonoBehaviour
     private void Update()
     {
         if (!doTimeout) { return; }
-        if (timeout < 1) { timeout += Time.deltaTime; return; }
+        if (timeout < 0.1f) { timeout += Time.deltaTime; return; }
 
         FreezeBox();
 
