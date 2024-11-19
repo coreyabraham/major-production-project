@@ -6,10 +6,6 @@ using UnityEngine;
 public class HazardTrigger : MonoBehaviour, ITouchable
 {
     #region Private Variables
-    [field: Header("Timer")]
-    [field: Tooltip("The amount of time in seconds before the player is considered \"dead\".")]
-    [field: SerializeField] private float deathDelayTimer;
-
     [field: Header("Bools")]
     [field: SerializeField] private bool useCrowSound;
     [field: SerializeField] private bool useSnap;
@@ -43,10 +39,6 @@ public class HazardTrigger : MonoBehaviour, ITouchable
         {
             snap.enabled = true;
         }
-
-        // Put timer delay
-
-        Player.DeathTriggered();
     }
 
     public void Entered(PlayerSystem Player)

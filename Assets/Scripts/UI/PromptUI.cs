@@ -4,21 +4,19 @@ using UnityEngine;
 
 public class PromptUI : Singleton<PromptUI>
 {
+    [field: Header("Root")]
     [field: SerializeField] private GameObject Prompt;
 
-    [field: Space(10.0f)]
-
+    [field: Header("Text Labels")]
     [field: SerializeField] private TMP_Text TitleLabel;
     [field: SerializeField] private TMP_Text SubLabel;
     [field: SerializeField] private TMP_Text BodyLabel;
 
-    [field: Space(5.0f)]
-
+    [field: Header("Interactions")]
     [field: SerializeField] private NavigatorButton AcceptInteract;
     [field: SerializeField] private NavigatorButton DenyInteract;
 
-    [field: Space(5.0f)]
-
+    [field: Header("Prompt Data")]
     [field: SerializeField] private PromptDataUI DefaultData;
 
     private PromptDataUI cachedData;

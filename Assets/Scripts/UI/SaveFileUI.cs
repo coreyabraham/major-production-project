@@ -13,6 +13,8 @@ public class SaveFileUI : MonoBehaviour
 
     private SaveData AssignedData;
 
+    [HideInInspector] public int AssignedIndex;
+
     public SaveData GetData() => AssignedData;
     public void AssignData(SaveData data) => AssignedData = data;
     public void UnassignData() => AssignedData = null;
