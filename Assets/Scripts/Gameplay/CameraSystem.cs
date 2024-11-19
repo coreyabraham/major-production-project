@@ -164,14 +164,14 @@ public class CameraSystem : MonoBehaviour
                 case EasingStyle.Lerp:
                     {
                         Position = Vector3.Lerp(main.transform.position, Position, LerpValue);
-                        EularRotation = Vector3.Lerp(main.transform.rotation.eulerAngles, EularRotation, LerpValue);
+                        Rotation = Quaternion.Lerp(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
 
                 case EasingStyle.Slerp:
                     {
                         Position = Vector3.Slerp(main.transform.position, Position, LerpValue);
-                        EularRotation = Vector3.Slerp(main.transform.rotation.eulerAngles, EularRotation, LerpValue);
+                        Rotation = Quaternion.Slerp(main.transform.rotation, Rotation, LerpValue);
                     }
                     break;
             }
@@ -183,7 +183,7 @@ public class CameraSystem : MonoBehaviour
             rotation = main.transform.rotation
         };
 
-        main.transform.SetPositionAndRotation(Position, Quaternion.Euler(EularRotation));
+        main.transform.SetPositionAndRotation(Position, Rotation);
 
         if (!CutsceneRunning || TrackCutsceneInterval) return;
         if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
@@ -202,11 +202,11 @@ public class CameraSystem : MonoBehaviour
         CurrentOffset = new()
         {
             position = Zone.TargetPosition,
-            rotation = Zone.TargetRotation
+            rotation = Quaternion.Euler(Zone.TargetRotation)
         };
 
         PreviousOffset.position = Zone.OverridePreviousPosition ? Zone.TargetPosition : PreviousOffset.position;
-        PreviousOffset.rotation = Zone.OverridePreviousRotation ? Zone.TargetRotation : PreviousOffset.rotation;
+        PreviousOffset.rotation = Zone.OverridePreviousRotation ? Quaternion.Euler(Zone.TargetRotation) : PreviousOffset.rotation;
         PreviousFOV = Zone.OverridePreviousFOV ? Zone.TargetFOV : PreviousFOV;
     }
 
@@ -397,7 +397,7 @@ public class CameraSystem : MonoBehaviour
         Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
             Vector3.Lerp(
                 CurrentOffset.rotation.eulerAngles,
-                ActiveZoneTrigger.TargetRotation.eulerAngles,
+                ActiveZoneTrigger.TargetRotation,
                 curveEvaluation
                 ) : CurrentOffset.rotation.eulerAngles;
 
@@ -431,9 +431,9 @@ public class CameraSystem : MonoBehaviour
         Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
             Vector3.Lerp(
                     cameraDelta.rotation.eulerAngles,
-                    ActiveZoneTrigger.TargetRotation.eulerAngles,
+                    ActiveZoneTrigger.TargetRotation,
                     curveEvaluation
-                ) : ActiveZoneTrigger.TargetRotation.eulerAngles;
+                ) : ActiveZoneTrigger.TargetRotation;
 
         Quaternion quaternion = Quaternion.Euler(rotation);
 
