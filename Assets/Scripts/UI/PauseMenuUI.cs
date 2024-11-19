@@ -1,28 +1,39 @@
 using UnityEngine;
+
+using UnityEngine.EventSystems;
+
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+
 using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
+    [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
     [field: SerializeField] private string TitleUIObject = "TitleUI";
     [field: SerializeField] private string PlayUIObject = "PlayUI";
 
-    [field: Space(2.5f)]
-
+    [field: Header("Generics")]
     [field: SerializeField] private GameObject Frame;
     [field: SerializeField] private SettingsUI Settings;
     [field: SerializeField] private NavigatorButton SettingsBackBtn;
 
-    [field: Space(2.5f)]
-
+    [field: Header("Navigation")]
     [field: SerializeField] private NavigatorButton ResumeBtn;
     [field: SerializeField] private NavigatorButton SettingsBtn;
     [field: SerializeField] private NavigatorButton ExitBtn;
 
-    [field: Space(2.5f)]
-
+    [field: Header("Lists and Arrays")]
     [field: SerializeField] private PromptDataUI ToMainMenuData;
+
+    [field: SerializeField] private string[] ActionNames = {
+        "Submit",
+        "Click"
+    };
+
+    [field: Header("Externals")]
+    [field: SerializeField] private InputSystemUIInputModule InputModule;
 
     private bool PausingPermitted;
 
@@ -90,7 +101,8 @@ public class PauseMenuUI : MonoBehaviour
         if (Settings.gameObject.activeSelf) Settings.gameObject.SetActive(false);
         if (Settings.PromptHandler.PromptActive()) Settings.PromptHandler.ForceEnd();
 
-        Time.timeScale = (Frame.activeSelf) ? 0.0f : 1.0f;
+        Time.timeScale = Frame.activeSelf ? 0.0f : 1.0f;
+        EventSystem.current.firstSelectedGameObject = Frame.activeSelf ? ResumeBtn.Button.gameObject : null;
     }
 
     private void PromptFinalized(bool result)
@@ -121,14 +133,39 @@ public class PauseMenuUI : MonoBehaviour
         Settings.PromptHandler.Begin(ToMainMenuData);
     }
 
+    private void InputReceived(InputAction.CallbackContext ctx)
+    {
+        GameObject currentSelection = EventSystem.current.currentSelectedGameObject;
+        if (!currentSelection) return;
+
+        bool result = currentSelection.transform.parent.gameObject.TryGetComponent(out NavigatorButton navigatorButton);
+        if (!result) return;
+
+        navigatorButton.ClickedEvent?.Invoke();
+    }
+
     private void Awake()
     {
         Frame.SetActive(false);
 
-        ResumeBtn.ClickedEvent.AddListener(ResumeClicked);
-        SettingsBtn.ClickedEvent.AddListener(SettingsClicked);
-        ExitBtn.ClickedEvent.AddListener(ExitClicked);
+        Debug.LogWarning(name + " | PLEASE ALLOCATE THESE BELOW TO THEIR RESPECTIVE `ClickedEvent` UNITY EVENTS!", this);
+        //ResumeBtn.ClickedEvent.AddListener(ResumeClicked);
+        //SettingsBtn.ClickedEvent.AddListener(SettingsClicked);
+        //ExitBtn.ClickedEvent.AddListener(ExitClicked);
 
-        SettingsBackBtn.ClickedEvent.AddListener(SettingsBackBtnClicked);
+        //SettingsBackBtn.ClickedEvent.AddListener(SettingsBackBtnClicked);
+    }
+
+    private void OnEnable()
+    {
+        var map = InputModule.actionsAsset.FindActionMap("UI");
+
+        foreach (string str in ActionNames)
+        {
+            var action = map.FindAction(str);
+            if (action == null) continue;
+
+            action.performed += InputReceived;
+        }
     }
 }
