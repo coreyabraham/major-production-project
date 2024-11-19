@@ -15,7 +15,6 @@ public class PlayUI : MonoBehaviour
     [field: SerializeField] private TMP_Text SelectLabel;
     [field: SerializeField] private TMP_Text LevelLabel;
     [field: SerializeField] private TMP_Text DeathLabel;
-    [field: SerializeField] private TMP_Text ProgressLabel;
 
     [field: Header("Miscellaneous")]
     [field: SerializeField] private int StartingLevelIndex;
@@ -44,7 +43,7 @@ public class PlayUI : MonoBehaviour
         SaveData targetData = CachedFiles[SaveFileUI_Index].GetData();
 
         if (string.IsNullOrWhiteSpace(targetData.levelName))
-            targetData.levelName = GameSystem.Instance.GetLevelName(StartingLevelIndex);
+            targetData.levelName = GameSystem.Instance.GetLevelNameWithIndex(StartingLevelIndex);
 
         DataHandler.Instance.SetCachedData(targetData);
         GameSystem.Instance.RequestLoadScene(targetData.levelName);
@@ -69,8 +68,9 @@ public class PlayUI : MonoBehaviour
         if (!result) return;
 
         string filename = DataHandler.Instance.GetFileName(SaveFileUI_Index);
-
         DataHandler.Instance.DestroyFileData(filename);
+
+        CachedFiles[SaveFileUI_Index].DateLabel.text = "Last Modified: ";
         CachedFiles[SaveFileUI_Index].AssignData(DataHandler.Instance.LoadSaveFile(filename));
 
         OnDisable();
@@ -97,7 +97,6 @@ public class PlayUI : MonoBehaviour
 
         LevelLabel.text = "Level Name: " + levelName;
         DeathLabel.text = "Deaths: " + file.GetData().deaths.ToString();
-        ProgressLabel.text = "Progress: " + file.GetData().gameProgress.ToString() + "%";
 
         ChosenParent.SetActive(true);
     }
@@ -140,7 +139,6 @@ public class PlayUI : MonoBehaviour
 
         LevelLabel.text = "Level Name: null";
         DeathLabel.text = "Deaths: 0";
-        ProgressLabel.text = "Progress: 0%";
 
         SaveFileUI_Index = -1;
         SelectLabel.text = NonSelectedText;

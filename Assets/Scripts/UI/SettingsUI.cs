@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 
 using TMPro;
 
 using UnityEngine;
-using System;
+using UnityEngine.EventSystems;
 
 public class SettingsUI : MonoBehaviour
 {
@@ -271,7 +272,6 @@ public class SettingsUI : MonoBehaviour
         ChangeSubFrame(Groups[VisibleIndexOnStartup].Frame);
 
         SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip, AudioType.Sound);
-        Debug.Log("Sound Test Created!", SoundTest);
     }
     #endregion
 }

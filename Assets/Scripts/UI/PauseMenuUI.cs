@@ -17,12 +17,9 @@ public class PauseMenuUI : MonoBehaviour
     [field: Header("Generics")]
     [field: SerializeField] private GameObject Frame;
     [field: SerializeField] private SettingsUI Settings;
-    [field: SerializeField] private NavigatorButton SettingsBackBtn;
 
     [field: Header("Navigation")]
     [field: SerializeField] private NavigatorButton ResumeBtn;
-    [field: SerializeField] private NavigatorButton SettingsBtn;
-    [field: SerializeField] private NavigatorButton ExitBtn;
 
     [field: Header("Lists and Arrays")]
     [field: SerializeField] private PromptDataUI ToMainMenuData;
@@ -37,7 +34,8 @@ public class PauseMenuUI : MonoBehaviour
 
     private bool PausingPermitted;
 
-    public void NewSceneLoaded(Scene Scene, LoadSceneMode Mode)
+    // TODO: Improve ALL searching algorithms contained within this method!
+    public void NewSceneLoaded(Scene Scene, LoadSceneMode _)
     {
         bool result = false;
 
@@ -76,8 +74,7 @@ public class PauseMenuUI : MonoBehaviour
             break;
         }
 
-        if (!TitleUI) return;
-        if (!PlayUI) return;
+        if (!TitleUI || !PlayUI) return;
 
         TitleUI.ExitMenu.PromptUI = Settings.PromptHandler;
 
@@ -89,8 +86,7 @@ public class PauseMenuUI : MonoBehaviour
 
     public void InputCalled(InputAction.CallbackContext ctx)
     {
-        if (!PausingPermitted) return;
-        if (ctx.phase != InputActionPhase.Performed) return;
+        if (!PausingPermitted || ctx.phase != InputActionPhase.Performed) return;
         ToggleUI();
     }
 
@@ -108,26 +104,26 @@ public class PauseMenuUI : MonoBehaviour
     private void PromptFinalized(bool result)
     {
         if (!result) return;
-        SceneManager.LoadScene(TitleScreenScene);
+        GameSystem.Instance.RequestLoadScene(TitleScreenScene);
         ToggleUI();
     }
 
-    private void SettingsBackBtnClicked()
+    public void SettingsBackBtnClicked()
     {
         if (!PausingPermitted) return;
         Settings.gameObject.SetActive(false);
         Frame.SetActive(true);
     }
 
-    private void ResumeClicked() => ToggleUI();
+    public void ResumeClicked() => ToggleUI();
 
-    private void SettingsClicked()
+    public void SettingsClicked()
     {
         Settings.gameObject.SetActive(true);
         Frame.SetActive(false);
     }
 
-    private void ExitClicked()
+    public void ExitClicked()
     {
         ToMainMenuData.PromptFinalized = PromptFinalized;
         Settings.PromptHandler.Begin(ToMainMenuData);
@@ -144,17 +140,7 @@ public class PauseMenuUI : MonoBehaviour
         navigatorButton.ClickedEvent?.Invoke();
     }
 
-    private void Awake()
-    {
-        Frame.SetActive(false);
-
-        Debug.LogWarning(name + " | PLEASE ALLOCATE THESE BELOW TO THEIR RESPECTIVE `ClickedEvent` UNITY EVENTS!", this);
-        //ResumeBtn.ClickedEvent.AddListener(ResumeClicked);
-        //SettingsBtn.ClickedEvent.AddListener(SettingsClicked);
-        //ExitBtn.ClickedEvent.AddListener(ExitClicked);
-
-        //SettingsBackBtn.ClickedEvent.AddListener(SettingsBackBtnClicked);
-    }
+    private void Awake() => Frame.SetActive(false);
 
     private void OnEnable()
     {
