@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 884.17554, g: 517.98535, b: 383.6333, a: 1}
+  m_IndirectSpecularColor: {r: 884.1819, g: 517.98145, b: 383.63135, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -6628,7 +6628,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 155993141}
   m_LocalRotation: {x: -0.7071068, y: -0.7071068, z: -0, w: 0}
-  m_LocalPosition: {x: 0.17579153, y: 0.13739778, z: 0.3866254}
+  m_LocalPosition: {x: -0, y: 0.077, z: 0}
   m_LocalScale: {x: 0.48299924, y: 0.5234767, z: 1.0633872}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6649,7 +6649,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <InteractionRange>k__BackingField: 1
   <IgnoreInteractionRange>k__BackingField: 0
-  posOnPlayer: {x: 0, y: 0.38, z: -0.025}
+  posOnPlayer: {x: 0, y: 0.32, z: -0.025}
   rotOnPlayer: {x: 178, y: 0, z: 0}
 --- !u!65 &155993144
 BoxCollider:
@@ -6663,7 +6663,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.9999991, y: 0.42180663, z: 0.34729767}
-  m_Center: {x: 0, y: -0.28909662, z: 0.32635105}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &155993145
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7556,6 +7556,18 @@ PrefabInstance:
     - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
       propertyPath: m_RootOrder
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1818426421878083301, guid: 6b69dc2a1fb7d0b41aa5ba795db14080, type: 3}
       propertyPath: m_LocalPosition.x
@@ -75553,24 +75565,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1711460590664839741, guid: 13139c4b6f05fcc469666a71926e2b88, type: 3}
   m_PrefabInstance: {fileID: 1958023206}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1958023208 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2056883866032416903, guid: 13139c4b6f05fcc469666a71926e2b88, type: 3}
-  m_PrefabInstance: {fileID: 1958023206}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1958023209
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958023208}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.7393897, y: 1.069197, z: 0.73938996}
-  m_Center: {x: -0.000007599592, y: 0.5345978, z: 0.000000461936}
 --- !u!1 &1959082892
 GameObject:
   m_ObjectHideFlags: 0
