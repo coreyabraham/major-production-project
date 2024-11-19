@@ -305,7 +305,11 @@ public class PlayerSystem : MonoBehaviour
     #endregion
 
     #region Functions - Private
-    private void RevertPlayerValues() => IsBeingLaunched = IsClimbing = IsGrabbing = IsHidden = IsJumping = IsJumpingFromClimb = IsMoving = IsOnMop = IsPulling = IsPushing = IsScurrying = IsSliding = false;
+    private void RevertPlayerValues()
+    {
+        IsBeingLaunched = IsClimbing = IsGrabbing = IsHidden = IsJumping = IsJumpingFromClimb = IsMoving = IsOnMop = IsPulling = IsPushing = IsScurrying = IsSliding = false;
+        MoveType = MoveType.TwoDimensionsOnly;
+    }
 
     private bool SpawnAtCheckpoint()
     {
