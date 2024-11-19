@@ -29,10 +29,12 @@ public class PlayUI : MonoBehaviour
     private int SaveFileUI_Index = -1;
 
     private bool Initialized = false;
+    
+    private bool SaveIndexIsValid() => SaveFileUI_Index > -1 && SaveFileUI_Index < DataHandler.Instance.GetMaxSaveFiles();
 
     public void PlayButtonPressed()
     {
-        if (SaveFileUI_Index < 0 || SaveFileUI_Index > CachedFiles.Length || CachedFiles[SaveFileUI_Index] == null)
+        if (!SaveIndexIsValid() || CachedFiles[SaveFileUI_Index] == null)
         {
             Debug.LogWarning(name + " | Cannot Play from Save File with Index: " + SaveFileUI_Index.ToString() + "!");
             return;
@@ -41,7 +43,7 @@ public class PlayUI : MonoBehaviour
         DataHandler.Instance.SetCurrentSaveFileIndex((uint)SaveFileUI_Index);
         SaveData targetData = CachedFiles[SaveFileUI_Index].GetData();
 
-       if (string.IsNullOrWhiteSpace(targetData.levelName))
+        if (string.IsNullOrWhiteSpace(targetData.levelName))
             targetData.levelName = GameSystem.Instance.GetLevelName(StartingLevelIndex);
 
         DataHandler.Instance.SetCachedData(targetData);
@@ -50,8 +52,16 @@ public class PlayUI : MonoBehaviour
 
     public void ClearButtonPressed()
     {
+        if (!SaveIndexIsValid()) return;
+
         ClearData.PromptFinalized = ClearDataFinished;
         PromptSystem.Begin(ClearData);
+    }
+
+    public void ExitButtonPressed()
+    {
+        if (SaveIndexIsValid()) SaveFileUI_Index = -1;
+        if (PromptSystem.PromptActive()) PromptSystem.ForceEnd();
     }
 
     private void ClearDataFinished(bool result)
@@ -66,21 +76,9 @@ public class PlayUI : MonoBehaviour
         OnDisable();
     }
 
-    private void UpdateSaveFileIndex(SaveFileUI file)
-    {
-        // TODO: Improve this post-prototype phase!
-        for (int i = 0; i < CachedFiles.Length; i++)
-        {
-            if (CachedFiles[i] != file) continue;
-
-            SaveFileUI_Index = i;
-            break;
-        }
-    }
-
     private void SaveFileSelected(SaveFileUI file)
     {
-        if (SaveFileUI_Index != -1 && file == CachedFiles[SaveFileUI_Index])
+        if (SaveIndexIsValid() && file == CachedFiles[SaveFileUI_Index])
         {
             SaveFileUI_Index = -1;
             SelectLabel.text = NonSelectedText;
@@ -90,7 +88,7 @@ public class PlayUI : MonoBehaviour
             return;
         }
 
-        UpdateSaveFileIndex(file);
+        SaveFileUI_Index = file.AssignedIndex;
 
         SelectLabel.text = "Selected File: " + file.NameLabel.text;
 
@@ -117,6 +115,8 @@ public class PlayUI : MonoBehaviour
         for (int i = 0; i < files.Length; i++)
         {
             SaveFileUI clone = Instantiate(SaveTemplate);
+
+            clone.AssignedIndex = i;
 
             clone.name = "SaveFile_" + (i + 1).ToString();
             clone.transform.SetParent(SavesParent.transform, false);
