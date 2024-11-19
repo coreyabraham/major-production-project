@@ -9,14 +9,43 @@ public class BoxScript : MonoBehaviour
     [field: SerializeField] float grabDistanceFromPlayer;
     #endregion
 
+
+    Rigidbody rb;
+    float timeout = 0.0f;
+    bool doTimeout = false;
+
+
     #region Functions - Public
     public float GetGrabDistance() => grabDistanceFromPlayer / 10f;
-    #endregion
+    public void FreezeBox()
+    {
+        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+    }
+    public void UnfreezeBox()
+    {
+        rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+        doTimeout = true;
+    }
 
 
-    #region Functions - Private
+
+    private void Update()
+    {
+        if (!doTimeout) { return; }
+        if (timeout < 0.1f) { timeout += Time.deltaTime; return; }
+
+        FreezeBox();
+
+        doTimeout = false;
+        timeout = 0.0f;
+    }
+
+
+
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         if (grabDistanceFromPlayer <= 0)
         {
             Debug.LogWarning("Properties for Grabbable Box have not been set correctly!");
