@@ -510,7 +510,7 @@ public class PlayerSystem : MonoBehaviour
             if (MoveInput.y == 0) { if (SlideTimer < TimeBeforeSlide) { SlideTimer += Time.fixedDeltaTime; } }
             else { SlideTimer = 0; IsSliding = false; SlideForce = 0; }
 
-            if (SlideTimer >= TimeBeforeSlide)
+            if (SlideTimer >= TimeBeforeSlide && CanClimbDown)
             {
                 // Begin sliding downwards
                 IsSliding = true;
@@ -624,7 +624,7 @@ public class PlayerSystem : MonoBehaviour
         Vector3 importedVelocity = !IsGrabbing ? actualVelocity : actualVelocity / PullInhibitMultiplier;
         Character.Move(importedVelocity * Time.fixedDeltaTime);
 
-        LastFrameVelocity = (!IsClimbing || !IsOnMop) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
+        LastFrameVelocity = (!IsClimbing && !IsOnMop) ? new(actualVelocity.x, Velocity.y, actualVelocity.z) : new(actualVelocity.x, actualVelocity.y, Velocity.z);
 
         if (!IsGrounded) HitDirection = Vector3.zero;
         else { UsedCoyoteJump = false; CurrentCoyoteTime = 0.0f; }
@@ -657,7 +657,7 @@ public class PlayerSystem : MonoBehaviour
         {
             CharacterRotation = Quaternion.Euler(
                 0.0f, // Original: !IsClimbing ? 0.0f : 90.0f,
-                !IsClimbing || !IsOnMop ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
+                !IsClimbing && !IsOnMop ? rotation : CurrentPipeSide == PipeSide.Left ? 220.0f : 140.0f,
                 0.0f // Original: IsClimbing ? 180.0f : 0.0f,
             );
         }
@@ -684,7 +684,7 @@ public class PlayerSystem : MonoBehaviour
             case MoveType.None: MoveInput = Vector2.zero; break;
             case MoveType.LockToLeftRight: MoveInput.y = 0.0f; break;
             case MoveType.LockToForwardBack: MoveInput.x = 0.0f; break;
-            case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing || !IsOnMop) ? 0.0f : MoveInput.y; break;
+            case MoveType.TwoDimensionsOnly: MoveInput.y = (!IsClimbing && !IsOnMop) ? 0.0f : MoveInput.y; break;
         }
 
         IsGrounded = Character.isGrounded;
