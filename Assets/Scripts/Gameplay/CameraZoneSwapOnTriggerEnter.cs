@@ -23,7 +23,6 @@ public class CameraZoneSwapOnTriggerEnter : MonoBehaviour
 			{ 
 				for(int i = 0; i < swapIn.Length; i++)
 				{
-					Debug.Log("Hello: " + swapIn[i]);
 					swapIn[i].enabled = true;
 				}
 			}
