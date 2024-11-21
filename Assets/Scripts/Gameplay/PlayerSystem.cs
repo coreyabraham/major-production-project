@@ -321,7 +321,7 @@ public class PlayerSystem : MonoBehaviour
 #endif
 
         if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
-        if (GameSystem.Instance.GetLevelNameWithIndex() != data.levelName) return false;
+        if (GameSystem.Instance.GetCurrentLevelName() != data.levelName) return false;
 
         PlrCheckpoint Checkpoint = null;
 
