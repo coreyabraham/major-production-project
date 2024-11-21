@@ -20,7 +20,7 @@ public class BoxScript : MonoBehaviour
 
     [field: Space]
 
-    [field: SerializeField] float checkRateForParticles = 0.2f;
+    [field: SerializeField] float particleTimer = 0.2f;
     #endregion
 
     #region Variables - Private
@@ -28,7 +28,7 @@ public class BoxScript : MonoBehaviour
     float grabTimeout = 0.0f;
     bool doTimeout = false, canUseParticles = false;
 
-    float particleDelayTimer = 0.0f;
+    float particleTimerDelay = 0.0f;
     float previousXPos;
     float marginOfError = 0.01f;
     #endregion
@@ -48,10 +48,10 @@ public class BoxScript : MonoBehaviour
 
     private void Update()
     {
-        particleDelayTimer += Time.deltaTime;
+        // Particle stuff. Is ignored if not set correctly in the inspector.
+        if (canUseParticles) { particleTimerDelay += Time.deltaTime; }
 
-        // Particles. Is ignored if not set correctly in the inspector.
-        if (canUseParticles && checkRateForParticles < particleDelayTimer)
+        if (canUseParticles && particleTimer < particleTimerDelay)
         {
             if(previousXPos - marginOfError >= gameObject.transform.position.x)
             {
@@ -81,7 +81,7 @@ public class BoxScript : MonoBehaviour
                 otherEmission.rateOverTime = 0;
             }
             previousXPos = gameObject.transform.position.x;
-            particleDelayTimer = 0;
+            particleTimerDelay = 0;
         }
 
         if (!doTimeout) { return; }
