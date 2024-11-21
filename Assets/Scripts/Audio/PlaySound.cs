@@ -22,6 +22,7 @@ public class PlaySound : MonoBehaviour
     #region Private Functions
     private void Start()
     {
+        if (!disableOnStart) { return; }
         for (int i = 0; i < audioClips.Length; i++) { audioClips[i].enabled = false; }
     }
     #endregion
