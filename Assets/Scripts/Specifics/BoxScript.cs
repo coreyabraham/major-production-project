@@ -8,24 +8,29 @@ public class BoxScript : MonoBehaviour
     [field: Tooltip("The distance that the box should be from the player when grabbing.\n\nValues that are too low will cause the box to teleport over the player, while values that are too high will push it away too far.")]
     [field: SerializeField] float grabDistanceFromPlayer;
 
+    [field: Header("Particle Properties")]
+
     [field: SerializeField] ParticleSystem rightParticleSystem;
     [field: SerializeField] ParticleSystem leftParticleSystem;
 
+    [field: Space]
+
     [field: SerializeField] int rightEmissionRate = 20;
     [field: SerializeField] int leftEmissionRate = 20;
+
+    [field: Space]
+
+    [field: SerializeField] float particleTimer = 0.2f;
     #endregion
 
     #region Variables - Private
     Rigidbody rb;
-    float timeout = 0.0f;
-    bool doTimeout = false;
+    float grabTimeout = 0.0f;
+    bool doTimeout = false, canUseParticles = false;
 
-    public float particleTimer = 1.0f;
-    float timer = 0.0f;
-
+    float particleTimerDelay = 0.0f;
     float previousXPos;
     float marginOfError = 0.01f;
-
     #endregion
 
     #region Functions - Public
@@ -43,8 +48,10 @@ public class BoxScript : MonoBehaviour
 
     private void Update()
     {
-        timer += Time.deltaTime;
-        if(particleTimer < timer && rightParticleSystem != null && leftParticleSystem !=null)
+        // Particle stuff. Is ignored if not set correctly in the inspector.
+        if (canUseParticles) { particleTimerDelay += Time.deltaTime; }
+
+        if (canUseParticles && particleTimer < particleTimerDelay)
         {
             if(previousXPos - marginOfError >= gameObject.transform.position.x)
             {
@@ -74,17 +81,16 @@ public class BoxScript : MonoBehaviour
                 otherEmission.rateOverTime = 0;
             }
             previousXPos = gameObject.transform.position.x;
-            timer = 0;
+            particleTimerDelay = 0;
         }
-        else { Debug.LogError("Particle Systems have not been set"); }
 
         if (!doTimeout) { return; }
-        if (timeout < 0.1f) { timeout += Time.deltaTime; return; }
+        if (grabTimeout < 0.1f) { grabTimeout += Time.deltaTime; return; }
 
         FreezeBox();
 
         doTimeout = false;
-        timeout = 0.0f;
+        grabTimeout = 0.0f;
     }
 
 
@@ -98,6 +104,9 @@ public class BoxScript : MonoBehaviour
             Debug.LogWarning("Properties for Grabbable Box have not been set correctly!");
             if (grabDistanceFromPlayer < 0) { grabDistanceFromPlayer = -grabDistanceFromPlayer; }
         }
+
+        if (rightParticleSystem != null && leftParticleSystem != null) { canUseParticles = true; }
+        else { Debug.LogWarning("One or both particles have not been set. They must both be set in order to use particles."); }
     }
     #endregion
 }
