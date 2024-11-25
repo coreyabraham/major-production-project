@@ -1,11 +1,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
-
 using UnityEngine.EventSystems;
-
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 
 public class TitleUI : MonoBehaviour
 {
@@ -14,7 +10,6 @@ public class TitleUI : MonoBehaviour
     {
         public string Name;
         public GameObject Frame;
-        public GameObject FirstSelection;
     }
 
     [field: Header("Values")]
@@ -28,17 +23,23 @@ public class TitleUI : MonoBehaviour
     public SettingsUI SettingsMenu;
     public ExitUI ExitMenu;
 
-    [field: SerializeField] private InputSystemUIInputModule InputModule;
-
     [field: Header("Lists and Arrays")]
     [field: SerializeField] private FrameGroup[] Groups;
     
-    [field: SerializeField] private string[] ActionNames = {
-        "Submit",
-        "Click"
-    };
-
     [field: SerializeField] private List<NavigatorButton> CachedButons;
+
+    private bool GameStarting = false;
+
+    public void StartGame()
+    {
+        if (GameStarting) return;
+        GameStarting = true;
+
+        int targetIndex = GameSystem.Instance.GetCurrentSceneBuildIndex() + 1;
+        string targetName = GameSystem.Instance.GetLevelNameWithIndex(targetIndex);
+
+        GameSystem.Instance.RequestLoadScene(targetName);
+    }
 
     private void GetButtons()
     {
@@ -67,12 +68,6 @@ public class TitleUI : MonoBehaviour
             if (Groups[i].Frame == Frame)
             {
                 Groups[i].Frame.SetActive(true);
-
-                GameObject selection = Groups[i].FirstSelection;
-                
-                EventSystem.current.firstSelectedGameObject = selection;
-                //EventSystem.current.SetSelectedGameObject(selection);
-                
                 continue;
             }
 
@@ -82,30 +77,5 @@ public class TitleUI : MonoBehaviour
         GetButtons();
     }
 
-    private void InputReceived(InputAction.CallbackContext ctx)
-    {
-        if (ctx.phase != InputActionPhase.Performed) return;
-
-        GameObject currentSelection = EventSystem.current.currentSelectedGameObject;
-        if (!currentSelection) return;
-
-        bool result = currentSelection.transform.parent.gameObject.TryGetComponent(out NavigatorButton navigatorButton);
-        if (!result) return;
-
-        navigatorButton.ClickedEvent?.Invoke();
-    }
-
     private void Start() => ToggleFrames(Groups[StartingGroupIndex].Frame);
-
-    private void OnEnable()
-    {
-        var map = InputModule.actionsAsset.FindActionMap("UI");
-
-        foreach (string str in ActionNames)
-        {
-            var action = map.FindAction(str);
-            if (action == null) continue;
-            action.performed += InputReceived;
-        }
-    }
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 883.5406, g: 517.25696, b: 382.979, a: 1}
+  m_IndirectSpecularColor: {r: 810.2622, g: 444.73413, b: 277.6787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -9279,6 +9279,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c185b316035d7446a8c3891f5999a3c, type: 3}
+--- !u!2083052967 &225684698 stripped
+VisualEffect:
+  m_CorrespondingSourceObject: {fileID: 1626773060074795765, guid: 76fd7842f18327647af1d6cb9e264b77, type: 3}
+  m_PrefabInstance: {fileID: 1690640152}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &226155044 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7221627935727776631, guid: a3665cbc5ca65d14a99f88798c1988c2, type: 3}
@@ -13350,7 +13355,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 336352209}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -64287,6 +64292,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blade: {fileID: 1762596238}
   hazardTrigger: {fileID: 1096462987}
+  smokeParticle: {fileID: 225684698}
   unitIsPowered: 1
   unitRunning: {fileID: 656341523}
   unitStopped: {fileID: 656341523}
@@ -74580,14 +74586,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CrowLighting
       objectReference: {fileID: 0}
-    - target: {fileID: 5104134910096721603, guid: dd396ebf8d644f14a9de2f737222db65, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 3613567641014311022, guid: c47c0da35eabcf346ad09fbe8e070da4, type: 3}
-    - target: {fileID: 7096800686071526691, guid: dd396ebf8d644f14a9de2f737222db65, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 2522817794248050662, guid: c47c0da35eabcf346ad09fbe8e070da4, type: 3}
     - target: {fileID: 7733675299296995117, guid: dd396ebf8d644f14a9de2f737222db65, type: 3}
       propertyPath: m_RootOrder
       value: 10
