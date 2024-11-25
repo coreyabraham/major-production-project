@@ -161,6 +161,7 @@ public class PlayerSystem : MonoBehaviour
 
     private bool IsScurrying, IsGrounded, IsMoving, IsSliding, IsBeingLaunched;
     private bool IsGrabbing, IsPushing, IsPulling;
+    private bool dieByPray = false, dieByBurn = false, dieByDrown = false;
     #endregion
 
     #region Functions - Handlers
@@ -275,6 +276,22 @@ public class PlayerSystem : MonoBehaviour
         Velocity.x = 2 * multiplier;
     }
 
+    public void PlayDeathAnimation(DeathType deathType)
+    {
+        switch (deathType)
+        {
+            case DeathType.Prayed:
+                dieByPray = true;
+                break;
+            case DeathType.Burned:
+                dieByBurn = true;
+                break;
+            case DeathType.Drowned:
+                dieByDrown = true;
+                break;
+        }
+    }
+
     public void DeathTriggered()
     {
         GameSystem.Instance.PlayerDiedCallback();
@@ -291,6 +308,7 @@ public class PlayerSystem : MonoBehaviour
     private void RevertPlayerValues()
     {
         IsBeingLaunched = IsClimbing = IsGrabbing = IsHidden = IsJumping = IsJumpingFromClimb = IsMoving = IsOnMop = IsPulling = IsPushing = IsScurrying = IsSliding = false;
+        dieByPray = dieByBurn = dieByDrown = false;
         MoveType = MoveType.TwoDimensionsOnly;
     }
 

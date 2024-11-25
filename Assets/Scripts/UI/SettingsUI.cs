@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class SettingsUI : MonoBehaviour
 {
@@ -26,12 +25,7 @@ public class SettingsUI : MonoBehaviour
     [field: SerializeField] private SliderUI MasterSlider;
     [field: SerializeField] private SliderUI MusicSlider;
     [field: SerializeField] private SliderUI SoundSlider;
-
-    [field: Space(2.5f)]
-
     [field: SerializeField] private SliderUI FPSSlider;
-
-    [field: Space(2.5f)]
 
     [field: Header("Dropdowns")]
     [field: SerializeField] private DropdownUI ResolutionDD;
@@ -93,21 +87,6 @@ public class SettingsUI : MonoBehaviour
 
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();
-    }
-
-    public void ContrastChanged(float value)
-    {
-        print(value);
-    }
-
-    public void BrightnessChanged(float value)
-    {
-        print(value);
-    }
-
-    public void ColourAccessibilityChanged(int value)
-    {
-        print(value);
     }
     #endregion
 
