@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class PauseMenuUI : MonoBehaviour
 {
     [field: Header("Settings")]
-    [field: SerializeField] private bool ToggleCursor = true;
+    [field: SerializeField] private bool ToggleCursor = false;
 
     [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
@@ -20,19 +20,9 @@ public class PauseMenuUI : MonoBehaviour
 
     private bool PausingPermitted;
 
-    // TODO: Improve ALL searching algorithms contained within this method!
     public void NewSceneLoaded(Scene Scene, LoadSceneMode _)
     {
-        bool result = false;
-
-        foreach (string SceneName in GameSystem.Instance.BlacklistedPauseScenes)
-        {
-            result = Scene.name != SceneName;
-            if (result == true) break;
-        }
-
-        PausingPermitted = result;
-
+        PausingPermitted = !GameSystem.Instance.BlacklistedPauseScenes.Contains(Scene.name);
         if (Scene.name != TitleScreenScene) return;
 
         TitleUI TitleUI = null;
