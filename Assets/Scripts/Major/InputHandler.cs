@@ -5,6 +5,7 @@ public class InputHandler : Singleton<InputHandler>
 {
     [field: Header("External References")]
     [field: SerializeField] private InputActionAsset Actions;
+    [field: SerializeField] private GameSystem GameSystem;
 
     [field: Header("Settings")]
     [field: SerializeField] private string ActionMap = "Player";
@@ -12,15 +13,24 @@ public class InputHandler : Singleton<InputHandler>
 
     private InputActionMap InputActionMap;
 
+    public bool CanToggleControls()
+    {
+        bool actionMap = InputActionMap != null;
+        string current = GameSystem.GetCurrentLevelName();
+        bool isBlacklistedScene = GameSystem.BlacklistedPauseScenes.Contains(current);
+
+        return actionMap && isBlacklistedScene;
+    }
+
     public void EnableControls()
     {
-        if (InputActionMap == null) return;
+        if (!CanToggleControls()) return;
         InputActionMap.Enable();
     }
 
     public void DisableControls()
     {
-        if (InputActionMap == null) return;
+        if (!CanToggleControls()) return;
         InputActionMap.Disable();
     }
 

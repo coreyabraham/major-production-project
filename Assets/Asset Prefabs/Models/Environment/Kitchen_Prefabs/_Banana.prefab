@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 8671540478807690256}
   - component: {fileID: 2142986354633968042}
   - component: {fileID: -5668053651588987802}
+  - component: {fileID: 6599320023586344649}
+  - component: {fileID: 6625695994989886263}
   m_Layer: 0
   m_Name: _Banana
-  m_TagString: SpawnedPrefab
+  m_TagString: Touchable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -94,7 +96,7 @@ Rigidbody:
   m_GameObject: {fileID: 7158326949187644869}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 2
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -114,3 +116,36 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.34063977, y: 0.21526466, z: 0.06315349}
   m_Center: {x: 0.014835663, y: 0.10676078, z: -0.0000000018626451}
+--- !u!65 &6599320023586344649
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7158326949187644869}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.34063977, y: 0.25323832, z: 0.2447652}
+  m_Center: {x: 0.014835656, y: 0.099561065, z: -0.010169618}
+--- !u!114 &6625695994989886263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7158326949187644869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeathType: 0
+  PrintMessages: 0
+  DeathDelayTime: 1.5
+  DisableControlOnDeath: 1
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0

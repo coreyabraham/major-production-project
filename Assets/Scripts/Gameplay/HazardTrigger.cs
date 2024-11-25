@@ -1,8 +1,8 @@
 using UnityEngine;
 
 
-// Script that will kill the player if they enter or are detected within the trigger it's attached to.
-// The player can avoid being seen if their "IsHidden" bool is enabled.
+// This script is now used simply for additional Death Stuff related to the player.
+// As of now, it handles sounds.
 public class HazardTrigger : MonoBehaviour, ITouchable
 {
     #region Private Variables
@@ -16,19 +16,15 @@ public class HazardTrigger : MonoBehaviour, ITouchable
     [field: SerializeField] private AudioSource snap;
 
     private float resetTimer = 0;
-    private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
+    public bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
 
     public bool Enabled { get; set; } = true;
     public bool HideOnStartup { get; set; } = false;
     #endregion
 
     #region Functions - Private
-    private bool HasPlayerBeenSpotted(PlayerSystem Player) => Player.IsHidden && !hasBeenSpotted;
-
-    private void PlayerIsSpotted(PlayerSystem Player)
+    private void PlayerIsSpotted()
     {
-        hasBeenSpotted = true;
-
         if (useCrowSound)
         {
             crowCaw.enabled = true;
@@ -43,19 +39,13 @@ public class HazardTrigger : MonoBehaviour, ITouchable
 
     public void Entered(PlayerSystem Player)
     {
-        if (Player.IsHidden) return;
-        if (!HasPlayerBeenSpotted(Player))
-        PlayerIsSpotted(Player);
+        if (!Player) { return; }
+        hasBeenSpotted = true;
     }
 
-    public void Left(PlayerSystem Player) {  }
+    public void Left(PlayerSystem Player) { }
 
-    public void Staying(PlayerSystem Player)
-    {
-        if (Player.IsHidden) return;
-        if (!HasPlayerBeenSpotted(Player)) return;
-        PlayerIsSpotted(Player);
-    }
+    public void Staying(PlayerSystem Player) { }
     #endregion
 
     private void Update()
@@ -63,14 +53,7 @@ public class HazardTrigger : MonoBehaviour, ITouchable
         if (hasBeenSpotted) { resetTimer += Time.deltaTime; }
         if (resetTimer < 1) { return; }
 
-        if (useCrowSound)
-        {
-            crowCaw.enabled = false;
-            crowSwoop.enabled = false;
-        }
-
-        if (useSnap) { snap.enabled = false; }
-
+        PlayerIsSpotted();
         hasBeenSpotted = false;
         resetTimer = 0;
     }

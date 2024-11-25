@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 
 using TMPro;
 
 using UnityEngine;
-using System;
+using UnityEngine.EventSystems;
 
 public class SettingsUI : MonoBehaviour
 {
@@ -32,18 +33,10 @@ public class SettingsUI : MonoBehaviour
 
     [field: Space(2.5f)]
 
-    [field: SerializeField] private SliderUI ContrastSlider;
-    [field: SerializeField] private SliderUI BrightnessSlider;
-
     [field: Header("Dropdowns")]
     [field: SerializeField] private DropdownUI ResolutionDD;
     [field: SerializeField] private DropdownUI QualityDD;
     [field: SerializeField] private DropdownUI WindowDD;
-    [field: SerializeField] private DropdownUI HudScaleDD;
-
-    [field: Space(2.5f)]
-
-    [field: SerializeField] private DropdownUI ColourAccDD;
 
     [field: Header("Checkboxes")]
     [field: SerializeField] private CheckboxUI VsyncCB;
@@ -134,14 +127,9 @@ public class SettingsUI : MonoBehaviour
             Resolution = ResolutionDD.Dropdown.options[ResolutionDD.Dropdown.value].text,
             Quality = QualityDD.Dropdown.options[QualityDD.Dropdown.value].text,
             WindowMode = WindowDD.Dropdown.options[WindowDD.Dropdown.value].text,
-            HudScale = HudScaleDD.Dropdown.options[HudScaleDD.Dropdown.value].text,
 
             FramesPerSecond = (int)FPSSlider.Slider.value,
             UseVsync = VsyncCB.Checkbox.isOn,
-
-            Contrast = ContrastSlider.Slider.value,
-            Brightness = BrightnessSlider.Slider.value,
-            ColourAccessibility = ColourAccDD.Dropdown.options[ColourAccDD.Dropdown.value].text
         };
 
         JsonHandler.ApplyData(newSettings);
@@ -192,14 +180,9 @@ public class SettingsUI : MonoBehaviour
         ResolutionDD.Dropdown.value = GetDropdownOptionIndex(ResolutionDD.Dropdown.options, Settings.Resolution);
         QualityDD.Dropdown.value = GetDropdownOptionIndex(QualityDD.Dropdown.options, Settings.Quality);
         WindowDD.Dropdown.value = GetDropdownOptionIndex(WindowDD.Dropdown.options, Settings.WindowMode);
-        HudScaleDD.Dropdown.value = GetDropdownOptionIndex(HudScaleDD.Dropdown.options, Settings.HudScale);
 
         FPSSlider.Slider.value = Settings.FramesPerSecond;
         VsyncCB.Checkbox.isOn = Settings.UseVsync;
-
-        ContrastSlider.Slider.value = Settings.Contrast;
-        BrightnessSlider.Slider.value = Settings.Brightness;
-        ColourAccDD.Dropdown.value = GetDropdownOptionIndex(ColourAccDD.Dropdown.options, Settings.ColourAccessibility);
     }
 
     private void UpdateGraphics()
@@ -238,11 +221,7 @@ public class SettingsUI : MonoBehaviour
 
     private void ChangeSubFrame(GameObject Frame)
     {
-        foreach (SettingsGroup group in Groups)
-        {
-            group.Frame.SetActive(group.Frame == Frame);
-        }
-
+        foreach (SettingsGroup group in Groups) group.Frame.SetActive(group.Frame == Frame);
         TitleLabel.text = TitleText + DividerText + Frame.name;
     }
 
@@ -259,19 +238,14 @@ public class SettingsUI : MonoBehaviour
         ResolutionDD.DropdownInitalized.AddListener(() => DropdownInitalized(ResolutionDD.Dropdown, currentData.Resolution));
         QualityDD.DropdownInitalized.AddListener(() => DropdownInitalized(QualityDD.Dropdown, currentData.Quality));
         WindowDD.DropdownInitalized.AddListener(() => DropdownInitalized(WindowDD.Dropdown, currentData.WindowMode));
-        HudScaleDD.DropdownInitalized.AddListener(() => DropdownInitalized(HudScaleDD.Dropdown, currentData.HudScale));
 
-        foreach (SettingsGroup group in Groups)
-        {
-            group.Navigator.Button.onClick.AddListener(() => ChangeSubFrame(group.Frame));
-        }
+        foreach (SettingsGroup group in Groups) group.Navigator.Button.onClick.AddListener(() => ChangeSubFrame(group.Frame));
 
         if (VisibleIndexOnStartup > Groups.Length || VisibleIndexOnStartup < 0) return;
 
         ChangeSubFrame(Groups[VisibleIndexOnStartup].Frame);
 
         SoundTest = AudioHandler.Instance.CreateGlobalSource(SoundTestClip, AudioType.Sound);
-        Debug.Log("Sound Test Created!", SoundTest);
     }
     #endregion
 }

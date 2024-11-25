@@ -51,7 +51,7 @@ public class PlrDeathState : MonoBehaviour, ITouchable
     #region ITouchable Inheritance
     public void Entered(PlayerSystem Player)
     {
-        if (!Player || DebounceStarted) return;
+        if (!Player || DebounceStarted || Player.IsHidden) return;
 
         PlaySys = Player; 
         DebounceStarted = DelayStarted = true;
@@ -62,9 +62,6 @@ public class PlrDeathState : MonoBehaviour, ITouchable
     public void Staying(PlayerSystem Player)
     {
         if (CurrentDelayTime < DeathDelayTime) { return; }
-
-        Debug.Log("Yo");
-
         Player.DeathTriggered();
     }
     #endregion

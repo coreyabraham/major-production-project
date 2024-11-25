@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.VFX;
+using UnityEngine.Rendering;
 
 
 // This script only handles the timed aspect of the trigger, NOT the hazard itself.
@@ -10,11 +10,11 @@ public class TimedHazardTrigger : MonoBehaviour
     [field: Header("Times of Duration")]
 
     [field: Tooltip("How long the triggers that detect the player are inactive for before enabling themselves.")]
-    [field: SerializeField] float durationBetweenActivity;
+    [field: SerializeField] float durationWhileOff;
     [field: Tooltip("How long the triggers that detect the player are active for before disabling themselves.")]
-    [field: SerializeField] float durationOfActivity;
+    [field: SerializeField] float durationWhileOn;
 
-    [field: Header("Particles (If Applicable)")]
+    [field: Header("Stove-Specific Variables")]
 
     [field: Tooltip("As of now, this is hard-coded so that the flames VFX will pause along with the trigger.")]
     [field: SerializeField] bool affectParticles;
@@ -30,18 +30,23 @@ public class TimedHazardTrigger : MonoBehaviour
     private BoxCollider trigger;
     private MeshRenderer meshRenderer;
     private GameObject[] vfx;
+    private PlaySound sound;
     #endregion
 
     #region Functions - Private
-    private void AlternateActive()
+    private void ToggleActiveState()
     {
         trigger.enabled = !trigger.enabled;
+
+        if (sound && trigger.enabled) { sound.PlaySoundOnce(0); sound.StopSoundOnce(1); sound.PlaySoundOnce(2); }
+        else if (sound && !trigger.enabled) { sound.PlaySoundOnce(1); sound.StopSoundOnce(0); sound.StopSoundOnce(2); }
 
         if (transform.childCount > 0 && affectParticles)
         {
             for (int i = 0; i < vfx.Length; i++)
             {
-                vfx[i].SetActive(!vfx[i].activeSelf);
+                if (!sound) { vfx[i].SetActive(!vfx[i].activeSelf); return; }
+                if (i >= 2) { vfx[i].SetActive(!vfx[i].activeSelf); }
             }
         }
 
@@ -55,15 +60,14 @@ public class TimedHazardTrigger : MonoBehaviour
     {
         timer += Time.deltaTime;
 
+
         if (trigger.enabled)
         {
-            if (timer >= durationOfActivity) { AlternateActive(); }
+            if (timer >= durationWhileOn) { ToggleActiveState(); }
             return;
         }
-        else
-        {
-            if (timer >= durationBetweenActivity) { AlternateActive(); }
-        }
+        
+        if (timer >= durationWhileOff) { ToggleActiveState(); }
     }
 
 
@@ -83,6 +87,11 @@ public class TimedHazardTrigger : MonoBehaviour
             {
                 vfx[i] = transform.GetChild(i).gameObject;
             }
+        }
+
+        if (GetComponent<PlaySound>())
+        {
+            sound = GetComponent<PlaySound>();
         }
     }
     #endregion

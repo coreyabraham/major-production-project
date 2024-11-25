@@ -8,32 +8,22 @@ public class CreditsUI : MonoBehaviour
         public string MemberName;
         public string MemberRoles;
         public string MemberLink;
+
         public Sprite MemberIcon;
+
+        public CreditEntryUI Instance;
     }
 
-    [field: SerializeField] private GameObject Parent;
-    [field: SerializeField] private CreditEntryUI Template;
     [field: SerializeField] private CreditEntry[] Prefabs;
 
-    private void Start()
+    private void Awake()
     {
-        int index = 0;
-
-        foreach (CreditEntry prefab in Prefabs)
+        for (int i = 0; i < Prefabs.Length; i++)
         {
-            CreditEntryUI entry = Instantiate(Template);
-            
-            entry.MemberName = prefab.MemberName;
-            entry.MemberRoles = prefab.MemberRoles;
-            entry.MemberLink = prefab.MemberLink; 
-            entry.MemberIcon = prefab.MemberIcon;
-
-            entry.name = "Credit_" + (index + 1).ToString();
-            entry.transform.SetParent(Parent.transform, false);
-            entry.gameObject.SetActive(true);
-
-            index++;
+            Prefabs[i].Instance.MemberName = Prefabs[i].MemberName;
+            Prefabs[i].Instance.MemberRoles = Prefabs[i].MemberRoles;
+            Prefabs[i].Instance.MemberLink = Prefabs[i].MemberLink;
+            Prefabs[i].Instance.MemberIcon = Prefabs[i].MemberIcon;
         }
     }
 }
- 

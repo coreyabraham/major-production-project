@@ -45,7 +45,7 @@ public class GameSystem : Singleton<GameSystem>
     public string TouchTag = "Touchable";
 
     [field: Header("Collections")]
-    public string[] BlacklistedPauseScenes;
+    public List<string> BlacklistedPauseScenes;
 
     [field: Header("Events")]
     public GameEvents Events;
@@ -74,14 +74,14 @@ public class GameSystem : Singleton<GameSystem>
 
     public int GetCurrentSceneBuildIndex() => SceneManager.GetActiveScene().buildIndex;
 
-    public string GetLevelName(int index)
+    public string GetLevelNameWithIndex(int index)
     {
         bool result = Levels.TryGetValue(index, out string value);
         if (!result) value = string.Empty;
         return value;
     }
 
-    public string GetLevelNameWithIndex() => GetLevelName(GetCurrentSceneBuildIndex());
+    public string GetCurrentLevelName() => GetLevelNameWithIndex(GetCurrentSceneBuildIndex());
     public bool IsTargetSceneAValidLevel(Scene Target) => Levels[Target.buildIndex] != null && Levels[Target.buildIndex] == Target.name;
     public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
     public int GetLevelCount() => Levels.Count;

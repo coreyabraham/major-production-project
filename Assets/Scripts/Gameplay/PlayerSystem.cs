@@ -321,7 +321,7 @@ public class PlayerSystem : MonoBehaviour
 #endif
 
         if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
-        if (GameSystem.Instance.GetLevelNameWithIndex() != data.levelName) return false;
+        if (GameSystem.Instance.GetCurrentLevelName() != data.levelName) return false;
 
         PlrCheckpoint Checkpoint = null;
 
@@ -419,6 +419,9 @@ public class PlayerSystem : MonoBehaviour
         if (other.transform.parent != null) { if (!other.transform.parent.CompareTag(GrabTag)) { return; } }
         if (!TogglePullState(InteractHeld) || !canGrab) { return; }
 
+        BoxScript bs = other.transform.parent.GetComponent<BoxScript>();
+        bs.UnfreezeBox();
+
         PullObjPos = other.transform.parent.position;
 
         // I know this is an atrocious way of checking which side of the object the player is on...
@@ -431,10 +434,7 @@ public class PlayerSystem : MonoBehaviour
         if ((CharacterRotation.eulerAngles.y <= 360f && CharacterRotation.eulerAngles.y > 180f && transform.position.x <= PullObjPos.x) ||
             (CharacterRotation.eulerAngles.y <= 180f && CharacterRotation.eulerAngles.y > 0f && transform.position.x > PullObjPos.x))
         {
-            other.transform.parent.position = new(
-            grabX - other.transform.localPosition.x,
-            other.transform.parent.position.y,
-            other.transform.parent.position.z);
+            other.transform.parent.position = new( grabX - other.transform.localPosition.x, other.transform.parent.position.y, other.transform.parent.position.z);
         }
     }
 
@@ -575,6 +575,9 @@ public class PlayerSystem : MonoBehaviour
 
                 if (IsJumping && !FloorMaterial.PreventJumping && !JumpButtonIsHeld) Velocity.y = JumpForce;
                 else if (Velocity.y < VelocityYIdle) Velocity.y = VelocityYIdle;
+
+                IsPulling = false;
+                IsPushing = false;
 
                 if (IsGrabbing)
                 {

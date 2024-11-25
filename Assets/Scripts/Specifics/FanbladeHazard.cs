@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.VFX;
 
 /// <summary>
 /// Animates the blades within the AC Unit without using actual animations. This needs to be placed on the trigger for chewing through the wire.
@@ -12,6 +13,8 @@ public class FanbladeHazard : MonoBehaviour, IInteractable
     [field: SerializeField] GameObject blade;
     [field: Tooltip("A reference to the hazard trigger associated with the fanblade.\n\nIf this fanblade doesn't have an associated hazard trigger, leave this section blank. It will function without a reference to one.")]
     [field: SerializeField] GameObject hazardTrigger;
+    [field: Tooltip("A reference to the smoke particle system.")]
+    [field: SerializeField] VisualEffect smokeParticle;
 
     [field: Header("Bools")]
 
@@ -43,6 +46,7 @@ public class FanbladeHazard : MonoBehaviour, IInteractable
         unitIsPowered = false;
         unitRunning.enabled = false;
         unitStopped.enabled = true;
+        smokeParticle.SetFloat("SteamAmount", 0);
     }
 
     private void Update()
