@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class TitleUI : MonoBehaviour
 {
@@ -19,7 +17,6 @@ public class TitleUI : MonoBehaviour
     public string ButtonTag = "UI_BUTTON";
 
     [field: Header("External References")]
-    public EventSystem EventSystem;
     public SettingsUI SettingsMenu;
     public ExitUI ExitMenu;
 

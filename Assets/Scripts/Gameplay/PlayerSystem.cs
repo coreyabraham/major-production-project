@@ -95,7 +95,6 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Header("Collections")]
     [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
-    [field: SerializeField] private PlayerEvents Events = new();
     #endregion
 
     #region Private Variables
@@ -169,14 +168,12 @@ public class PlayerSystem : MonoBehaviour
     {
         if (IsOnMop) { return; }
         MoveInput = ctx.ReadValue<Vector2>();
-        Events.Moving.Invoke(MoveInput);
     }
 
     public void OnClimbing(InputAction.CallbackContext ctx)
     {
         if (MoveType == MoveType.None) return;
         ClimbingRequested = ctx.ReadValueAsButton();
-        Events.Climbing.Invoke(ClimbingRequested);
     }
 
     public void OnScurry(InputAction.CallbackContext ctx)
@@ -185,8 +182,6 @@ public class PlayerSystem : MonoBehaviour
             IsClimbing || IsOnMop || IsGrabbing) return;
 
         IsScurrying = !IsScurrying;
-
-        Events.Scurrying.Invoke(IsScurrying);
 
         if (IsScurrying || !CanScurry || !IsMoving) return;
         CanScurry = false;
@@ -203,7 +198,6 @@ public class PlayerSystem : MonoBehaviour
             (IsGrabbing)) { return; }
 
         IsJumping = JumpingRequested;
-        Events.Jumping.Invoke(IsJumping);
     }
 
     public void OnInteracting(InputAction.CallbackContext ctx)
@@ -212,7 +206,6 @@ public class PlayerSystem : MonoBehaviour
         if (ctx.phase != InputActionPhase.Performed) return;
 
         bool interactResult = ctx.ReadValueAsButton();
-        Events.Interacting.Invoke(interactResult);
 
         if (canGrab) { InteractHeld = interactResult; }
         if (!interactResult) return;
@@ -775,15 +768,6 @@ public class PlayerSystem : MonoBehaviour
         SpawnAtCheckpoint();
     }
 
-    private void Awake()
-    {
-        Character = GetComponent<CharacterController>();
-
-        Events.Moving ??= new();
-        Events.Jumping ??= new();
-        Events.Scurrying ??= new();
-        Events.Climbing ??= new();
-        Events.Interacting ??= new();
-    }
+    private void Awake() => Character = GetComponent<CharacterController>();
     #endregion
 }
