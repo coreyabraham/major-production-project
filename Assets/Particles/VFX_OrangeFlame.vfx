@@ -73,7 +73,7 @@ MonoBehaviour:
     x: 432
     y: -249
     width: 958
-    height: 2422
+    height: 2402
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -84,7 +84,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d4c867f6b72b714dbb5fd1780afe208, type: 3}
-  m_Name: VFX_BlueFire 1
+  m_Name: VFX_OrangeFlame
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 0}
@@ -109,8 +109,8 @@ MonoBehaviour:
   m_UISuperCollapsed: 0
   m_UIInfos: {fileID: 114340500867371532}
   m_ParameterInfo:
-  - name: MiddleFlamesRate
-    path: MiddleFlamesRate
+  - name: GasRate
+    path: GasRate
     tooltip: 
     sheetType: m_Float
     realType: Single
@@ -118,7 +118,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 50
+      m_SerializableObject: 10
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -1671,7 +1671,7 @@ MonoBehaviour:
   m_InputSlots: []
   m_OutputSlots:
   - {fileID: 8926484042661614651}
-  m_ExposedName: MiddleFlamesRate
+  m_ExposedName: GasRate
   m_Exposed: 1
   m_Order: 0
   m_Category: 
@@ -1720,7 +1720,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 50
+      m_SerializableObject: 10
     m_Space: 2147483647
   m_Property:
     name: o
