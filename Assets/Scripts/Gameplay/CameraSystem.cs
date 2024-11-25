@@ -1,15 +1,7 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class CameraSystem : MonoBehaviour
 {
-    [System.Serializable]
-    public class CameraEvents
-    {
-        public UnityEvent CutsceneStarted;
-        public UnityEvent CutsceneFinished;
-    }
-
     #region Public / Serialized Private Variables
     [field: Header("Booleans")]
     [field: SerializeField] private bool CameraJumpsWithPlayer = false;
@@ -34,9 +26,6 @@ public class CameraSystem : MonoBehaviour
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
     [HideInInspector] public Camera main;
-
-    [field: Space(2.5f)]
-    [field: SerializeField] private CameraEvents Events;
     #endregion
 
     #region Private Variables
