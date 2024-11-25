@@ -24,6 +24,7 @@ public class PlrDeathState : MonoBehaviour, ITouchable
     private float CurrentDelayTime = 0.0f;
     private bool DebounceStarted = false;
     private bool DelayStarted = false;
+    private bool DeathAnimationTriggered = false;
 
     private PlayerSystem PlaySys;
 
@@ -53,7 +54,7 @@ public class PlrDeathState : MonoBehaviour, ITouchable
     {
         if (!Player || DebounceStarted || Player.IsHidden) return;
 
-        PlaySys = Player; 
+        PlaySys = Player;
         DebounceStarted = DelayStarted = true;
     }
 
@@ -75,6 +76,7 @@ public class PlrDeathState : MonoBehaviour, ITouchable
         else if (result) method();
 
         Player.DeathTriggered();
+        DeathAnimationTriggered = false;
     }
 
 
@@ -85,6 +87,7 @@ public class PlrDeathState : MonoBehaviour, ITouchable
         {
             CurrentDelayTime += Time.deltaTime;
             if (DisableControlOnDeath) { PlaySys.SetMoveType(MoveType.None, false); }
+            if (!DeathAnimationTriggered) { PlaySys.PlayDeathAnimation(DeathType); DeathAnimationTriggered = true; }
             if (CurrentDelayTime >= DeathDelayTime)
             {
                 TriggerDeath(PlaySys);
