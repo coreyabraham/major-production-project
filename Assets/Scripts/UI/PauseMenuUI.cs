@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
+    [field: Header("Settings")]
+    [field: SerializeField] private bool ToggleCursor = true;
+
     [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
     [field: SerializeField] private string TitleUIObject = "TitleUI";
@@ -67,6 +70,9 @@ public class PauseMenuUI : MonoBehaviour
         if (Settings.PromptHandler.PromptActive()) Settings.PromptHandler.ForceEnd();
 
         Time.timeScale = Frame.activeSelf ? 0.0f : 1.0f;
+
+        if (!ToggleCursor) return;
+        Cursor.visible = Frame.activeSelf;
     }
 
     private void PromptFinalized(bool result)
@@ -97,5 +103,10 @@ public class PauseMenuUI : MonoBehaviour
         Settings.PromptHandler.Begin(ToMainMenuData);
     }
 
-    private void Awake() => Frame.SetActive(false);
+    private void Awake()
+    {
+        Frame.SetActive(false);
+        if (!ToggleCursor) return;
+        Cursor.visible = false;
+    }
 }
