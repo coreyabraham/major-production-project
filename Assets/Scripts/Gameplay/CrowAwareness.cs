@@ -26,7 +26,6 @@ public class CrowAwareness : MonoBehaviour
     {
         if(crowSight.hasBeenSpotted == true)
         {
-            player = GameObject.FindWithTag("Target").transform;
             Vector3 enemyToPlayerVector = player.position;
 
             AwareofPlayer = (enemyToPlayerVector.magnitude <= awarenessDistance);

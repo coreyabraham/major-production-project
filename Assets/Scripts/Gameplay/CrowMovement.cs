@@ -36,7 +36,6 @@ public class CrowMovement : MonoBehaviour
             targetDirection = crowAwareness.DirectionOfPlayer;
             crowRb.velocity = transform.forward * speed;
         }
-        else return;
     }
 
     /* Ignore the enemy rotation - treat that as an emergent graphical feature.
