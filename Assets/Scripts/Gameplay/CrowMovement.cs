@@ -1,51 +1,82 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CrowMovement : MonoBehaviour
 {
-    // Movement
-    private Vector3 targetDirection;
-
+    #region Public Variables
     // Speed
     [SerializeField] float speed;
     [SerializeField] float rotationSpeed;
 
-    // Collect components
-    private Rigidbody crowRb;
-    private CrowAwareness crowAwareness;
+    // Check for playing Death Animation
+    public bool attackPlayer;
+    #endregion
 
 
-    void Awake()
+    #region Private Variables
+    // Positions & Rotation
+    private Vector3 targetDirection, originPosition;
+    private Quaternion originRotation;
+
+    // Collect Components
+    private Rigidbody rb;
+    private CrowAwareness awareness;
+
+    // Reset Position on Death
+    private float resetTimer = 0.0f;
+    private bool resetTriggered = false;
+    #endregion
+
+
+    #region Private Functions
+    private void FreezeRigidbody() => rb.constraints = RigidbodyConstraints.FreezeAll;
+    private void UnfreezeRigidbody() => rb.constraints = RigidbodyConstraints.None;
+
+
+    private void FixedUpdate()
     {
-        crowRb = GetComponent<Rigidbody>();
-        crowAwareness = GetComponent<CrowAwareness>();
-    }
+        if (!rb || !awareness) { return; }
 
-    // Call these functions
-    void FixedUpdate()
-    {
-        PlayerTargeting();
-    }
-
-    void PlayerTargeting()
-    {
-        if (crowAwareness.AwareofPlayer)
+        if (awareness.GetAwareness())
         {
-            RotateToTarget();
-            targetDirection = crowAwareness.DirectionOfPlayer;
-            crowRb.velocity = transform.forward * speed;
+            resetTriggered = true;
+
+            // Rotate crow to face target.
+            targetDirection = awareness.GetDirection();
+            transform.LookAt(targetDirection);
+
+            // Launch crow forward.
+            rb.velocity = transform.forward * speed;
+        }
+        if (!resetTriggered) { return; }
+
+        resetTimer += Time.fixedDeltaTime;
+
+        if (resetTimer > 1f)
+        {
+            FreezeRigidbody();
+
+            attackPlayer = true;
+            rb.velocity = new(0, 0);
+            transform.SetPositionAndRotation(originPosition, originRotation);
+
+            UnfreezeRigidbody();
+
+            attackPlayer = false;
+            resetTimer = 0.0f;
+            resetTriggered = false;
         }
     }
 
-    /* Ignore the enemy rotation - treat that as an emergent graphical feature.
-     * Constantly move the enemy forward.
-     * Add its target velocity to its current velocity, then renormalise.*/
-    void RotateToTarget()
+    private void Awake()
     {
-        float desiredAngle = Mathf.Atan2(targetDirection.x, targetDirection.z);
-        transform.localEulerAngles = new Vector3(0, desiredAngle, 0) * rotationSpeed;
+        rb = GetComponent<Rigidbody>();
+        if (!rb) { Debug.LogError("Script cannot make a reference to Rigidbody!"); }
 
-        Debug.Log("Using angle: " + desiredAngle);
+        awareness = GetComponent<CrowAwareness>();
+        if (!awareness) { Debug.LogError("Script cannot make a reference to CrowAwareness!"); }
+
+        originPosition = transform.position;
+        originRotation = transform.rotation;
     }
+    #endregion
 }
