@@ -47,22 +47,9 @@ public class CameraSystem : MonoBehaviour
     private Vector3 GroundCameraPosition;
 
     private bool IgnoreCameraJumping = false;
-
-    private bool CutsceneRunning = false;
-    private bool TrackCutsceneInterval = false;
-
-    private float CurrentInterval = 0.0f;
-    private float MaxInterval = 0.0f;
-    private float CutsceneSpeed = -1.0f;
-
-    private int CutsceneIndex = 0;
-    private CameraTarget[] CutscenePoints;
-
-    private MoveType PreviousMoveType;
-    private CameraType PreviousCameraType;
-
     private float PreviousFOV;
 
+    private CameraType PreviousCameraType;
     private ZoneCamera ActiveZoneTrigger;
 
     private PlayerSystem ActivePlayer = null;
@@ -177,11 +164,6 @@ public class CameraSystem : MonoBehaviour
         };
 
         main.transform.SetPositionAndRotation(Position, Rotation);
-
-        if (!CutsceneRunning || TrackCutsceneInterval) return;
-        if (main.transform.position != CutscenePoints[CutsceneIndex].position || main.transform.rotation != CutscenePoints[CutsceneIndex].rotation) return;
-
-        TrackCutsceneInterval = true;
     }
 
     public void LerpCameraTransform(CameraTarget Target, float CustomLerpSpeed = -1.0f) => LerpCameraTransform(Target.position, Target.rotation, CustomLerpSpeed);
@@ -207,91 +189,6 @@ public class CameraSystem : MonoBehaviour
     {
         CurrentOffset = PreviousOffset;
         FieldOfView = PreviousFOV;
-    }
-    #endregion
-
-    #region Cutscene Methods
-    public void BeginCutscene(CameraTarget[] Points, float TimeInterval, float CameraSpeed = -1.0f)
-    {
-        if (CutsceneRunning)
-        {
-            Debug.LogWarning(name + " | A Cutscene is already running! Please wait for it to end or cancel it via `CancelCutscene()`!");
-            return;
-        }
-
-        if (ActivePlayer)
-        {
-            PreviousMoveType = ActivePlayer.GetMoveType();
-            ActivePlayer.SetMoveType(MoveType.None, true);
-        }
-
-        CameraType = CameraType.Scriptable;
-
-        CurrentInterval = 0.0f;
-        MaxInterval = TimeInterval;
-        CutsceneSpeed = CameraSpeed;
-
-        CutscenePoints = Points;
-        CutsceneRunning = true;
-
-        Events.CutsceneStarted?.Invoke();
-    }
-
-    public void BeginCutscene(GameObject[] Points, float TimeInterval, float CameraSpeed = -1.0f)
-    {
-        CameraTarget[] POIs = new CameraTarget[Points.Length];
-
-        for (int i = 0; i < Points.Length; i++)
-        {
-            POIs[i] = new()
-            {
-                position = Points[i].transform.position,
-                rotation = Points[i].transform.rotation,
-            };
-        }
-
-        BeginCutscene(POIs, TimeInterval, CameraSpeed);
-    }
-
-    public void BeginCutscene(Transform[] Points, float TimeInterval, float CameraSpeed = -1.0f)
-    {
-        CameraTarget[] POIs = new CameraTarget[Points.Length];
-
-        for (int i = 0; i < Points.Length; i++)
-        {
-            POIs[i] = new()
-            {
-                position = Points[i].position,
-                rotation = Points[i].rotation,
-            };
-        }
-
-        BeginCutscene(POIs, TimeInterval, CameraSpeed);
-    }
-
-    private void UpdateCutsceneIndex()
-    {
-        CutsceneIndex++;
-        if (CutsceneIndex < CutscenePoints.Length) return;
-        CutsceneFinished();
-    }
-
-    private void CutsceneFinished()
-    {
-        CutsceneRunning = false;
-        
-        CurrentInterval = 0.0f;
-        MaxInterval = 0.0f;
-        CutsceneSpeed = -1.0f;
-
-        CutsceneIndex = 0;
-        CutscenePoints = null;
-
-        (PreviousCameraType, CameraType) = (CameraType, PreviousCameraType);
-
-        if (ActivePlayer) ActivePlayer.SetMoveType(PreviousMoveType, true);
-        
-        Events.CutsceneFinished?.Invoke();
     }
     #endregion
 
@@ -380,7 +277,7 @@ public class CameraSystem : MonoBehaviour
         Vector3 position = CameraSubject.transform.position + newCamOffset;
         position.x = Mathf.Lerp(position.x, position.x + GetAnticipationOffset(), Time.fixedDeltaTime * AnticipationSpeed);
 
-        if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
+        if (ActiveZoneTrigger.IgnorePlayerJumping) position.y = GroundCameraPosition.y;
 
         Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
             Vector3.Lerp(
@@ -414,7 +311,7 @@ public class CameraSystem : MonoBehaviour
                 curveEvaluation
                 ) : ActiveZoneTrigger.TargetPosition;
 
-        if (IgnoreCameraJumping) position.y = PreviousCameraLocation.position.y;
+        if (ActiveZoneTrigger.IgnorePlayerJumping) position.y = GroundCameraPosition.y;
 
         Vector3 rotation = ActiveZoneTrigger.UseRotationOffset ?
             Vector3.Lerp(
@@ -434,22 +331,6 @@ public class CameraSystem : MonoBehaviour
         };
     }
     #endregion
-
-    private void Update()
-    {
-        if (!CutsceneRunning || !TrackCutsceneInterval) return;
-
-        if (CurrentInterval < MaxInterval)
-        {
-            CurrentInterval += Time.deltaTime;
-            return;
-        }
-
-        CurrentInterval = 0.0f;
-        TrackCutsceneInterval = false;
-
-        UpdateCutsceneIndex();
-    }
 
     private void FixedUpdate()
     {
@@ -480,9 +361,9 @@ public class CameraSystem : MonoBehaviour
                 && !ActivePlayer.FallingFromClimb;
         }
 
-        CameraTarget Target = !CutsceneRunning ? PreviousCameraLocation : CutscenePoints[CutsceneIndex];
+        CameraTarget Target = PreviousCameraLocation;
 
-        if (!CutsceneRunning && CameraType != CameraType.Scriptable)
+        if (CameraType != CameraType.Scriptable)
         {
             switch (CameraType)
             {
@@ -494,7 +375,7 @@ public class CameraSystem : MonoBehaviour
             }
         }
 
-        LerpCameraTransform(Target, CutsceneSpeed);
+        LerpCameraTransform(Target);
     }
 
     private void Start()

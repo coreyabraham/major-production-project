@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 262.3369, g: 325.0498, b: 430.21924, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2889,17 +2889,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 319678301}
   m_CullTransparentMesh: 1
---- !u!114 &325709903 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1081834574957618818, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
-  m_PrefabInstance: {fileID: 2386756148295699801}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c5843b5008d2b24a93253672addaa64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &325709904 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
@@ -18248,7 +18237,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &3892153841503069969
 GameObject:
   m_ObjectHideFlags: 0
@@ -19162,7 +19151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4489664403281485242
 Transform:
   m_ObjectHideFlags: 0
@@ -23698,7 +23687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -2451.817
+      value: -2184.463
       objectReference: {fileID: 0}
     - target: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: m_SizeDelta.y
@@ -23734,11 +23723,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 699
+      value: 701
       objectReference: {fileID: 0}
     - target: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -402
+      value: -434
       objectReference: {fileID: 0}
     - target: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -25522,7 +25511,7 @@ PrefabInstance:
     - target: {fileID: 1081834574957618818, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: TargetFrame
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1269553749}
     - target: {fileID: 3280167464699663805, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
       propertyPath: m_text
       value: 
@@ -29904,10 +29893,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TitleScreenScene: Title Screen
   TitleUIObject: TitleUI
-  PlayUIObject: PlayUI
   Frame: {fileID: 3867927023925881868}
   Settings: {fileID: 166764527}
-  ResumeBtn: {fileID: 325709903}
   ToMainMenuData:
     Title: Exiting to Title Screen
     SubTitle: Exiting Confirmation
@@ -29915,10 +29902,6 @@ MonoBehaviour:
       progress will be lost!
     AcceptButtonText: Yes, I'm sure.
     DenyButtonText: No, I change my mind.
-  ActionNames:
-  - Submit
-  - Click
-  InputModule: {fileID: 2323585539012961689}
 --- !u!1 &8254426813420550234
 GameObject:
   m_ObjectHideFlags: 0

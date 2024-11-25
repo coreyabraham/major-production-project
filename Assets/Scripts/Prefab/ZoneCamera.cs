@@ -9,6 +9,7 @@ public class ZoneCamera : MonoBehaviour, ITouchable
     [field: Header("CameraSystem Settings")]
     public bool IgnoreAnticipationOffset;
     public bool IgnoreCurrentOffset;
+    public bool IgnorePlayerJumping;
 
     [field: Header("Scaling Options")]
     public CartesianCoords LocalScaleType = CartesianCoords.X;
@@ -93,25 +94,25 @@ public class ZoneCamera : MonoBehaviour, ITouchable
             {
                 switch (BlendType)
                 {
-                    //Get offsets between target and TriggerZone 
                     case ZoneBlendType.OffsetState: TargetPosition = TargetObject.transform.position - transform.position; break;
                     case ZoneBlendType.TargetState: TargetPosition = TargetObject.transform.position; break;
                 }
             }
 
-            //Get rotation of target and set in newRotOffset
             if (DeriveRotation) TargetRotation = TargetObject.transform.rotation.eulerAngles;
         }
 
-        if (DeriveFieldOfView)
+        if (DeriveFieldOfView && TargetObject != null)
         {
             float originalTargetFOV = TargetFOV;
-            //TargetFOV = GameSystem.Instance.Camera.FieldOfView;
-            TargetFOV = TargetObject.gameObject.GetComponent<Camera>().fieldOfView;
-            if (SumDerivedFOV) TargetFOV += originalTargetFOV;
+            
+            if (TargetObject.gameObject.TryGetComponent(out Camera targetCamera))
+            {
+                TargetFOV = targetCamera.fieldOfView;
+                if (SumDerivedFOV) TargetFOV += originalTargetFOV;
+            }
         }
 
-        // TODO: This is part of the reason for bug #334's existence, please fix it!
         if (TargetRotation.x > 180) { TargetRotation.x -= 360; }
         if (TargetRotation.y > 180) { TargetRotation.y -= 360; }
         if (TargetRotation.z > 180) { TargetRotation.z -= 360; }

@@ -7,14 +7,24 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
     [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("Trigger Specific")]
+    [field: SerializeField] private bool UseNonPersistantCheckpoints = true;
+
     [field: SerializeField] private bool UseSceneName = true;
     [field: SerializeField] private bool HideOutput = true;
 
     [field: SerializeField] private string OverrideName;
-    [field: SerializeField] private Transform OverrideTranform;
+    public Transform OverrideTransform;
 
     public void Entered(PlayerSystem Player)
     {
+        if (UseNonPersistantCheckpoints)
+        {
+            if (Player.CurrentCheckpoint == this) return;
+            Player.CurrentCheckpoint = this;
+
+            return;
+        }
+
         SaveData data = DataHandler.Instance.GetCachedData();
 
         if (data.checkpointName == gameObject.name)
@@ -27,7 +37,7 @@ public class PlrCheckpoint : MonoBehaviour, ITouchable
 
         data.checkpointName = (!string.IsNullOrWhiteSpace(OverrideName)) ? OverrideName : gameObject.name;
 
-        Transform target = (OverrideTranform != null) ? OverrideTranform : transform;
+        Transform target = (OverrideTransform != null) ? OverrideTransform : transform;
         data.checkpointPosition = DataHandler.Instance.ConvertVector3ToFloatArray(target.position);
         data.checkpointRotation = DataHandler.Instance.ConvertVector3ToFloatArray(target.rotation.eulerAngles);
 
