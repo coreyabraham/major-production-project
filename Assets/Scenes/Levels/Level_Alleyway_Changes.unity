@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 884.0205, g: 517.8882, b: 383.59863, a: 1}
+  m_IndirectSpecularColor: {r: 883.75977, g: 517.75, b: 383.54102, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -21290,6 +21290,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: -39.23
       objectReference: {fileID: 0}
+    - target: {fileID: 1693874239653180522, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3665936094918937293, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
       propertyPath: LerpCurve.m_Curve.Array.size
       value: 3
@@ -21366,6 +21370,10 @@ PrefabInstance:
       propertyPath: ValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: set_weight
       objectReference: {fileID: 0}
+    - target: {fileID: 5554197034758966161, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6604701745784615236, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
       propertyPath: ValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -21390,6 +21398,22 @@ PrefabInstance:
       propertyPath: ValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 411659821}
+    - target: {fileID: 7152297546163492267, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451309784726493485, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.783158
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451309784726493485, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.853
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451309784726493485, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.413
+      objectReference: {fileID: 0}
     - target: {fileID: 7586481016005929841, guid: acd16eb7e6a47394e9653383096db2a0, type: 3}
       propertyPath: camPos
       value: 
@@ -69753,13 +69777,6 @@ MonoBehaviour:
   CameraType: 1
   CameraSubject: {fileID: 1464405246}
   main: {fileID: 2107819146}
-  Events:
-    CutsceneStarted:
-      m_PersistentCalls:
-        m_Calls: []
-    CutsceneFinished:
-      m_PersistentCalls:
-        m_Calls: []
 --- !u!4 &2092286612
 Transform:
   m_ObjectHideFlags: 0
