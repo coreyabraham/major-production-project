@@ -81,7 +81,6 @@ public class PlayerSystem : MonoBehaviour
     [field: SerializeField] private string GrabTag = "Grabbable";
 
     [field: Header("Miscellaneous")]
-    [field: SerializeField] private bool IgnoreCheckpointData = false;
     [field: SerializeField] private string SurfaceMaterialsPath = "SurfaceMaterials";
     [field: SerializeField] private SurfaceMaterial GenericSurface;
 
@@ -95,8 +94,8 @@ public class PlayerSystem : MonoBehaviour
     public Animator Animator;
 
     [field: Header("Collections")]
-    [field: SerializeField] public PlayerAnimation[] PlayerAnimations;
-    [field: SerializeField] public PlayerEvents Events = new();
+    [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
+    [field: SerializeField] private PlayerEvents Events = new();
     #endregion
 
     #region Private Variables
@@ -120,6 +119,8 @@ public class PlayerSystem : MonoBehaviour
     [HideInInspector] public bool IsJumping;
     [HideInInspector] public bool JumpingRequested;
     [HideInInspector] public bool InteractHeld = false;
+
+    [HideInInspector] public PlrCheckpoint CurrentCheckpoint;
     #endregion
 
     private Quaternion WarpRotation;
@@ -246,6 +247,11 @@ public class PlayerSystem : MonoBehaviour
         WarpPosition = NewTarget.position;
         WarpRotation = NewTarget.rotation;
     }
+    public void WarpTarget(Transform NewTransform)
+    {
+        WarpPosition = NewTransform.position;
+        WarpRotation = NewTransform.rotation;
+    }
 
     public void SetVelocity(Vector3 NewVelocity) => Velocity = NewVelocity;
 
@@ -271,30 +277,7 @@ public class PlayerSystem : MonoBehaviour
 
     public void DeathTriggered()
     {
-        /*
-         * TODO:
-         * 1. Trigger cut to black
-         * 2. Hold screen for a few seconds
-         * 3. Reload previously interacted objects and Scene data so they can be used again
-         * 4. Fade from black with the player reloaded at the previous checkpoint
-         * 5. Add to the current save file's "Deaths" data
-         * 6. Save to disk!
-         */
-
-        SaveData data = DataHandler.Instance.GetCachedData();
-        data.deaths++;
-
-        DataHandler.Instance.SetCachedData(data);
-        bool result = DataHandler.Instance.SaveCachedDataToFile();
-
-        string msg = result == true
-            ? name + " Successfully saved: " + DataHandler.Instance.GetFileName() + " to disk!"
-            : name + " Failed to save: " + DataHandler.Instance.GetFileName() + " to disk... :(";
-
-        Debug.Log(msg);
-
         GameSystem.Instance.PlayerDiedCallback();
-
         RevertPlayerValues();
 
         bool checkpointResult = SpawnAtCheckpoint();
@@ -313,41 +296,13 @@ public class PlayerSystem : MonoBehaviour
 
     private bool SpawnAtCheckpoint()
     {
-        SaveData data = DataHandler.Instance.RefreshCachedData();
-        bool RunningInEditor = false;
-
-#if UNITY_EDITOR
-        RunningInEditor = true;
-#endif
-
-        if (!RunningInEditor && IgnoreCheckpointData == true) IgnoreCheckpointData = false;
-        if (GameSystem.Instance.GetCurrentLevelName() != data.levelName) return false;
-
-        PlrCheckpoint Checkpoint = null;
-
-        if (!string.IsNullOrWhiteSpace(data.checkpointName))
-        {
-            foreach (PlrCheckpoint checkpoint in FindObjectsOfType<PlrCheckpoint>())
-            {
-                if (checkpoint.gameObject.name != data.checkpointName) continue;
-                Checkpoint = checkpoint;
-                break;
-            }
-        }
-
-        if (!Checkpoint || IgnoreCheckpointData == true)
+        if (!CurrentCheckpoint)
         {
             WarpTarget(OriginalSpawn);
             return false;
         }
 
-        Vector3 Position = DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointPosition);
-        Quaternion Rotation = Quaternion.Euler(DataHandler.Instance.ConvertFloatArrayToVector3(data.checkpointRotation));
-
-        if (Checkpoint.gameObject.transform.position != Position) Position = Checkpoint.gameObject.transform.position;
-        if (Checkpoint.gameObject.transform.rotation != Rotation) Rotation = Checkpoint.gameObject.transform.rotation;
-
-        Warp(Position, Rotation);
+        WarpTarget(CurrentCheckpoint.OverrideTransform == null ? CurrentCheckpoint.transform : CurrentCheckpoint.OverrideTransform);
         return true;
     }
 

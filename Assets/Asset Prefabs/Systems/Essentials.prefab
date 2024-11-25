@@ -336,7 +336,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2389180204614053018}
-  - component: {fileID: 9141108622811272769}
   - component: {fileID: 8337814683459291855}
   m_Layer: 0
   m_Name: Data Handler
@@ -360,26 +359,6 @@ Transform:
   m_Father: {fileID: 6975320980592092749}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9141108622811272769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7331677958958138894}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c67742905f73b7e41b35d57c02139885, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FolderName: SaveData
-  TargetPath: 
-  ExtensionName: .dat
-  SaveFileName: SaveFile
-  ValidateDataOnStartup: 1
-  CacheDataOnStartup: 0
-  ClearDataOnStartup: 0
-  IgnoreSaveRequests: 0
 --- !u!114 &8337814683459291855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,12 +381,8 @@ MonoBehaviour:
     Resolution: 
     Quality: Very Low
     WindowMode: FullscreenWindow
-    HudScale: x1
     FramesPerSecond: 60
     UseVsync: 1
-    Contrast: 0.5
-    Brightness: 0.5
-    ColourAccessibility: Default
   Initialized:
     m_PersistentCalls:
       m_Calls: []
