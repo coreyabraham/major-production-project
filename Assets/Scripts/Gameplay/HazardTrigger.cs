@@ -16,7 +16,7 @@ public class HazardTrigger : MonoBehaviour, ITouchable
     [field: SerializeField] private AudioSource snap;
 
     private float resetTimer = 0;
-    private bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
+    public bool hasBeenSpotted;        // Should be reset back to false if the player dies and respawns.
 
     public bool Enabled { get; set; } = true;
     public bool HideOnStartup { get; set; } = false;
