@@ -40,12 +40,6 @@ public class PlayerSettings
     public string WindowMode;
 
     /// <summary>
-    /// The Scale of ALL User Interfaces in the game. <br/>
-    /// This includes gameplay specific UI elements as well.
-    /// </summary>
-    public string HudScale;
-
-    /// <summary>
     /// The target amount of Frames Per Second the game will try to reach during gameplay. <br/>
     /// THIS WILL NOT BE READ IF VSYNC IS ENABLED!
     /// </summary>
@@ -56,22 +50,5 @@ public class PlayerSettings
     /// THIS WILL IGNORE YOUR FRAMES PER SECOND VALUE UPON BEING USED!
     /// </summary>
     public bool UseVsync;
-    #endregion
-
-    #region Visuals
-    /// <summary>
-    /// The Contrast the game will use to make things pop more for the sake of easier sightings.
-    /// </summary>
-    public float Contrast;
-
-    /// <summary>
-    /// The Brightness the game will use to make things easier to see for players.
-    /// </summary>
-    public float Brightness;
-
-    /// <summary>
-    /// The filter type the game will use to support those who have colour-based imparements.
-    /// </summary>
-    public string ColourAccessibility;
     #endregion
 }
