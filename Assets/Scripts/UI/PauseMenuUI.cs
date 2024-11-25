@@ -71,7 +71,9 @@ public class PauseMenuUI : MonoBehaviour
 
         Time.timeScale = Frame.activeSelf ? 0.0f : 1.0f;
 
-        if (!ToggleCursor) return;
+        bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
+        if (!ToggleCursor || levelCheck) return;
+
         Cursor.visible = Frame.activeSelf;
     }
 
@@ -103,10 +105,13 @@ public class PauseMenuUI : MonoBehaviour
         Settings.PromptHandler.Begin(ToMainMenuData);
     }
 
-    private void Awake()
+    private void Start()
     {
         Frame.SetActive(false);
-        if (!ToggleCursor) return;
+
+        bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
+        if (!ToggleCursor || levelCheck) return;
+
         Cursor.visible = false;
     }
 }
