@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.VFX;
 
 
 // This script only handles the timed aspect of the trigger, NOT the hazard itself.
@@ -23,6 +24,9 @@ public class TimedHazardTrigger : MonoBehaviour
 
     [field: Tooltip("Enables the trigger's Mesh Renderer to physically show it when it's active. If false, the Mesh Renderer will be disabled.")]
     [field: SerializeField] bool useDebugRenderer;
+
+    private VisualEffect[] particleEffects;
+    private float[] particleRates;
     #endregion
 
     #region Private Variables
@@ -38,28 +42,32 @@ public class TimedHazardTrigger : MonoBehaviour
     {
         trigger.enabled = !trigger.enabled;
 
+        timer = 0;
+
         if (sound && trigger.enabled) { sound.PlaySoundOnce(0); sound.StopSoundOnce(1); sound.PlaySoundOnce(2); }
         else if (sound && !trigger.enabled) { sound.PlaySoundOnce(1); sound.StopSoundOnce(0); sound.StopSoundOnce(2); }
 
         if (transform.childCount > 0 && affectParticles)
         {
-            for (int i = 0; i < vfx.Length; i++)
+            for (int i = 0; i < particleEffects.Length; i++)
             {
-                if (!sound) { vfx[i].SetActive(!vfx[i].activeSelf); return; }
-                if (i >= 2) { vfx[i].SetActive(!vfx[i].activeSelf); }
+                if (particleEffects[i].HasFloat("GasRate"))
+                {
+                    if (particleEffects[i].GetFloat("GasRate") > 0)
+                    {
+                        particleEffects[i].SetFloat("GasRate", 0);
+                    }
+                    else particleEffects[i].SetFloat("GasRate", particleRates[i]);
+                }
             }
         }
-
-
         if (useDebugRenderer && meshRenderer != null) { meshRenderer.enabled = !meshRenderer.enabled; }
-        timer = 0;
     }
 
 
     private void Update()
     {
         timer += Time.deltaTime;
-
 
         if (trigger.enabled)
         {
@@ -81,11 +89,13 @@ public class TimedHazardTrigger : MonoBehaviour
 
         if (transform.childCount > 0 && affectParticles)
         {
-            vfx = new GameObject[transform.childCount];
+            particleEffects = new VisualEffect[transform.childCount];
+            particleRates = new float[transform.childCount];
 
             for (int i = 0; i < transform.childCount; i++)
             {
-                vfx[i] = transform.GetChild(i).gameObject;
+                particleEffects[i] = transform.GetChild(i).gameObject.GetComponent<VisualEffect>();
+                particleRates[i] = particleEffects[i].GetFloat("GasRate");
             }
         }
 
