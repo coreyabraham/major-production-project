@@ -674,6 +674,9 @@ public class PlayerSystem : MonoBehaviour
                     case AnimType.Pushing: Animator.SetBool(anim.Name, IsPulling); break;
                     case AnimType.Pulling: Animator.SetBool(anim.Name, IsPushing); break;
                     case AnimType.Idle: Animator.SetBool(anim.Name, IsGrounded); break;
+                    case AnimType.Burned: Animator.SetBool(anim.Name, dieByBurn); break;
+                    case AnimType.Drowned: Animator.SetBool(anim.Name, dieByDrown); break;
+                    case AnimType.Prayed: Animator.SetBool(anim.Name, dieByPray); break;
                 }
 
                 continue;

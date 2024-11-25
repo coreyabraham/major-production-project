@@ -64,6 +64,8 @@ public class CrowMovement : MonoBehaviour
             attackPlayer = false;
             resetTimer = 0.0f;
             resetTriggered = false;
+
+            awareness.ResetAwareness();
         }
     }
 
