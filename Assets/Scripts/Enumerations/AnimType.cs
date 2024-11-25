@@ -13,5 +13,8 @@ public enum AnimType
     Sliding,
     Pushing,
     Pulling,
-    Idle
+    Idle,
+    Burned,
+    Drowned,
+    Prayed
 }

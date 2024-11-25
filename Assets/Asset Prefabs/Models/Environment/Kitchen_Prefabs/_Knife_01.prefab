@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3751277157772160684}
   - component: {fileID: -8253429340524885001}
   - component: {fileID: 758684943641492144}
-  - component: {fileID: -5488068093208223647}
+  - component: {fileID: 8264699234252918706}
   m_Layer: 0
   m_Name: _Knife_01
   m_TagString: Touchable
@@ -129,7 +129,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.2674137, y: 0.21975276, z: 0.6418492}
   m_Center: {x: -0.00012461841, y: -0.08090219, z: -0.24129736}
---- !u!114 &-5488068093208223647
+--- !u!114 &8264699234252918706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -138,11 +138,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 469475679254754270}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useCrowSound: 0
-  useSnap: 0
-  crowCaw: {fileID: 0}
-  crowSwoop: {fileID: 0}
-  snap: {fileID: 0}
+  DeathType: 1
+  PrintMessages: 0
+  DeathDelayTime: 0.5
+  DisableControlOnDeath: 0
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0

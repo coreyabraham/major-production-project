@@ -16,6 +16,7 @@ public class CrowAwareness : MonoBehaviour
 
     #region Public Functions
     public bool GetAwareness() => AwareOfPlayer;
+    public void ResetAwareness() => AwareOfPlayer = false;
     public Vector3 GetDirection() => playerTransform.position;
     #endregion
 
