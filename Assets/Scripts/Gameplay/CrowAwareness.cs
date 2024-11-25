@@ -1,36 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CrowAwareness : MonoBehaviour
 {
-    public HazardTrigger crowSight;
-    public bool AwareofPlayer { get; private set; }
-    public Vector3 DirectionOfPlayer { get; private set; }
-
+    #region Public Variables
+    [SerializeField] HazardTrigger hazardTrigger;
     [SerializeField] float awarenessDistance;
-    public Transform player;
+    #endregion
 
-    void Awake()
+
+    #region Private Variables
+    private bool AwareOfPlayer;
+    private Transform playerTransform;
+    #endregion
+
+
+    #region Public Functions
+    public bool GetAwareness() => AwareOfPlayer;
+    public Vector3 GetDirection() => playerTransform.position;
+    #endregion
+
+
+    #region Private Functions
+    private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        if (!hazardTrigger) { Debug.Log("Hazard Trigger has not been set in the Inspector!"); }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        MoveToPlayer();
+        if (!hazardTrigger) { return; }
+        if (!hazardTrigger.hasBeenSpotted) { return; }
+        AwareOfPlayer = playerTransform.position.magnitude <= awarenessDistance;
     }
-
-    void MoveToPlayer()
-    {
-        if(crowSight.hasBeenSpotted == true)
-        {
-            player = GameObject.FindWithTag("Target").transform;
-            Vector3 enemyToPlayerVector = player.position;
-
-            AwareofPlayer = (enemyToPlayerVector.magnitude <= awarenessDistance);
-        }
-    }
-
+    #endregion
 }
