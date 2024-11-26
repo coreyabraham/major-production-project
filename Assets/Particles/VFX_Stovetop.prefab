@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7606628169421674524}
   - component: {fileID: 1645102552}
   - component: {fileID: 1645102550}
-  - component: {fileID: 1645102551}
   m_Layer: 0
   m_Name: VFX_Stovetop
   m_TagString: Touchable
@@ -85,27 +84,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9555dc8c3109da14a882648ce7afec8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  durationBetweenActivity: 2
-  durationOfActivity: 2
+  durationWhileOff: 0
+  durationWhileOn: 0
   affectParticles: 1
   useDebugRenderer: 0
---- !u!114 &1645102551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7606628169421674525}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1792348fcbe42a4487ab3251df98042, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useCrowSound: 0
-  useSnap: 0
-  crowCaw: {fileID: 0}
-  crowSwoop: {fileID: 0}
-  snap: {fileID: 0}
 --- !u!1001 &642771291823547081
 PrefabInstance:
   m_ObjectHideFlags: 0
