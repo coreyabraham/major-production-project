@@ -88,9 +88,11 @@ public class SettingsUI : MonoBehaviour
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();
     }
+
+    public void VsyncToggled(bool IsOn) => FPSSlider.Slider.interactable = !IsOn;
     #endregion
 
-    #region PromptMethods
+    #region Prompt Methods
     private void SavePromptFinished(bool Result)
     {
         Container.SetActive(true);
