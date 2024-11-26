@@ -136,6 +136,8 @@ public class PlayerSystem : MonoBehaviour
     private CameraTarget OriginalSpawn;
     private SurfaceMaterial FloorMaterial;
 
+    private BoxScript box;
+
     private bool UsedCoyoteJump;
     private float CurrentCoyoteTime;
 
@@ -385,8 +387,8 @@ public class PlayerSystem : MonoBehaviour
         if (other.transform.parent != null) { if (!other.transform.parent.CompareTag(GrabTag)) { return; } }
         if (!TogglePullState(InteractHeld) || !canGrab) { return; }
 
-        BoxScript bs = other.transform.parent.GetComponent<BoxScript>();
-        bs.UnfreezeBox();
+        box = other.transform.parent.GetComponent<BoxScript>();
+        box.UnfreezeBox();
 
         PullObjPos = other.transform.parent.position;
 
@@ -397,11 +399,14 @@ public class PlayerSystem : MonoBehaviour
             ? transform.position.x + grabDist // Left Side
             : transform.position.x - grabDist; // Right Side
 
-        if ((CharacterRotation.eulerAngles.y <= 360f && CharacterRotation.eulerAngles.y > 180f && transform.position.x <= PullObjPos.x) ||
-            (CharacterRotation.eulerAngles.y <= 180f && CharacterRotation.eulerAngles.y > 0f && transform.position.x > PullObjPos.x))
+        if ((CharacterRotation.eulerAngles.y <= 360f && CharacterRotation.eulerAngles.y > 180f && transform.position.x <= PullObjPos.x && box.CheckIfValidPush(Vector3.right)) ||
+            (CharacterRotation.eulerAngles.y <= 180f && CharacterRotation.eulerAngles.y > 0f && transform.position.x > PullObjPos.x && box.CheckIfValidPush(Vector3.left)))
         {
-            other.transform.parent.position = new( grabX - other.transform.localPosition.x, other.transform.parent.position.y, other.transform.parent.position.z);
+            other.transform.parent.position = new(grabX - other.transform.localPosition.x, other.transform.parent.position.y, other.transform.parent.position.z);
+            return;
         }
+
+        IsPushing = IsPulling = false;
     }
 
     private void OnTriggerExit(Collider other)

@@ -31,21 +31,26 @@ public class BoxScript : MonoBehaviour
     float particleTimerDelay = 0.0f;
     float previousXPos;
     float marginOfError = 0.01f;
+
+    RaycastHit ray;
     #endregion
 
     #region Functions - Public
     public float GetGrabDistance() => grabDistanceFromPlayer / 10f;
-    public void FreezeBox()
+    public bool CheckIfValidPush(Vector3 direction)
     {
-        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+        // Draw ray.
+        return true;
     }
+    public void FreezeBox() => rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     public void UnfreezeBox()
     {
         rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
         doTimeout = true;
     }
+    #endregion
 
-
+    #region Functions - Private
     private void Update()
     {
         // Particle stuff. Is ignored if not set correctly in the inspector.
