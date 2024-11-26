@@ -85,7 +85,5 @@ public class TitleUI : MonoBehaviour
         Source = AudioHandler.Instance.CreateGlobalSource(Music, AudioType.Music);
         Source.loop = true;
         Source.Play();
-
-        print(AudioHandler.Instance.GetSource(Music.name));
     }
 }
