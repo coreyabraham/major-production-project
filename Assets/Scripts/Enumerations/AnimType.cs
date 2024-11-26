@@ -16,5 +16,6 @@ public enum AnimType
     Idle,
     Burned,
     Drowned,
-    Prayed
+    Prayed,
+    XVelocity
 }

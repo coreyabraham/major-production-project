@@ -31,8 +31,7 @@ public class DestroyObjectsOnTriggerEnter : MonoBehaviour
     {
         if (tagToLookFor == "" && typeOfObject == DestroyObjectsEnum.Elements) { return; }
 
-        if (other.CompareTag("SpawnedPrefab")) { Destroy(other.gameObject); }
-        else if (other.CompareTag(tagToLookFor))
+        if (other.CompareTag(tagToLookFor))
         {
             foreach (GameObject obj in elements)
             {

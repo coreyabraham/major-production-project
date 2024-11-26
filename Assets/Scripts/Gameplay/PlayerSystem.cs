@@ -677,6 +677,7 @@ public class PlayerSystem : MonoBehaviour
                     case AnimType.Burned: Animator.SetBool(anim.Name, dieByBurn); break;
                     case AnimType.Drowned: Animator.SetBool(anim.Name, dieByDrown); break;
                     case AnimType.Prayed: Animator.SetBool(anim.Name, dieByPray); break;
+                    case AnimType.XVelocity: Animator.SetFloat(anim.Name, Mathf.Abs(Character.velocity.x)); break;
                 }
 
                 continue;
