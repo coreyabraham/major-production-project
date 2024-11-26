@@ -87,17 +87,17 @@ public class FadeTransition : MonoBehaviour
         Frame.color = TrueStartColor;
     }
 
-    private void UpdateUsability()
+    private void UpdateUsability(bool OverrideValue = false, bool Overrider = false)
     {
-        string current = GameSystem.Instance.GetCurrentLevelName();
-        bool canUse = true;
+        bool canUse;
 
-        foreach (string str in GameSystem.Instance.BlacklistedPauseScenes)
+        if (!OverrideValue)
         {
-            if (current != str) continue;
-            canUse = false;
-            break;
+            string current = GameSystem.Instance.GetCurrentLevelName();
+            canUse = !GameSystem.Instance.BlacklistedPauseScenes.Contains(current);
         }
+
+        else canUse = Overrider;
 
         Frame.gameObject.SetActive(canUse);
     }
@@ -105,6 +105,8 @@ public class FadeTransition : MonoBehaviour
     private void SceneChanged(Scene Previous, Scene New) => UpdateUsability();
 
     private void PlayerDied(PlayerSystem Player) => RunTransition = true;
+
+    private void PlayerPaused(bool Status) => UpdateUsability(true, !Status);
 
     private void Start()
     {
@@ -118,6 +120,7 @@ public class FadeTransition : MonoBehaviour
         Frame.color = TrueStartColor;
 
         GameSystem.Instance.Events.PlayerDied.AddListener(PlayerDied);
+        GameSystem.Instance.Events.PlayerPaused.AddListener(PlayerPaused);
         GameSystem.Instance.Events.SceneChanged.AddListener(SceneChanged);
 
         UpdateUsability();
