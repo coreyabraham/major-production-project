@@ -6990,10 +6990,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2860555276909148003, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
+      propertyPath: RoundToDecimals
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3298494259395902035, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
+      propertyPath: DemoResetKey
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4472505316025654378, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
       propertyPath: TargetFrame
       value: 
       objectReference: {fileID: 6892630423648654871}
+    - target: {fileID: 6701165995552854637, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
+      propertyPath: RoundToDecimals
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6975320980592092749, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -7041,6 +7053,10 @@ PrefabInstance:
     - target: {fileID: 8081438214460888954, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
       propertyPath: m_Name
       value: Essentials
+      objectReference: {fileID: 0}
+    - target: {fileID: 8463834247982211802, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
+      propertyPath: RoundToDecimals
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2fdb1a8d6dcdc148b81e2fbd16a7041, type: 3}
@@ -23138,9 +23154,8 @@ MonoBehaviour:
   PromptUI: {fileID: 0}
   PromptData:
     Title: < Exiting >
-    SubTitle: Exit Application Confirmation
-    Description: Are you sure you'd like to Exit the Game? Any unsaved data will
-      be lost!
+    SubTitle: Exiting Game
+    Description: Are you sure you'd like to Exit the Game? We'll miss you!
     AcceptButtonText: Yes, I'd like to.
     DenyButtonText: Maybe not...
 --- !u!1 &6892630425106448476
@@ -23377,6 +23392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StartingGroupIndex: 0
   ButtonTag: UI_BUTTON
+  Music: {fileID: 8300000, guid: 2141de063a48cd349b2913dcb62ce71b, type: 3}
   SettingsMenu: {fileID: 1164974009}
   ExitMenu: {fileID: 6892630424926694012}
   Groups:

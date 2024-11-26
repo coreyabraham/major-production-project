@@ -71,26 +71,28 @@ public class SettingsUI : MonoBehaviour
     public void MasterVolumeChanged(float value)
     {
         MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Master);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
     }
 
     public void MusicVolumeChanged(float value)
     {
         MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Music);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
     }
 
     public void SoundVolumeChanged(float value)
     {
         MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Sound);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
 
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();
     }
+
+    public void VsyncToggled(bool IsOn) => FPSSlider.Slider.interactable = !IsOn;
     #endregion
 
-    #region PromptMethods
+    #region Prompt Methods
     private void SavePromptFinished(bool Result)
     {
         Container.SetActive(true);

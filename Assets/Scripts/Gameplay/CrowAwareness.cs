@@ -3,7 +3,7 @@ using UnityEngine;
 public class CrowAwareness : MonoBehaviour
 {
     #region Public Variables
-    [SerializeField] HazardTrigger hazardTrigger;
+    [SerializeField] HazardSounds hazardTrigger;
     [SerializeField] float awarenessDistance;
     #endregion
 

@@ -12,6 +12,7 @@ public class GameSystem : Singleton<GameSystem>
     {
         public UnityEvent<PlayerSystem, CameraSystem> ExternalsCached;
         public UnityEvent<PlayerSystem> PlayerDied;
+        public UnityEvent<bool> PlayerPaused;
 
         public UnityEvent RequestLoadingUI;
         [HideInInspector] public UnityEvent LoadingUIFinished;
@@ -70,7 +71,11 @@ public class GameSystem : Singleton<GameSystem>
 
     #region Public Methods
     public float GetElapsedPlaytime() => ElapsedPlaytime;
-    public void SetPausedState(bool State) => GameplayPaused = State;
+    public void SetPausedState(bool State)
+    {
+        GameplayPaused = State;
+        Events.PlayerPaused?.Invoke(State);
+    }
 
     public int GetCurrentSceneBuildIndex() => SceneManager.GetActiveScene().buildIndex;
 
@@ -207,6 +212,7 @@ public class GameSystem : Singleton<GameSystem>
     {
         Events.ExternalsCached ??= new();
         Events.PlayerDied ??= new();
+        Events.PlayerPaused ??= new();
 
         Events.RequestLoadingUI ??= new();
         Events.LoadingStarted ??= new();
