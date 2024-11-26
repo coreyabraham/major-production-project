@@ -71,19 +71,19 @@ public class SettingsUI : MonoBehaviour
     public void MasterVolumeChanged(float value)
     {
         MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Master);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
     }
 
     public void MusicVolumeChanged(float value)
     {
         MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Music);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
     }
 
     public void SoundVolumeChanged(float value)
     {
         MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Sound);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioCalculations(value));
+        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
 
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();

@@ -15,6 +15,7 @@ public class TitleUI : MonoBehaviour
 
     [field: Header("Miscellaneous")]
     public string ButtonTag = "UI_BUTTON";
+    [field: SerializeField] private AudioClip Music;
 
     [field: Header("External References")]
     public SettingsUI SettingsMenu;
@@ -26,11 +27,14 @@ public class TitleUI : MonoBehaviour
     [field: SerializeField] private List<NavigatorButton> CachedButons;
 
     private bool GameStarting = false;
+    private AudioSource Source;
 
     public void StartGame()
     {
         if (GameStarting) return;
         GameStarting = true;
+
+        Source.Stop();
 
         int targetIndex = GameSystem.Instance.GetCurrentSceneBuildIndex() + 1;
         string targetName = GameSystem.Instance.GetLevelNameWithIndex(targetIndex);
@@ -74,5 +78,14 @@ public class TitleUI : MonoBehaviour
         GetButtons();
     }
 
-    private void Start() => ToggleFrames(Groups[StartingGroupIndex].Frame);
+    private void Start()
+    {
+        ToggleFrames(Groups[StartingGroupIndex].Frame);
+        
+        Source = AudioHandler.Instance.CreateGlobalSource(Music, AudioType.Music);
+        Source.loop = true;
+        Source.Play();
+
+        print(AudioHandler.Instance.GetSource(Music.name));
+    }
 }

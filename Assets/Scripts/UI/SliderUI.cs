@@ -35,7 +35,10 @@ public class SliderUI : MonoBehaviour
             case SliderTypeUI.Percentage:
                 {
                     displayValue *= 100;
-                    if (RoundToDecimals > 0) displayValue = (float)Math.Round(displayValue, RoundToDecimals);
+
+                    displayValue = RoundToDecimals <= 0
+                        ? Mathf.RoundToInt(displayValue) 
+                        : (float)Math.Round(displayValue, RoundToDecimals);
                 }
                 break;
 

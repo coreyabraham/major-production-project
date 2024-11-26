@@ -448,6 +448,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 786e80d160e4e674d94c0e6822067593, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ToggleCursor: 0
+  DemoResetKey: 0
   TitleScreenScene: Title Screen
   TitleUIObject: TitleUI
   Frame: {fileID: 226840395386259781}
@@ -508,7 +510,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5773476190144420078}
         m_TargetAssemblyTypeName: PauseMenuUI, Assembly-CSharp
-        m_MethodName: InputCalled
+        m_MethodName: PauseInputCalled
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -520,6 +522,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 61668d0b-15b2-43a8-9258-bf4beae1f66a
     m_ActionName: Player/Pause[/Keyboard/escape]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5773476190144420078}
+        m_TargetAssemblyTypeName: PauseMenuUI, Assembly-CSharp
+        m_MethodName: ResetInputCalled
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c933a81a-694d-4e07-aecc-c415e55e9322
+    m_ActionName: Player/Reset[/Keyboard/backquote]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
