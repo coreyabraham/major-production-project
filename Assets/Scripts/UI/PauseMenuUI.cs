@@ -1,3 +1,5 @@
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -6,19 +8,27 @@ public class PauseMenuUI : MonoBehaviour
 {
     [field: Header("Settings")]
     [field: SerializeField] private bool ToggleCursor = false;
+    [field: SerializeField] private bool AllowForDebug = true;
+    [field: SerializeField] private bool DemoResetKey = false;
 
     [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
     [field: SerializeField] private string TitleUIObject = "TitleUI";
 
-    [field: Header("Generics")]
+    [field: Header("Game Objects")]
     [field: SerializeField] private GameObject Frame;
+    [field: SerializeField] private GameObject Backdrop;
+    [field: SerializeField] private GameObject SettingsContainer;
+
+    [field: Header("Other Externals")]
     [field: SerializeField] private SettingsUI Settings;
+    [field: SerializeField] private TMP_Text FPSLabel;
 
     [field: Header("Lists and Arrays")]
     [field: SerializeField] private PromptDataUI ToMainMenuData;
 
     private bool PausingPermitted;
+    private float timer, refresh, avgFramerate;
 
     public void NewSceneLoaded(Scene Scene, LoadSceneMode _)
     {
@@ -46,19 +56,34 @@ public class PauseMenuUI : MonoBehaviour
         TitleUI.SettingsMenu.PromptHandler = Settings.PromptHandler;
     }
 
-    public void InputCalled(InputAction.CallbackContext ctx)
+    public void PauseInputCalled(InputAction.CallbackContext ctx)
     {
         if (!PausingPermitted || ctx.phase != InputActionPhase.Performed) return;
         ToggleUI();
     }
 
+    public void ResetInputCalled(InputAction.CallbackContext ctx)
+    {
+        bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
+        if (!DemoResetKey || levelCheck || ctx.phase != InputActionPhase.Performed) return;
+        GameSystem.Instance.RequestLoadScene(TitleScreenScene);
+    }
+
+    public void DebugInputCalled(InputAction.CallbackContext ctx)
+    {
+        if (!AllowForDebug || ctx.phase != InputActionPhase.Performed) return;
+        FPSLabel.gameObject.SetActive(!FPSLabel.gameObject.activeSelf);
+    }
+
     private void ToggleUI()
     {
         Frame.SetActive(!Frame.activeSelf);
+        Backdrop.SetActive(Frame.activeSelf);
 
-        if (Settings.gameObject.activeSelf) Settings.gameObject.SetActive(false);
+        if (SettingsContainer.activeSelf) SettingsContainer.SetActive(false);
         if (Settings.PromptHandler.PromptActive()) Settings.PromptHandler.ForceEnd();
 
+        GameSystem.Instance.SetPausedState(Frame.activeSelf);
         Time.timeScale = Frame.activeSelf ? 0.0f : 1.0f;
 
         bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
@@ -77,7 +102,7 @@ public class PauseMenuUI : MonoBehaviour
     public void SettingsBackBtnClicked()
     {
         if (!PausingPermitted) return;
-        Settings.gameObject.SetActive(false);
+        SettingsContainer.SetActive(false);
         Frame.SetActive(true);
     }
 
@@ -85,7 +110,7 @@ public class PauseMenuUI : MonoBehaviour
 
     public void SettingsClicked()
     {
-        Settings.gameObject.SetActive(true);
+        SettingsContainer.SetActive(true);
         Frame.SetActive(false);
     }
 
@@ -93,6 +118,23 @@ public class PauseMenuUI : MonoBehaviour
     {
         ToMainMenuData.PromptFinalized = PromptFinalized;
         Settings.PromptHandler.Begin(ToMainMenuData);
+    }
+
+    private void Update()
+    {
+        if (!FPSLabel.gameObject.activeSelf) return;
+
+        if (Time.timeScale <= 0.0f)
+        {
+            FPSLabel.text = "Game Paused.";
+            return;
+        }
+
+        float timelapse = Time.smoothDeltaTime;
+        timer = timer <= 0 ? refresh : timer -= timelapse;
+
+        if (timer <= 0) avgFramerate = (int)(1f / timelapse);
+        FPSLabel.text = string.Format("FPS: {0}", avgFramerate.ToString());
     }
 
     private void Start()

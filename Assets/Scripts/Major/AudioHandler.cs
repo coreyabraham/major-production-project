@@ -20,7 +20,6 @@ public class AudioHandler : Singleton<AudioHandler>
 
     public MixerReference GetMixerReference(AudioType TargetAudioType)
     {
-        // TODO: Surely there's a better way to do this... right?
         foreach (MixerReference mixer in MixerReferences)
         {
             if (mixer.AudioType != TargetAudioType) continue;
@@ -32,14 +31,7 @@ public class AudioHandler : Singleton<AudioHandler>
 
     public AudioSource GetSource(string Name)
     {
-        // TODO: Replace this algorithm with a much faster find Algorithm
-        AudioSource found = null;
-
-        foreach (AudioSource source in Sources)
-        {
-            if (source.name != Name) continue;
-            found = source;
-        }
+        AudioSource found = Sources.Find(source => string.Equals(source.name, Name));
 
         if (!found)
         {
@@ -105,7 +97,7 @@ public class AudioHandler : Singleton<AudioHandler>
         PlaySource(source, delay);
     }
 
-    public float AudioCalculations(float value) => Mathf.Log10(value) * 20.0f;
+    public float AudioDecibelCalculation(float value) => Mathf.Log10(value) * 20.0f;
 
     private void Start()
     {
@@ -126,16 +118,9 @@ public class AudioHandler : Singleton<AudioHandler>
                 case AudioType.Sound: value = currentData.SoundVolume; break;
             }
 
-            AudioMixer.SetFloat(MixerReferences[i].ExposedName, AudioCalculations(value));
+            AudioMixer.SetFloat(MixerReferences[i].ExposedName, AudioDecibelCalculation(value));
         }
     }
 
-    protected override void Initialize() 
-    {
-        // TODO: Figure out what needs to be done here in future revisions!
-        //foreach (AudioSource source in Sources)
-        //{
-
-        //}
-    }
+    protected override void Initialize() { }
 }
