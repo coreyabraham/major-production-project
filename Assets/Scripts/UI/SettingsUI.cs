@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class SettingsUI : MonoBehaviour
 {
@@ -68,29 +69,22 @@ public class SettingsUI : MonoBehaviour
     #endregion
 
     #region Public References
-    public void MasterVolumeChanged(float value)
-    {
-        MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Master);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
-    }
+    public void MasterVolumeChanged(float value) => ModifyAudioSetting(AudioHandler.Instance.GetMixerReference(AudioType.Master).ExposedName, value);
 
-    public void MusicVolumeChanged(float value)
-    {
-        MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Music);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
-    }
+    public void MusicVolumeChanged(float value) => ModifyAudioSetting(AudioHandler.Instance.GetMixerReference(AudioType.Music).ExposedName, value);
 
     public void SoundVolumeChanged(float value)
     {
-        MixerReference reference = AudioHandler.Instance.GetMixerReference(AudioType.Sound);
-        AudioHandler.Instance.AudioMixer.SetFloat(reference.ExposedName, AudioHandler.Instance.AudioDecibelCalculation(value));
+        ModifyAudioSetting(AudioHandler.Instance.GetMixerReference(AudioType.Sound).ExposedName, value);
 
         if (SoundTest.isPlaying) SoundTest.Stop();
         SoundTest.Play();
     }
+
+    public void VsyncToggled(bool IsOn) => FPSSlider.Slider.interactable = !IsOn;
     #endregion
 
-    #region PromptMethods
+    #region Prompt Methods
     private void SavePromptFinished(bool Result)
     {
         Container.SetActive(true);
@@ -130,6 +124,8 @@ public class SettingsUI : MonoBehaviour
     #endregion
 
     #region Private Methods
+    private void ModifyAudioSetting(string Name, float Value) => AudioHandler.Instance.AudioMixer.SetFloat(Name, AudioHandler.Instance.AudioDecibelCalculation(Value));
+
     private int GetDropdownOptionIndex(List<TMP_Dropdown.OptionData> Options, string Text)
     {
         int index = -1;
@@ -145,10 +141,7 @@ public class SettingsUI : MonoBehaviour
         return index;
     }
 
-    private void DropdownInitalized(TMP_Dropdown Dropdown, string Text)
-    {
-        Dropdown.value = GetDropdownOptionIndex(Dropdown.options, Text);
-    }
+    private void DropdownInitalized(TMP_Dropdown Dropdown, string Text) => Dropdown.value = GetDropdownOptionIndex(Dropdown.options, Text);
 
     private void UpdateUI(PlayerSettings Settings)
     {
