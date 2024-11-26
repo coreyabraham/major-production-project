@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class TitleUI : MonoBehaviour
 {
@@ -10,47 +10,29 @@ public class TitleUI : MonoBehaviour
         public GameObject Frame;
     }
 
-    [field: Header("Values")]
-    [field: SerializeField] private int StartingGroupIndex;
-
-    [field: Header("Miscellaneous")]
+    public TMP_Text SubTitle;
+    public string SubTitleText = "TEAM NAME";
     public string ButtonTag = "UI_BUTTON";
 
-    [field: Header("External References")]
+    [field: Space(5.0f)]
+
     public SettingsUI SettingsMenu;
     public ExitUI ExitMenu;
 
-    [field: Header("Lists and Arrays")]
+    [field: Space(5.0f)]
+
     [field: SerializeField] private FrameGroup[] Groups;
-    
-    [field: SerializeField] private List<NavigatorButton> CachedButons;
-
-    private bool GameStarting = false;
-
-    public void StartGame()
-    {
-        if (GameStarting) return;
-        GameStarting = true;
-
-        int targetIndex = GameSystem.Instance.GetCurrentSceneBuildIndex() + 1;
-        string targetName = GameSystem.Instance.GetLevelNameWithIndex(targetIndex);
-
-        GameSystem.Instance.RequestLoadScene(targetName);
-    }
 
     private void GetButtons()
     {
         GameObject[] objs = GameObject.FindGameObjectsWithTag(ButtonTag);
-
         foreach (GameObject obj in objs)
         {
             NavigatorButton navigator = obj.GetComponent<NavigatorButton>();
 
             if (!navigator) continue;
-            if (CachedButons.Contains(navigator)) continue;
 
-            navigator.ClickedEvent.AddListener(() => ToggleFrames(navigator.TargetFrame));
-            CachedButons.Add(navigator);
+            navigator.Button.onClick.AddListener(() => ButtonClicked(navigator));
         }
     }
 
@@ -58,21 +40,37 @@ public class TitleUI : MonoBehaviour
     {
         if (Frame == null) return;
 
-        for (int i = 0; i < Groups.Length; i++)
-        {
-            if (Groups[i].Frame == null) continue;
+        FrameGroup target = new();
+        bool foundTarget = false;
 
-            if (Groups[i].Frame == Frame)
+        foreach (FrameGroup group in Groups)
+        {
+            if (group.Frame == Frame)
             {
-                Groups[i].Frame.SetActive(true);
+                target = group;
+                foundTarget = true;
+                Frame.SetActive(true);
+
                 continue;
             }
 
-            Groups[i].Frame.SetActive(false);
+            group.Frame?.SetActive(false);
         }
+
+        string str = (!foundTarget) ? Frame.name : target.Name;
+        SubTitle.text = SubTitleText + " | " + str;
 
         GetButtons();
     }
 
-    private void Start() => ToggleFrames(Groups[StartingGroupIndex].Frame);
+    private void ButtonClicked(NavigatorButton Button)
+    {
+        Button.ClickedEvent?.Invoke();
+        ToggleFrames(Button.TargetFrame);
+    }
+
+    private void Start()
+    {
+        ToggleFrames(Groups[0].Frame);
+    }
 }
