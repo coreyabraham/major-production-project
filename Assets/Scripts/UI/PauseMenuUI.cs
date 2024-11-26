@@ -15,10 +15,13 @@ public class PauseMenuUI : MonoBehaviour
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
     [field: SerializeField] private string TitleUIObject = "TitleUI";
 
-    [field: Header("Generics")]
+    [field: Header("Game Objects")]
     [field: SerializeField] private GameObject Frame;
-    [field: SerializeField] private SettingsUI Settings;
+    [field: SerializeField] private GameObject Backdrop;
     [field: SerializeField] private GameObject SettingsContainer;
+
+    [field: Header("Other Externals")]
+    [field: SerializeField] private SettingsUI Settings;
     [field: SerializeField] private TMP_Text FPSLabel;
 
     [field: Header("Lists and Arrays")]
@@ -75,6 +78,7 @@ public class PauseMenuUI : MonoBehaviour
     private void ToggleUI()
     {
         Frame.SetActive(!Frame.activeSelf);
+        Backdrop.SetActive(Frame.activeSelf);
 
         if (SettingsContainer.activeSelf) SettingsContainer.SetActive(false);
         if (Settings.PromptHandler.PromptActive()) Settings.PromptHandler.ForceEnd();
