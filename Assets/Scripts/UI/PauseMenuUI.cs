@@ -4,25 +4,39 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
-    [field: Header("Settings")]
-    [field: SerializeField] private bool ToggleCursor = false;
-
-    [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
     [field: SerializeField] private string TitleUIObject = "TitleUI";
 
-    [field: Header("Generics")]
+    [field: Space(2.5f)]
+
     [field: SerializeField] private GameObject Frame;
     [field: SerializeField] private SettingsUI Settings;
+    [field: SerializeField] private NavigatorButton SettingsBackBtn;
 
-    [field: Header("Lists and Arrays")]
+    [field: Space(2.5f)]
+
+    [field: SerializeField] private NavigatorButton ResumeBtn;
+    [field: SerializeField] private NavigatorButton SettingsBtn;
+    [field: SerializeField] private NavigatorButton ExitBtn;
+
+    [field: Space(2.5f)]
+
     [field: SerializeField] private PromptDataUI ToMainMenuData;
 
     private bool PausingPermitted;
 
-    public void NewSceneLoaded(Scene Scene, LoadSceneMode _)
+    public void NewSceneLoaded(Scene Scene, LoadSceneMode Mode)
     {
-        PausingPermitted = !GameSystem.Instance.BlacklistedPauseScenes.Contains(Scene.name);
+        bool result = false;
+
+        foreach (string SceneName in GameSystem.Instance.BlacklistedPauseScenes)
+        {
+            result = Scene.name != SceneName;
+            if (result == true) break;
+        }
+
+        PausingPermitted = result;
+
         if (Scene.name != TitleScreenScene) return;
 
         TitleUI TitleUI = null;
@@ -48,7 +62,8 @@ public class PauseMenuUI : MonoBehaviour
 
     public void InputCalled(InputAction.CallbackContext ctx)
     {
-        if (!PausingPermitted || ctx.phase != InputActionPhase.Performed) return;
+        if (!PausingPermitted) return;
+        if (ctx.phase != InputActionPhase.Performed) return;
         ToggleUI();
     }
 
@@ -59,49 +74,45 @@ public class PauseMenuUI : MonoBehaviour
         if (Settings.gameObject.activeSelf) Settings.gameObject.SetActive(false);
         if (Settings.PromptHandler.PromptActive()) Settings.PromptHandler.ForceEnd();
 
-        Time.timeScale = Frame.activeSelf ? 0.0f : 1.0f;
-
-        bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
-        if (!ToggleCursor || levelCheck) return;
-
-        Cursor.visible = Frame.activeSelf;
+        Time.timeScale = (Frame.activeSelf) ? 0.0f : 1.0f;
     }
 
     private void PromptFinalized(bool result)
     {
         if (!result) return;
-        GameSystem.Instance.RequestLoadScene(TitleScreenScene);
+        SceneManager.LoadScene(TitleScreenScene);
         ToggleUI();
     }
 
-    public void SettingsBackBtnClicked()
+    private void SettingsBackBtnClicked()
     {
         if (!PausingPermitted) return;
         Settings.gameObject.SetActive(false);
         Frame.SetActive(true);
     }
 
-    public void ResumeClicked() => ToggleUI();
+    private void ResumeClicked() => ToggleUI();
 
-    public void SettingsClicked()
+    private void SettingsClicked()
     {
         Settings.gameObject.SetActive(true);
         Frame.SetActive(false);
     }
 
-    public void ExitClicked()
+    private void ExitClicked()
     {
         ToMainMenuData.PromptFinalized = PromptFinalized;
         Settings.PromptHandler.Begin(ToMainMenuData);
     }
 
-    private void Start()
+    private void Awake()
     {
         Frame.SetActive(false);
 
-        bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
-        if (!ToggleCursor || levelCheck) return;
+        ResumeBtn.ClickedEvent.AddListener(ResumeClicked);
+        SettingsBtn.ClickedEvent.AddListener(SettingsClicked);
+        ExitBtn.ClickedEvent.AddListener(ExitClicked);
 
-        Cursor.visible = false;
+        SettingsBackBtn.ClickedEvent.AddListener(SettingsBackBtnClicked);
     }
 }
