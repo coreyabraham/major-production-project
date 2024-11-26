@@ -51,13 +51,16 @@ public class TimedHazardTrigger : MonoBehaviour
         {
             for (int i = 0; i < particleEffects.Length; i++)
             {
-                if (particleEffects[i].HasFloat("GasRate"))
+                if (i > 2)
                 {
-                    if (particleEffects[i].GetFloat("GasRate") > 0)
+                    if (particleEffects[i].HasFloat("GasRate"))
                     {
-                        particleEffects[i].SetFloat("GasRate", 0);
+                        if (particleEffects[i].GetFloat("GasRate") > 0)
+                        {
+                            particleEffects[i].SetFloat("GasRate", 0);
+                        }
+                        else particleEffects[i].SetFloat("GasRate", particleRates[i]);
                     }
-                    else particleEffects[i].SetFloat("GasRate", particleRates[i]);
                 }
             }
         }
@@ -94,8 +97,12 @@ public class TimedHazardTrigger : MonoBehaviour
 
             for (int i = 0; i < transform.childCount; i++)
             {
-                particleEffects[i] = transform.GetChild(i).gameObject.GetComponent<VisualEffect>();
-                particleRates[i] = particleEffects[i].GetFloat("GasRate");
+                if (i > 2)
+                {
+                    //add the particle if it is a particle
+                    particleEffects[i] = transform.GetChild(i).gameObject.GetComponent<VisualEffect>();
+                    particleRates[i] = particleEffects[i].GetFloat("GasRate");
+                }
             }
         }
 

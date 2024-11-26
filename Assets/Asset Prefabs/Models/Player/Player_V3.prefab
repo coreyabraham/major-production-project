@@ -2029,6 +2029,7 @@ GameObject:
   - component: {fileID: 590231323864142498}
   - component: {fileID: 1886212965}
   - component: {fileID: 1811432823432441354}
+  - component: {fileID: 1464405266}
   m_Layer: 0
   m_Name: Player_V3
   m_TagString: Player
@@ -2079,17 +2080,16 @@ MonoBehaviour:
   JumpForcePipe: 2
   EnableScurryInAir: 1
   LockZAxis: 1
-  ZAxisPlane: -26.54
+  ZAxisPlane: 0.2
   GravityMultiplier: 1.05
   VelocityYIdle: 0.1
   ClimbSpeed: 1.5
   SlideSpeed: 0.1
-  TimeBeforeSlide: 1
+  TimeBeforeSlide: 0.1
   LerpStyle: 2
   LerpSpeed: 8
   PushForce: 1
   GrabTag: Grabbable
-  IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
   Camera: {fileID: 0}
@@ -2127,22 +2127,18 @@ MonoBehaviour:
     InternalAnimType: 7
     CustomValueType: 0
     CustomValue: 
-  Events:
-    Moving:
-      m_PersistentCalls:
-        m_Calls: []
-    Jumping:
-      m_PersistentCalls:
-        m_Calls: []
-    Scurrying:
-      m_PersistentCalls:
-        m_Calls: []
-    Climbing:
-      m_PersistentCalls:
-        m_Calls: []
-    Interacting:
-      m_PersistentCalls:
-        m_Calls: []
+  - Name: Drowned
+    InternalAnimType: 11
+    CustomValueType: 0
+    CustomValue: 
+  - Name: Burned
+    InternalAnimType: 10
+    CustomValueType: 0
+    CustomValue: 
+  - Name: Prayed
+    InternalAnimType: 12
+    CustomValueType: 0
+    CustomValue: 
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
@@ -2156,6 +2152,7 @@ MonoBehaviour:
   IsJumping: 0
   JumpingRequested: 0
   InteractHeld: 0
+  CurrentCheckpoint: {fileID: 0}
 --- !u!143 &1886212965
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2264,10 +2261,6 @@ MonoBehaviour:
     m_ActionId: 5a9cda02-3beb-4749-ad5f-90bc1a35f41c
     m_ActionName: Player/Climb[/Keyboard/e]
   - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: def9cd2f-9fc4-4cfe-8133-1e3b8b614bef
-    m_ActionName: Generic/Pause[/Keyboard/escape]
-  - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 590231323864142498}
         m_TargetAssemblyTypeName: PlayerSystem, Assembly-CSharp
@@ -2283,11 +2276,111 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: a52396c5-967e-4b58-8fac-adf39fa7a420
     m_ActionName: Player/Interact[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 61668d0b-15b2-43a8-9258-bf4beae1f66a
+    m_ActionName: Player/Pause[/Keyboard/escape]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!82 &1464405266
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246030398808792733}
+  m_Enabled: 0
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 13c4998d2c818d247b2445a6117079dc, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.4
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &7035204898497686867
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2516,7 +2609,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
