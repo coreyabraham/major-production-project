@@ -6,6 +6,7 @@ public class PauseMenuUI : MonoBehaviour
 {
     [field: Header("Settings")]
     [field: SerializeField] private bool ToggleCursor = false;
+    [field: SerializeField] private bool DemoResetKey = false;
 
     [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
@@ -46,10 +47,17 @@ public class PauseMenuUI : MonoBehaviour
         TitleUI.SettingsMenu.PromptHandler = Settings.PromptHandler;
     }
 
-    public void InputCalled(InputAction.CallbackContext ctx)
+    public void PauseInputCalled(InputAction.CallbackContext ctx)
     {
         if (!PausingPermitted || ctx.phase != InputActionPhase.Performed) return;
         ToggleUI();
+    }
+
+    public void ResetInputCalled(InputAction.CallbackContext ctx)
+    {
+        bool levelCheck = GameSystem.Instance.BlacklistedPauseScenes.Contains(GameSystem.Instance.GetCurrentLevelName());
+        if (!DemoResetKey || levelCheck || ctx.phase != InputActionPhase.Performed) return;
+        GameSystem.Instance.RequestLoadScene(TitleScreenScene);
     }
 
     private void ToggleUI()
