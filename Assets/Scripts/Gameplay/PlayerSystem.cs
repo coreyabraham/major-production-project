@@ -399,12 +399,21 @@ public class PlayerSystem : MonoBehaviour
             ? transform.position.x + grabDist // Left Side
             : transform.position.x - grabDist; // Right Side
 
-        if ((CharacterRotation.eulerAngles.y <= 360f && CharacterRotation.eulerAngles.y > 180f && transform.position.x <= PullObjPos.x && box.CheckIfValidPush(Vector3.right)) ||
-            (CharacterRotation.eulerAngles.y <= 180f && CharacterRotation.eulerAngles.y > 0f && transform.position.x > PullObjPos.x && box.CheckIfValidPush(Vector3.left)))
+
+        if (CharacterRotation.eulerAngles.y <= 360f && CharacterRotation.eulerAngles.y > 180f && transform.position.x <= PullObjPos.x)
         {
+            if (!box.CheckIfValidPush(Vector3.right) && MoveInput.x > 0) { return; }
             other.transform.parent.position = new(grabX - other.transform.localPosition.x, other.transform.parent.position.y, other.transform.parent.position.z);
             return;
         }
+
+        if (CharacterRotation.eulerAngles.y <= 180f && CharacterRotation.eulerAngles.y > 0f && transform.position.x > PullObjPos.x)
+        {
+            if (!box.CheckIfValidPush(Vector3.left) && MoveInput.x < 0) { return; }
+            other.transform.parent.position = new(grabX - other.transform.localPosition.x, other.transform.parent.position.y, other.transform.parent.position.z);
+            return;
+        }
+
 
         IsPushing = IsPulling = false;
     }
@@ -557,7 +566,7 @@ public class PlayerSystem : MonoBehaviour
                     else { IsPulling = false; }
 
 
-                    if ((MoveInput.x > 0 && PullObjPos.x > transform.position.x) || (MoveInput.x < 0 && PullObjPos.x < transform.position.x))
+                    if ((MoveInput.x > 0 && PullObjPos.x > transform.position.x && box.CheckIfValidPush(Vector3.right)) || (MoveInput.x < 0 && PullObjPos.x < transform.position.x && box.CheckIfValidPush(Vector3.left)))
                     { IsPushing = true; }
                     else { IsPushing = false; }
                 }
