@@ -17,5 +17,8 @@ public enum AnimType
     Burned,
     Drowned,
     Prayed,
-    XVelocity
+    XVelocity,
+    EnemyIsSpotted,
+    IsFlying,
+    IsLanding
 }

@@ -1,3 +1,4 @@
+using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.VFX;
@@ -51,7 +52,7 @@ public class TimedHazardTrigger : MonoBehaviour
         {
             for (int i = 0; i < particleEffects.Length; i++)
             {
-                if (i > 2)
+                if (i > 2 || transform.GetChild(i).name == "VFX_Fire" || transform.GetChild(i).name == "VFX_HeatDistortion")
                 {
                     if (particleEffects[i].HasFloat("GasRate"))
                     {
@@ -97,7 +98,7 @@ public class TimedHazardTrigger : MonoBehaviour
 
             for (int i = 0; i < transform.childCount; i++)
             {
-                if (i > 2)
+                if (i > 2 || transform.GetChild(i).name == "VFX_Fire" || transform.GetChild(i).name == "VFX_HeatDistortion")
                 {
                     //add the particle if it is a particle
                     particleEffects[i] = transform.GetChild(i).gameObject.GetComponent<VisualEffect>();

@@ -10,6 +10,10 @@ public class CrowMovement : MonoBehaviour
     // Check for playing Death Animation
     public bool attackPlayer;
     #endregion
+    [field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
+    public Animator Animator;
+    [field: Header("Collections")]
+    [field: SerializeField] private PlayerAnimation[] CrowAnimations;
 
 
     #region Private Variables
@@ -24,6 +28,7 @@ public class CrowMovement : MonoBehaviour
     // Reset Position on Death
     private float resetTimer = 0.0f;
     private bool resetTriggered = false;
+    private bool EnemyIsSpotted, IsLanding, IsFlying;
     #endregion
 
 
@@ -39,6 +44,7 @@ public class CrowMovement : MonoBehaviour
         if (awareness.GetAwareness())
         {
             resetTriggered = true;
+            IsFlying = true;
 
             // Rotate crow to face target.
             targetDirection = awareness.GetDirection();
@@ -46,26 +52,50 @@ public class CrowMovement : MonoBehaviour
 
             // Launch crow forward.
             rb.velocity = transform.forward * speed;
+
+            if (!resetTriggered) { return; }
+
+            resetTimer += Time.fixedDeltaTime;
+
+            if (resetTimer > 1f)
+            {
+                FreezeRigidbody();
+
+                attackPlayer = true;
+                rb.velocity = new(0, 0);
+                transform.SetPositionAndRotation(originPosition, originRotation);
+
+                UnfreezeRigidbody();
+
+                attackPlayer = false;
+                resetTimer = 0.0f;
+                resetTriggered = false;
+                IsFlying = false;
+                awareness.ResetAwareness();
+            }
         }
-        if (!resetTriggered) { return; }
-
-        resetTimer += Time.fixedDeltaTime;
-
-        if (resetTimer > 1f)
+    }
+    private void Update()
+    {
+        foreach (PlayerAnimation anim in CrowAnimations)
         {
-            FreezeRigidbody();
-
-            attackPlayer = true;
-            rb.velocity = new(0, 0);
-            transform.SetPositionAndRotation(originPosition, originRotation);
-
-            UnfreezeRigidbody();
-
-            attackPlayer = false;
-            resetTimer = 0.0f;
-            resetTriggered = false;
-
-            awareness.ResetAwareness();
+            if (anim.InternalAnimType != AnimType.Custom)
+            {
+                switch (anim.InternalAnimType)
+                {
+                    case AnimType.EnemyIsSpotted: Animator.SetBool(anim.Name, EnemyIsSpotted); break;
+                    case AnimType.IsFlying: Animator.SetBool(anim.Name, IsFlying); break;
+                    case AnimType.IsLanding: Animator.SetBool(anim.Name, IsLanding); break;
+                }
+                continue;
+            }
+            switch (anim.CustomValueType)
+            {
+                case AnimValueType.Boolean:
+                    if (!bool.TryParse(anim.CustomValue, out bool resultBool)) return;
+                    Animator.SetBool(anim.Name, resultBool);
+                    break;
+            }
         }
     }
 
