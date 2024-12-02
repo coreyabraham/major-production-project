@@ -11,11 +11,7 @@ public class LoadingMenu : MonoBehaviour
     [field: Space(2.5f)]
 
     [field: SerializeField] private Image Background;
-    [field: SerializeField] private TMP_Text Label;
-    [field: SerializeField] private Slider Bar;
-
-    [field: Header("Settings")]
-    [field: SerializeField] private float LerpingModifier = 1.0f;
+    [field: SerializeField] private Animator SpriteAnimator;
 
     private bool Loading = false;
     private bool UIRequested = false;
@@ -23,10 +19,13 @@ public class LoadingMenu : MonoBehaviour
     private float ArtificialTimer = 0.0f;
     readonly private float MaxArtificialTimer = 0.0f;
 
-    private float TimeElapsed = 0.0f;
     private float CurrentProgress = 0.0f;
 
-    public void ToggleLoadingScreen(bool Toggle) => Canvas.SetActive(Toggle);
+    public void ToggleLoadingScreen(bool Toggle)
+    {
+        Canvas.SetActive(Toggle);
+        SpriteAnimator.gameObject.SetActive(Toggle);
+    }
 
     public void RequestUI()
     {
@@ -38,17 +37,11 @@ public class LoadingMenu : MonoBehaviour
 
     public void LoadingFinished()
     {
-        print("Time Spent loading: " + TimeElapsed.ToString());
-
         Loading = false;
         UIRequested = false;
 
-        TimeElapsed = 0.0f;
         ArtificialTimer = 0.0f;
         CurrentProgress = 0.0f;
-
-        Bar.value = Bar.minValue;
-        Label.text = "Progress: " + Bar.minValue.ToString() + "%";
 
         ToggleLoadingScreen(false);
     }
@@ -74,13 +67,6 @@ public class LoadingMenu : MonoBehaviour
 
             GameSystem.Instance.Events.LoadingUIFinished?.Invoke();
         }
-
-        if (!Loading) return;
-
-        Bar.value = Mathf.Lerp(Bar.value, CurrentProgress * 2, LerpingModifier * Time.deltaTime);
-        Label.text = "Progress: " + Mathf.Round(CurrentProgress * 100.0f).ToString() + "%";
-
-        TimeElapsed += Time.deltaTime;
     }
 
     private void Start() => Canvas.SetActive(false);
