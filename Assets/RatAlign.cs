@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class RatAlign : MonoBehaviour
 {
+    // Written Ethan & Brooke
+
     public Transform targetPos;
     public Transform returnPos;
     public GameObject ratbody;
