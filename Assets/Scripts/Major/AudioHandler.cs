@@ -5,6 +5,13 @@ using UnityEngine.Audio;
 
 public class AudioHandler : Singleton<AudioHandler>
 {
+    [System.Serializable]
+    public struct InitializerClip
+    {
+        public AudioClip Sound;
+        public AudioType Type;
+    }
+
     [field: Header("Mixing")]
     public AudioMixer AudioMixer;
     public MixerReference[] MixerReferences;
@@ -14,6 +21,7 @@ public class AudioHandler : Singleton<AudioHandler>
 
     [field: Header("Lists and Arrays")]
     [field: SerializeField] private List<AudioSource> Sources = new();
+    [field: SerializeField] private List<InitializerClip> InitializingClips = new();
 
     public void AddSource(AudioSource Source) => Sources.Add(Source);
     public bool RemoveSource(AudioSource Source) => Sources.Remove(Source);
@@ -29,13 +37,13 @@ public class AudioHandler : Singleton<AudioHandler>
         return null;
     }
 
-    public AudioSource GetSource(string Name)
+    public AudioSource GetSource(string Name, bool IgnoreDebug = false)
     {
         AudioSource found = Sources.Find(source => string.Equals(source.name, Name));
 
         if (!found)
         {
-            Debug.LogWarning(name + " | Could not find AudioSource with Name: " + Name + " in internal AudioSources list.");
+            if (!IgnoreDebug) Debug.LogWarning(name + " | Could not find AudioSource with Name: " + Name + " in internal AudioSources list.");
             return null;
         }
 
@@ -122,5 +130,9 @@ public class AudioHandler : Singleton<AudioHandler>
         }
     }
 
-    protected override void Initialize() { }
+    protected override void Initialize() 
+    { 
+        foreach (InitializerClip clip in InitializingClips)
+            CreateGlobalSource(clip.Sound, clip.Type);
+    }
 }

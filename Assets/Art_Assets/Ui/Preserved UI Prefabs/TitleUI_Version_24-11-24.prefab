@@ -550,7 +550,6 @@ MonoBehaviour:
   LerpSpeed: 8
   PushForce: 1
   GrabTag: Grabbable
-  IgnoreCheckpointData: 1
   SurfaceMaterialsPath: SurfaceMaterials
   GenericSurface: {fileID: 11400000, guid: 1f6170a23a6ff694a9c884da631dffa8, type: 2}
   Camera: {fileID: 0}
@@ -588,22 +587,6 @@ MonoBehaviour:
     InternalAnimType: 7
     CustomValueType: 0
     CustomValue: 
-  Events:
-    Moving:
-      m_PersistentCalls:
-        m_Calls: []
-    Jumping:
-      m_PersistentCalls:
-        m_Calls: []
-    Scurrying:
-      m_PersistentCalls:
-        m_Calls: []
-    Climbing:
-      m_PersistentCalls:
-        m_Calls: []
-    Interacting:
-      m_PersistentCalls:
-        m_Calls: []
   ClimbingRequested: 0
   IsClimbing: 0
   IsJumpingFromClimb: 0
@@ -617,6 +600,7 @@ MonoBehaviour:
   IsJumping: 0
   JumpingRequested: 0
   InteractHeld: 0
+  CurrentCheckpoint: {fileID: 0}
 --- !u!143 &5889827821461320961
 CharacterController:
   m_ObjectHideFlags: 0
@@ -6667,29 +6651,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StartingGroupIndex: 0
   ButtonTag: UI_BUTTON
-  EventSystem: {fileID: 267485817398894291}
+  Music: {fileID: 0}
   SettingsMenu: {fileID: 6790132383352851949}
   ExitMenu: {fileID: 2316544725335324158}
-  InputModule: {fileID: 6899100395042159131}
   Groups:
   - Name: Main Menu
     Frame: {fileID: 2316544724456196501}
-    FirstSelection: {fileID: 6307273641991340916}
   - Name: Play Menu
     Frame: {fileID: 2316544725531518960}
-    FirstSelection: {fileID: 6307273641858113428}
   - Name: Settings Menu
     Frame: {fileID: 274447813981979718}
-    FirstSelection: {fileID: 5106250097769675245}
   - Name: Credits Menu
     Frame: {fileID: 2316544725034045094}
-    FirstSelection: {fileID: 6307273641470695771}
   - Name: Exit Menu
     Frame: {fileID: 2316544725335324160}
-    FirstSelection: {fileID: 0}
-  ActionNames:
-  - Click
-  - Submit
   CachedButons: []
 --- !u!1 &2316544724957660563
 GameObject:
@@ -6817,45 +6792,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9021cbfc56c6f9644b41ae8ca08d9c2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Parent: {fileID: 9187783032128248374}
-  Template: {fileID: 0}
   Prefabs:
   - MemberName: 'Jordan Schofield '
     MemberRoles: Producer / Designer
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Brooke Feely
     MemberRoles: Designer
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Declan Cassidy
     MemberRoles: Designer
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Jaio Medwin
     MemberRoles: Artist
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Michelle Hayashi
     MemberRoles: Artist
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Ethan Grigg
     MemberRoles: Artist
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Casey Pozzobon
     MemberRoles: Artist
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Josh Zurcas
     MemberRoles: Programmer
     MemberLink: https://www.linkedin.com/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
   - MemberName: Corey Abraham
     MemberRoles: Programmer
     MemberLink: https://coreyabraham.github.io/
     MemberIcon: {fileID: 0}
+    Instance: {fileID: 0}
 --- !u!1 &2316544725112430558
 GameObject:
   m_ObjectHideFlags: 0
@@ -7967,6 +7949,7 @@ MonoBehaviour:
     AudioMixerGroup: {fileID: -8211331919460887159, guid: 142fccf1582619749aa7b932b853062f, type: 2}
   JsonHandler: {fileID: 6022398334170992747}
   Sources: []
+  InitializingClips: []
 --- !u!1 &2967070723108286417
 GameObject:
   m_ObjectHideFlags: 0
@@ -10342,6 +10325,9 @@ MonoBehaviour:
     PlayerDied:
       m_PersistentCalls:
         m_Calls: []
+    PlayerPaused:
+      m_PersistentCalls:
+        m_Calls: []
     RequestLoadingUI:
       m_PersistentCalls:
         m_Calls:
@@ -11298,12 +11284,8 @@ MonoBehaviour:
     Resolution: 
     Quality: Very Low
     WindowMode: FullscreenWindow
-    HudScale: x1
     FramesPerSecond: 60
     UseVsync: 1
-    Contrast: 0.5
-    Brightness: 0.5
-    ColourAccessibility: Default
   Initialized:
     m_PersistentCalls:
       m_Calls: []
@@ -17077,12 +17059,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 786e80d160e4e674d94c0e6822067593, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ToggleCursor: 0
+  AllowForDebug: 1
+  DemoResetKey: 0
   TitleScreenScene: Title Screen
   TitleUIObject: TitleUI
-  PlayUIObject: PlayUI
   Frame: {fileID: 5344696196891472782}
+  Backdrop: {fileID: 0}
+  SettingsContainer: {fileID: 0}
   Settings: {fileID: 6790132383352851949}
-  ResumeBtn: {fileID: 5881009791460193369}
+  FPSLabel: {fileID: 0}
   ToMainMenuData:
     Title: Exiting to Title Screen
     SubTitle: Exiting Confirmation
@@ -17090,10 +17076,6 @@ MonoBehaviour:
       progress will be lost!
     AcceptButtonText: Yes, I'm sure.
     DenyButtonText: No, I change my mind.
-  ActionNames:
-  - Submit
-  - Click
-  InputModule: {fileID: 6899100395042159131}
 --- !u!114 &5521620953888226327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27523,11 +27505,6 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 972af2bd395385e42a0afa8632b9c3ca, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
---- !u!1 &6307273641470695771 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8620429351640743517, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
-  m_PrefabInstance: {fileID: 2316544724043704070}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &7277468047232752981 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
@@ -27995,17 +27972,12 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 5abdabbd6b1d57f4d84996021822cf72, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
---- !u!1 &6307273641858113428 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8620429351640743517, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
-  m_PrefabInstance: {fileID: 2316544724460544457}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6381442011688578387 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8694597740488101018, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
   m_PrefabInstance: {fileID: 2316544724460544457}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6307273641858113428}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -28242,17 +28214,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3968729789064007170, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
   m_PrefabInstance: {fileID: 2316544724597587241}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6307273641991340916 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8620429351640743517, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
-  m_PrefabInstance: {fileID: 2316544724597587241}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6381442013698765235 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8694597740488101018, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
   m_PrefabInstance: {fileID: 2316544724597587241}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6307273641991340916}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -28263,7 +28230,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8962631875348018370, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
   m_PrefabInstance: {fileID: 2316544724597587241}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6307273641991340916}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -29553,17 +29520,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5881009791460193369 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1081834574957618818, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
-  m_PrefabInstance: {fileID: 6818161692900430555}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c5843b5008d2b24a93253672addaa64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &7848752632580863049
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29685,11 +29641,6 @@ GameObject:
 --- !u!224 &4357669297336924305 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5806780167799983320, guid: 4529a43ba6c012f43ae7f2a62be2c183, type: 3}
-  m_PrefabInstance: {fileID: 7848752632580863049}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5106250097769675245 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3040305264868298148, guid: 4529a43ba6c012f43ae7f2a62be2c183, type: 3}
   m_PrefabInstance: {fileID: 7848752632580863049}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &6790132383352851949 stripped
