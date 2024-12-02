@@ -92,6 +92,8 @@ public class PlayerSystem : MonoBehaviour
     public CameraSystem Camera;
     [field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
     public Animator Animator;
+    [field: Tooltip("The Character Model to rotate when dealing with rotations")]
+    [field: SerializeField] private GameObject RotatableCharacter;
 
     [field: Header("Collections")]
     [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
@@ -650,14 +652,16 @@ public class PlayerSystem : MonoBehaviour
             else CharacterRotation = Quaternion.Euler(0, PullObjPos.y - 90, 0);
         }
 
+        GameObject rotater = !RotatableCharacter ? Character.gameObject : RotatableCharacter;
+
         switch (LerpStyle)
         {
-            case EasingStyle.Basic: CharacterRotation = Quaternion.RotateTowards(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
-            case EasingStyle.Lerp: CharacterRotation = Quaternion.Lerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
-            case EasingStyle.Slerp: CharacterRotation = Quaternion.Slerp(Character.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
+            case EasingStyle.Basic: CharacterRotation = Quaternion.RotateTowards(rotater.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
+            case EasingStyle.Lerp: CharacterRotation = Quaternion.Lerp(rotater.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
+            case EasingStyle.Slerp: CharacterRotation = Quaternion.Slerp(rotater.transform.rotation, CharacterRotation, Time.fixedDeltaTime * LerpSpeed); break;
         }
 
-        Character.transform.rotation = CharacterRotation;
+        rotater.transform.rotation = CharacterRotation;
     }
 
     private void Update()
