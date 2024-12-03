@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 3385979908390427686}
   - component: {fileID: 2309137973648779772}
   - component: {fileID: 5363585153598337294}
-  - component: {fileID: 7809831632703207975}
-  - component: {fileID: 5297640761574045000}
   m_Layer: 0
   m_Name: _Knife_02
   m_TagString: Touchable
@@ -65,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 602fc09e09c2e9c4eba2e607d2fa94c5, type: 2}
+  - {fileID: 2100000, guid: de5956532438a564789555d256cc6189, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,36 +114,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &7809831632703207975
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3890431375749627379}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.2674137, y: 0.21975276, z: 0.7802689}
-  m_Center: {x: -0.00012461841, y: -0.08090249, z: -0.31050786}
---- !u!114 &5297640761574045000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3890431375749627379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DeathType: 1
-  PrintMessages: 0
-  DeathDelayTime: 0.5
-  DisableControlOnDeath: 0
-  UseDebounce: 1
-  DebounceTime: 1
-  <Enabled>k__BackingField: 1
-  <HideOnStartup>k__BackingField: 0

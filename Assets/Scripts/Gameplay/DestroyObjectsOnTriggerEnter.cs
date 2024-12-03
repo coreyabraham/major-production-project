@@ -24,6 +24,8 @@ public class DestroyObjectsOnTriggerEnter : MonoBehaviour
     [field: SerializeField] bool enableElementsOnStart;
     [field: Tooltip("The tag of the object that is intended to enter this trigger.\n\nWill be ignored if \"Type Of Object\" is set to Prefabs.")]
     [field: SerializeField] string tagToLookFor;
+    [field: Tooltip("Destroys the object immediately!")]
+    [field: SerializeField] bool destroyImmediately;
     #endregion
 
 
@@ -36,6 +38,13 @@ public class DestroyObjectsOnTriggerEnter : MonoBehaviour
             foreach (GameObject obj in elements)
             {
                 if (!obj) continue;
+                
+                if (destroyImmediately)
+                {
+                    DestroyImmediate(obj);
+                    continue;
+                }
+
                 Destroy(obj);
             }
         }

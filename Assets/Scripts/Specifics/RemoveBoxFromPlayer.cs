@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using UnityEngine;
 
 /// <summary>
@@ -6,27 +9,50 @@ using UnityEngine;
 public class RemoveBoxFromPlayer : MonoBehaviour, ITouchable
 {
     #region Public Variables
+    [field: Header("References")]
+    [field: SerializeField] private GameObject TargetInstance;
+
     [field: Header("ITouchable Inheritance")]
-    public bool Enabled { get; set; } = true;
-    public bool HideOnStartup { get; set; } = false;
+    [field: SerializeField] public bool Enabled { get; set; } = true;
+    [field: SerializeField] public bool HideOnStartup { get; set; } = false;
     #endregion
 
     #region Private Variables
     bool hasTriggeredOnce = false;
     #endregion
 
+    private bool DestroyTarget(PlayerSystem Player)
+    {
+        List<GameObject> children = new();
+
+        for (int i = 0; i < Player.gameObject.transform.childCount; i++)
+        {
+            Transform child = Player.transform.GetChild(i);
+            children.Add(child.gameObject);
+        }
+
+        GameObject target = children.Where(x => x.name == TargetInstance.name).SingleOrDefault();
+        if (!target) return false;
+
+        Destroy(target);
+
+        return true;
+    }
 
     public void Entered(PlayerSystem Player)
     {
         if (hasTriggeredOnce) { return; }
+        
+        bool result = DestroyTarget(Player);
+        if (!result) return;
 
         Player.IsHidden = false;
-        Destroy(Player.gameObject.transform.GetChild(2).gameObject);
-
         hasTriggeredOnce = true;
     }
 
     public void Left(PlayerSystem Player) {  }
 
     public void Staying(PlayerSystem Player) { }
+
+    private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 883.9126, g: 517.8413, b: 383.57275, a: 1}
+  m_IndirectSpecularColor: {r: 882.94727, g: 517.3213, b: 383.38623, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -12603,10 +12603,11 @@ MonoBehaviour:
   - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
   - {fileID: 1640667348317841838, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
   - {fileID: 9008884340773773650, guid: 1e6dd1dd3edd0d744845058217e75547, type: 3}
-  spawnRate: 0
+  spawnRate: 1
   spawnDelay: 1
-  spawnLimit: 0
-  lifetime: 0
+  spawnLimit: 5
+  lifetime: 1
+  canKill: 1
   useKnifeAngle: 0
   axisToSpawnAlong: 0
   clonedObjects: []
@@ -12894,6 +12895,7 @@ MonoBehaviour:
   CameraType: 1
   CameraSubject: {fileID: 2715605760701819830}
   main: {fileID: 5172598729472999201}
+  PauseMovement: 0
 --- !u!1 &5172598729454713145
 GameObject:
   m_ObjectHideFlags: 0
@@ -15145,10 +15147,11 @@ MonoBehaviour:
   - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
   - {fileID: 1640667348317841838, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
   - {fileID: 9008884340773773650, guid: 1e6dd1dd3edd0d744845058217e75547, type: 3}
-  spawnRate: 0
+  spawnRate: 1
   spawnDelay: 1
-  spawnLimit: 0
-  lifetime: 0
+  spawnLimit: 5
+  lifetime: 1
+  canKill: 1
   useKnifeAngle: 0
   axisToSpawnAlong: 0
   clonedObjects: []
@@ -16498,10 +16501,11 @@ MonoBehaviour:
   - {fileID: 3890431375749627379, guid: a742671dc1c1d784a9afe4b917ea34ba, type: 3}
   - {fileID: 1640667348317841838, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
   - {fileID: 9008884340773773650, guid: 1e6dd1dd3edd0d744845058217e75547, type: 3}
-  spawnRate: 0
+  spawnRate: 1
   spawnDelay: 1
-  spawnLimit: 0
-  lifetime: 0
+  spawnLimit: 5
+  lifetime: 1
+  canKill: 1
   useKnifeAngle: 0
   axisToSpawnAlong: 0
   clonedObjects: []
@@ -23131,7 +23135,6 @@ GameObject:
   - component: {fileID: 5172598729953620569}
   - component: {fileID: 5172598729953620570}
   - component: {fileID: 5172598729953620571}
-  - component: {fileID: 5172598729953620575}
   m_Layer: 0
   m_Name: RemoveBox
   m_TagString: Touchable
@@ -23214,18 +23217,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb15985bd8013d2408a2f471d53d4228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5172598729953620575
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5172598729953620549}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  TargetInstance: {fileID: 5172598730656588933}
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 1
 --- !u!1001 &5172598729960914789
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35259,7 +35253,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!33 &5172598730602275408
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -37733,7 +37727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40911b8be17962144bdd4ac75c81d897, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeOfObject: 0
+  typeOfObject: 1
   destroySelf: 0
   elements:
   - {fileID: 2638386819547335886, guid: 4804105f69193054f85219f01c195cd8, type: 3}
@@ -37743,7 +37737,7 @@ MonoBehaviour:
   - {fileID: 1640667348317841838, guid: 7e13af790677c774ca4b8fee61bd0c6b, type: 3}
   - {fileID: 9008884340773773650, guid: 1e6dd1dd3edd0d744845058217e75547, type: 3}
   enableElementsOnStart: 0
-  tagToLookFor: special
+  tagToLookFor: Touchable
 --- !u!4 &5172598730727279834
 Transform:
   m_ObjectHideFlags: 0

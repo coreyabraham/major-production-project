@@ -5,10 +5,10 @@ public class PlrDeathState : MonoBehaviour, ITouchable
 {
     #region Inspector Variables
     [field: Header("Settings // Standard")]
-    [field: SerializeField] private DeathType DeathType = DeathType.Default;
-    [field: SerializeField] private bool PrintMessages = false;
-    [field: SerializeField] private float DeathDelayTime = 0.5f;
-    [field: SerializeField] private bool DisableControlOnDeath = false;
+    public DeathType DeathType = DeathType.Default;
+    public bool PrintMessages = false;
+    public float DeathDelayTime = 0.5f;
+    public bool DisableControlOnDeath = false;
 
     [field: Header("Settings // Debouncing")]
     [field: SerializeField] private bool UseDebounce = true;
