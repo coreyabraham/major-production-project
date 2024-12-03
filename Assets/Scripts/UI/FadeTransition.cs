@@ -19,7 +19,7 @@ public class FadeTransition : MonoBehaviour
     [field: SerializeField] private Color TargetColor;
 
     private bool RunTransition = false;
-    private bool FadeState = false; // true = Faded in, false = Faded out
+    private bool FadeState = false;
     private bool InMiddlePoint = false;
 
     private float Current = 0.0f;
