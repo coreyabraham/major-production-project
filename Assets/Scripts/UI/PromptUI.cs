@@ -36,6 +36,9 @@ public class PromptUI : Singleton<PromptUI>
         cachedData = new();
     }
 
+    public void AcceptButtonClicked() => NavigatorInteracted(true);
+    public void DenyButtonClicked() => NavigatorInteracted(false);
+
     private void SetupPrompt(PromptDataUI data)
     {
         TitleLabel.text = data.Title;
@@ -62,8 +65,5 @@ public class PromptUI : Singleton<PromptUI>
     {
         Prompt.SetActive(false);
         SetupPrompt(DefaultData);
-
-        AcceptInteract.ClickedEvent.AddListener(() => NavigatorInteracted(true));
-        DenyInteract.ClickedEvent.AddListener(() => NavigatorInteracted(false));
     }
 }

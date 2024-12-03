@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class SettingsUI : MonoBehaviour
 {
@@ -40,6 +39,8 @@ public class SettingsUI : MonoBehaviour
     [field: SerializeField] private TMP_Text TitleLabel;
     [field: SerializeField] private string TitleText = "Player Settings";
     [field: SerializeField] private string DividerText = " // ";
+
+    [field: Header("Externals")]
     [field: SerializeField] private GameObject Container;
 
     [field: Header("Prompt UI Data")]
