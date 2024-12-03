@@ -25,7 +25,9 @@ public class CameraSystem : MonoBehaviour
 
     [field: Header("External References")]
     [field: SerializeField] private GameObject CameraSubject;
+
     [HideInInspector] public Camera main;
+    [HideInInspector] public bool PauseMovement = false;
     #endregion
 
     #region Private Variables
@@ -331,6 +333,8 @@ public class CameraSystem : MonoBehaviour
             if (!result) ActivePlayer = null;
             PreviousCameraSubject = CameraSubject;
         }
+
+        if (PauseMovement) return;
 
         if (CameraType != CameraType.TargetState || CameraType != CameraType.OffsetState)
         {

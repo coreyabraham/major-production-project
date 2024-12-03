@@ -102,6 +102,8 @@ public class PlayerSystem : MonoBehaviour
     #region Private Variables
 
     #region Public + Hidden Variables
+    [HideInInspector] public bool PhysicsPaused = false;
+
     [HideInInspector] public bool ClimbingRequested;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public bool IsJumpingFromClimb;
@@ -123,6 +125,8 @@ public class PlayerSystem : MonoBehaviour
 
     [HideInInspector] public PlrCheckpoint CurrentCheckpoint;
     #endregion
+
+    private Quaternion DefaultRotation;
 
     private Quaternion WarpRotation;
     private Quaternion CharacterRotation;
@@ -306,7 +310,9 @@ public class PlayerSystem : MonoBehaviour
     {
         IsBeingLaunched = IsClimbing = IsGrabbing = IsHidden = IsJumping = IsJumpingFromClimb = IsMoving = IsOnMop = IsPulling = IsPushing = IsScurrying = IsSliding = false;
         dieByPray = dieByBurn = dieByDrown = false;
+
         MoveType = MoveType.TwoDimensionsOnly;
+        CharacterRotation = DefaultRotation;
     }
 
     private bool SpawnAtCheckpoint()
@@ -454,9 +460,10 @@ public class PlayerSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (PhysicsPaused) return;
+
         CalculateFloorMaterial();
 
-        // TODO: This if statement chain needs to be improved for the sake of clarity!
         if (MaterialMoveSpeed <= 0.0f)
         {
             if ((!IsJumpingFromClimb && !IsScurrying && (!IsClimbing || !IsOnMop))) { SetMoveSpeed = MoveSpeed; }
@@ -480,7 +487,6 @@ public class PlayerSystem : MonoBehaviour
             IsSliding = false;
             SlideForce = 0;
 
-            // If IsJumping is true, set JumpButtonIsHeld to true after .05 seconds.
             TimeUntilJumpButtonIsDisabled += Time.fixedDeltaTime;
             if (TimeUntilJumpButtonIsDisabled > 0.05f) JumpButtonIsHeld = true;
         }
@@ -529,7 +535,6 @@ public class PlayerSystem : MonoBehaviour
         if (IsOnMop)
         {
             IsJumpingFromClimb = false;
-
             if (IsBeingLaunched) { IsBeingLaunched = false; }
         }
 
@@ -774,6 +779,8 @@ public class PlayerSystem : MonoBehaviour
 
     private void Start()
     {
+        DefaultRotation = RotatableCharacter != null ? RotatableCharacter.transform.rotation : Character.transform.rotation;
+        
         foreach (SurfaceMaterial material in Resources.LoadAll<SurfaceMaterial>(SurfaceMaterialsPath))
         {
             Surfaces.Add(material.Material.name, material);

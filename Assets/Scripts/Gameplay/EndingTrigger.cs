@@ -1,7 +1,4 @@
-using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
-using UnityEngine.UI;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class EndingTrigger : MonoBehaviour, ITouchable
 {
@@ -10,7 +7,7 @@ public class EndingTrigger : MonoBehaviour, ITouchable
     [field: SerializeField] public bool HideOnStartup { get; set; }
 
     [field: Header("External References")]
-    [field: SerializeField] private Image UI_Image;
+    [field: SerializeField] private EndingUI UI;
 
     [field: Header("Timing")]
     [field: SerializeField] private float FadeTime;
@@ -24,28 +21,26 @@ public class EndingTrigger : MonoBehaviour, ITouchable
     private bool Triggered = false;
     private bool RunTimer = false;
 
-    private void FadingComplete()
-    {
-        print("FADING COMPLETE!");
-    }
-
     private Color GetColorLerp()
     {
         Color targetColor = new(
             TargetColor.r,
             TargetColor.g,
             TargetColor.b,
-            1.0f
+            1.5f
         );
 
-        return Color.Lerp(UI_Image.color, targetColor, Time.deltaTime * FadeModifier);
+        return Color.Lerp(UI.Background.color, targetColor, Time.deltaTime * FadeModifier);
     }
 
     public void Entered(PlayerSystem Player)
     {
         if (Triggered) return;
+
         Triggered = true;
         RunTimer = true;
+
+        GameSystem.Instance.Camera.PauseMovement = true;
     }
 
     public void Left(PlayerSystem Player) { }
@@ -59,14 +54,14 @@ public class EndingTrigger : MonoBehaviour, ITouchable
         if (CurrentFadeTime < FadeTime)
         {
             CurrentFadeTime += Time.deltaTime * FadeModifier;
-            UI_Image.color = GetColorLerp();
+            UI.Background.color = GetColorLerp();
             return;
         }
 
         CurrentFadeTime = 0.0f;
         RunTimer = false;
 
-        FadingComplete();
+        UI.EnableUI();
     }
 
     private void Awake() => GetComponent<ITouchable>().SetupTrigger(gameObject);
