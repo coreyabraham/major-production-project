@@ -8,7 +8,10 @@ public class FallingObjectSpawner : MonoBehaviour
     public class ClonedObject
     {
         public GameObject Object;
-        public Material Material;
+
+        public Rigidbody Rigidbody;
+        public MeshRenderer Renderer;
+        public PlrDeathState DeathState;
 
         public float CurrentLifetime;
         public float CurrentFadeOut;
@@ -36,6 +39,8 @@ public class FallingObjectSpawner : MonoBehaviour
     [field: SerializeField] int spawnLimit;
     [field: Tooltip("The amount of time in seconds that the newly spawned object lasts for before deletion.")]
     [field: SerializeField] float lifetime;
+    [field: Tooltip("Sets a toggle within each clone to dictate whether they can kill the player if moving or not.")]
+    [field: SerializeField] bool canKill;
 
     [field: Header("Rotation")]
 
@@ -51,7 +56,7 @@ public class FallingObjectSpawner : MonoBehaviour
     BoxCollider box;
     Vector3 posToSpawnAt;
     Quaternion angToSpawnAt;
-    [field: SerializeField] List<ClonedObject> clonedObjects = new();
+    List<ClonedObject> clonedObjects = new();
     #endregion
 
 
@@ -60,7 +65,8 @@ public class FallingObjectSpawner : MonoBehaviour
     {
         if (isActive && (spawnLimit != 0 && clonedObjects.Count >= spawnLimit))
         {
-            Debug.LogWarning("You're attempting to activate a Falling Object Spawner that has already reached its Spawn Limit! Nothing will spawn if it's activated!"); return;
+            Debug.LogWarning("You're attempting to activate a Falling Object Spawner that has already reached its Spawn Limit! Nothing will spawn if it's activated!", this);
+            return;
         }
 
         isActive = setActive;
@@ -95,35 +101,55 @@ public class FallingObjectSpawner : MonoBehaviour
         //{ Debug.LogError("Prefab doesn't have a rigidbody component! It needs a rigidbody to work properly!"); isActive = false; return; }
 
         GameObject clone = Instantiate(objToSpawn, posToSpawnAt, angToSpawnAt);
-        Material material = null;
+        PlrDeathState state = null;
 
-        bool result = clone.TryGetComponent<MeshRenderer>(out MeshRenderer renderer);
-        if (result) material = renderer.material;
+        if (canKill)
+        {
+            state = clone.AddComponent<PlrDeathState>();
+
+            state.DeathType = DeathType.Default;
+            state.DeathDelayTime = 0.0f;
+            state.DisableControlOnDeath = true;
+
+            GameSystem.Instance.CacheTouchable(clone, state.GetComponent<ITouchable>());
+        }
+
+        MeshRenderer renderer = clone.GetComponent<MeshRenderer>();
+        Rigidbody rigidbody = clone.GetComponent<Rigidbody>();
 
         clonedObjects.Add(new ClonedObject {
             Object = clone,
-            Material = material,
+            
+            Rigidbody = rigidbody,
+            Renderer = renderer,
+            DeathState = state,
+
             CurrentLifetime = 0.0f,
             CurrentFadeOut = 0.0f
         });
+
+        clone.transform.parent = transform;
 
         timer = 0;
     }
 
     private bool FadeObjectOut(ClonedObject Clone)
     {
-        if (Clone.CurrentFadeOut < lifetime && Clone.Material != null)
+        if (Clone.CurrentFadeOut < lifetime && Clone.Renderer != null)
         {
             Clone.CurrentFadeOut += Time.deltaTime;
 
-            Color targetColor = new(
-                Clone.Material.color.r,
-                Clone.Material.color.g,
-                Clone.Material.color.b,
-                0.0f
-            );
+            foreach (Material material in Clone.Renderer.materials)
+            {
+                Color targetColor = new(
+                    material.color.r,
+                    material.color.g,
+                    material.color.b,
+                    0.0f
+                );
 
-            Clone.Material.color = Color.Lerp(Clone.Material.color, targetColor, Time.deltaTime);
+                material.color = Color.Lerp(material.color, targetColor, Time.deltaTime);
+            }
 
             return false;
         }
@@ -133,19 +159,25 @@ public class FallingObjectSpawner : MonoBehaviour
 
     private void Update()
     {
-        foreach (ClonedObject clone in clonedObjects)
+        for (int i = 0; i < clonedObjects.Count; i++)
         {
-            if (clone.CurrentLifetime < lifetime)
+            if (clonedObjects[i].Object != null)
             {
-                clone.CurrentLifetime += Time.deltaTime;
-                continue;
+                if (clonedObjects[i].DeathState != null)
+                    clonedObjects[i].DeathState.Enabled = clonedObjects[i].Rigidbody.velocity.y > 0.0f;
+
+                if (clonedObjects[i].CurrentLifetime < lifetime)
+                {
+                    clonedObjects[i].CurrentLifetime += Time.deltaTime;
+                    continue;
+                }
+
+                bool current = FadeObjectOut(clonedObjects[i]);
+                if (!current) continue;
             }
 
-            bool current = FadeObjectOut(clone);
-            if (!current) continue;
-
-            Destroy(clone.Object);
-            clonedObjects.Remove(clone);
+            Destroy(clonedObjects[i].Object);
+            clonedObjects.Remove(clonedObjects[i]);
         }
 
         timer += Time.deltaTime * spawnRate;
