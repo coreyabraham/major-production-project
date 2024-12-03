@@ -1,22 +1,23 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 
-/// <summary> This script should not be used anywhere outside Josh's scene. </summary>
+/// <summary> Used for handling relaunching the game during showcase day. </summary>
 public class JoshsSuperUsefulTools : MonoBehaviour
 {
     #region Private Variables
     [Header("Bools")]
 
-    [Tooltip("Press the R key to reload the current scene.")]
-    [SerializeField] bool enableSceneReloading;
-    [Tooltip("Press the Up and Down arrow keys to cycle between referenced sets.")]
-    [SerializeField] bool enableSetCycling;
+    [Tooltip("Press the = key to load the main menu scene.")]
+    [SerializeField] bool enableGameReloading = true;
+    [Tooltip("Press the - key to reload the current scene.")]
+    [SerializeField] bool enableSceneReloading = true;
+    [Tooltip("Press the Up and Down arrow keys to cycle between referenced sets.\n\nIf this script is being used outside Josh's scene, this will be ignored and treated as false.")]
+    [SerializeField] bool enableSetCycling = false;
 
     [Header("Set Cycling")]
 
-    [Tooltip("References to sets that can be toggled. They need to be manually set.\n\nIgnored if Enable Set Cycling is false.")]
+    [Tooltip("References to sets that can be toggled. They need to be manually set.\n\nIgnored if Enable Set Cycling is false or if used outside Josh's scene.")]
     [SerializeField] GameObject[] objectReferences;
 
 
@@ -27,7 +28,8 @@ public class JoshsSuperUsefulTools : MonoBehaviour
     #region Private Functions
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R) && enableSceneReloading) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
+        if (Input.GetKeyDown(KeyCode.Minus) && enableSceneReloading) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
+        if (Input.GetKeyDown(KeyCode.Equals) && enableGameReloading) { SceneManager.LoadScene(0); }
 
         if (enableSetCycling)
         {
@@ -116,6 +118,8 @@ public class JoshsSuperUsefulTools : MonoBehaviour
 
     private void Start()
     {
+        if (SceneManager.GetActiveScene().name == "Alleyway" || SceneManager.GetActiveScene().name == "Kitchen" || SceneManager.GetActiveScene().name == "Main Menu") { enableSetCycling = false; return; }
+
         // Set all referenced parents to false if they don't equal 0.
         if (enableSetCycling && objectReferences.Length > 0)
         {

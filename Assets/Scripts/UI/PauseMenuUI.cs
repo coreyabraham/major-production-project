@@ -13,7 +13,6 @@ public class PauseMenuUI : MonoBehaviour
 
     [field: Header("Scenes and Tags")]
     [field: SerializeField] private string TitleScreenScene = "Title Screen";
-    [field: SerializeField] private string TitleUIObject = "TitleUI";
 
     [field: Header("Game Objects")]
     [field: SerializeField] private GameObject Frame;
@@ -30,31 +29,7 @@ public class PauseMenuUI : MonoBehaviour
     private bool PausingPermitted;
     private float timer, refresh, avgFramerate;
 
-    public void NewSceneLoaded(Scene Scene, LoadSceneMode _)
-    {
-        PausingPermitted = !GameSystem.Instance.BlacklistedPauseScenes.Contains(Scene.name);
-        if (Scene.name != TitleScreenScene) return;
-
-        TitleUI TitleUI = null;
-
-        foreach (GameObject obj in Scene.GetRootGameObjects())
-        {
-            if (obj.name != TitleUIObject) continue;
-
-            TitleUI title = obj.GetComponent<TitleUI>();
-            if (!title) continue;
-
-            TitleUI = title;
-            break;
-        }
-
-        if (!TitleUI) return;
-
-        TitleUI.ExitMenu.PromptUI = Settings.PromptHandler;
-
-        TitleUI.SettingsMenu.JsonHandler = Settings.JsonHandler;
-        TitleUI.SettingsMenu.PromptHandler = Settings.PromptHandler;
-    }
+    public void NewSceneLoaded(Scene Scene, LoadSceneMode _) => PausingPermitted = !GameSystem.Instance.BlacklistedPauseScenes.Contains(Scene.name);
 
     public void PauseInputCalled(InputAction.CallbackContext ctx)
     {

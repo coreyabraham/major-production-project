@@ -21,14 +21,12 @@ public class RatAlign : MonoBehaviour
                 Vector3 newPos = new Vector3(playerV3.transform.position.x, playerV3.transform.position.y, targetPos.position.z);
                 Vector3 lerpPos = Vector3.Lerp(ratbody.transform.position, newPos, targetSpeed * Time.deltaTime);
                 ratbody.transform.position = lerpPos;
-                Debug.Log(ratbody.name + " is moving to target.");
         }
         else
         {
                 Vector3 newPos = new Vector3(playerV3.transform.position.x, playerV3.transform.position.y, returnPos.position.z);
                 Vector3 lerpPos = Vector3.Lerp(ratbody.transform.position, newPos, targetSpeed * Time.deltaTime);
                 ratbody.transform.position = lerpPos;
-                Debug.Log(ratbody.name + " is moving to target.");
         }
     }
 

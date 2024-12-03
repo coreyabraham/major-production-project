@@ -97,9 +97,8 @@ public class PlayerSystem : MonoBehaviour
 
     [field: Header("Collections")]
     [field: SerializeField] private PlayerAnimation[] PlayerAnimations;
+    [field: SerializeField] private string[] CustomIdleAnimations;
     #endregion
-
-    #region Private Variables
 
     #region Public + Hidden Variables
     [HideInInspector] public bool PhysicsPaused = false;
@@ -125,6 +124,11 @@ public class PlayerSystem : MonoBehaviour
 
     [HideInInspector] public PlrCheckpoint CurrentCheckpoint;
     #endregion
+
+    #region Private Variables
+    private int RandomIdleAnimIndex = 0;
+    private float RandomIdleAnimCurrentTime;
+    readonly private float RandomIdleAnimMaxTime = 10;
 
     private Quaternion DefaultRotation;
 
@@ -682,6 +686,9 @@ public class PlayerSystem : MonoBehaviour
         IsGrounded = Character.isGrounded;
         IsMoving = MoveDelta.magnitude != 0.0f;
 
+        Animator.SetBool("IsGrounded", IsGrounded);
+        Animator.SetBool("IsMoving", IsMoving);
+
         foreach (PlayerAnimation anim in PlayerAnimations)
         {
             if (anim.InternalAnimType != AnimType.Custom)
@@ -696,11 +703,39 @@ public class PlayerSystem : MonoBehaviour
                     case AnimType.Sliding: Animator.SetBool(anim.Name, IsSliding); break;
                     case AnimType.Pushing: Animator.SetBool(anim.Name, IsPulling); break;
                     case AnimType.Pulling: Animator.SetBool(anim.Name, IsPushing); break;
-                    case AnimType.Idle: Animator.SetBool(anim.Name, IsGrounded); break;
                     case AnimType.Burned: Animator.SetBool(anim.Name, dieByBurn); break;
                     case AnimType.Drowned: Animator.SetBool(anim.Name, dieByDrown); break;
                     case AnimType.Prayed: Animator.SetBool(anim.Name, dieByPray); break;
                     case AnimType.XVelocity: Animator.SetFloat(anim.Name, Mathf.Abs(Character.velocity.x)); break;
+
+                    case AnimType.Idle:
+                        if (CustomIdleAnimations.Length > 0)
+                        {
+                            if (RandomIdleAnimIndex == 0)
+                            {
+                                if (!IsGrounded || IsMoving)
+                                {
+                                    RandomIdleAnimCurrentTime = 0.0f;
+                                    RandomIdleAnimIndex = 0;
+
+                                    Animator.SetFloat("RandomIdleIndex", 0);
+                                    break;
+                                }
+
+                                if (RandomIdleAnimCurrentTime < RandomIdleAnimMaxTime)
+                                {
+                                    RandomIdleAnimCurrentTime += Time.deltaTime;
+                                    break;
+                                }
+
+                                RandomIdleAnimCurrentTime = 0.0f;
+                                RandomIdleAnimIndex = Random.Range(1, CustomIdleAnimations.Length);
+
+                                Animator.SetFloat("RandomIdleIndex", RandomIdleAnimIndex);
+                                RandomIdleAnimIndex = 0;
+                            }
+                        }
+                        break;
                 }
 
                 continue;
