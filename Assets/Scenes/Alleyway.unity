@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 882.94727, g: 517.3213, b: 383.38623, a: 1}
+  m_IndirectSpecularColor: {r: 882.7832, g: 525.666, b: 401.47754, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4642,23 +4642,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1566824813021216367, guid: 3376db53ee4d63d4982ea99f9f4a044d, type: 3}
   m_PrefabInstance: {fileID: 5172598729620367878}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2127746195
+--- !u!1 &2127746195 stripped
 GameObject:
-  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 3384127118997953031, guid: ab80552a296deff4fa2d35f6701782c7, type: 3}
   m_PrefabInstance: {fileID: 5172598730904606406}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5172598730435508050}
-  - component: {fileID: 5172598730435508049}
-  m_Layer: 0
-  m_Name: 
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
 --- !u!4 &2137305691 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1950087434944561939, guid: 7bc75fd2c73dceb47b6841129ce3e13a, type: 3}
@@ -5889,11 +5877,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.68
+      value: -36.1
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.92
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 6765966995821839399, guid: d709df7a8006d924088a9e877e2dee51, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12610,7 +12598,6 @@ MonoBehaviour:
   canKill: 1
   useKnifeAngle: 0
   axisToSpawnAlong: 0
-  clonedObjects: []
 --- !u!4 &5172598729445132751
 Transform:
   m_ObjectHideFlags: 0
@@ -13102,8 +13089,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5172598730904606407}
   - {fileID: 5172598729594720020}
-  - {fileID: 5172598730435508050}
   m_Father: {fileID: 5172598730000353592}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -15154,7 +15141,6 @@ MonoBehaviour:
   canKill: 1
   useKnifeAngle: 0
   axisToSpawnAlong: 0
-  clonedObjects: []
 --- !u!4 &5172598729543765159
 Transform:
   m_ObjectHideFlags: 0
@@ -16232,7 +16218,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5172598729461841433}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5172598729594720021
 GameObject:
@@ -16508,7 +16494,6 @@ MonoBehaviour:
   canKill: 1
   useKnifeAngle: 0
   axisToSpawnAlong: 0
-  clonedObjects: []
 --- !u!4 &5172598729606685673
 Transform:
   m_ObjectHideFlags: 0
@@ -23729,6 +23714,7 @@ MonoBehaviour:
   - {fileID: 5172598731276052134}
   enableElementsOnStart: 0
   tagToLookFor: Interactable
+  destroyImmediately: 0
 --- !u!4 &5172598729991915605
 Transform:
   m_ObjectHideFlags: 0
@@ -31784,21 +31770,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40072461ed0e4f1408ba4aa18b47c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &5172598730435508050
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2127746195}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5172598729461841433}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &5172598730438477748
 Transform:
   m_ObjectHideFlags: 0
@@ -37738,6 +37709,7 @@ MonoBehaviour:
   - {fileID: 9008884340773773650, guid: 1e6dd1dd3edd0d744845058217e75547, type: 3}
   enableElementsOnStart: 0
   tagToLookFor: Touchable
+  destroyImmediately: 0
 --- !u!4 &5172598730727279834
 Transform:
   m_ObjectHideFlags: 0
@@ -41382,6 +41354,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ab80552a296deff4fa2d35f6701782c7, type: 3}
+--- !u!4 &5172598730904606407 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 228935026645812749, guid: ab80552a296deff4fa2d35f6701782c7, type: 3}
+  m_PrefabInstance: {fileID: 5172598730904606406}
+  m_PrefabAsset: {fileID: 0}
 --- !u!65 &5172598730905781890
 BoxCollider:
   m_ObjectHideFlags: 0
