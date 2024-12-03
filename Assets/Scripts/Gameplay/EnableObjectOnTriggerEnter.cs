@@ -42,7 +42,7 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
         {
             case "FallingPotPlant": elementsToEnable[2].SetActive(true);break;
             case "FallingSprayCan": elementsToEnable[1].SetActive(true);break;
-            case "FallingPipe": elementsToEnable[0].SetActive(true); break;
+            //case "FallingPipe": elementsToEnable[0].SetActive(true); break;
             case "FallingNoodleBox": elementsToEnable[0].SetActive(true); break;
             default: wasSuccessful = false; break;
         }
@@ -60,7 +60,7 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
             if (randomiseEnables) { UpdateVisibilityRandomly(); }
             else { UpdateVisibilitySpecifically(other.name); }
 
-            if (destroyTaggedObject) { Destroy(other.gameObject); }
+            if (destroyTaggedObject && other.name != "FallingPipe") { Destroy(other.gameObject); }
         }
 
         if (other.CompareTag("Player") && canKillPlayer)
