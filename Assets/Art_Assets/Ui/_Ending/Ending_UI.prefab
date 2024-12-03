@@ -240,9 +240,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19376f2e16162294b968f9bc4e3649e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TitleSceneName: Main Menu
+  AboveZeroDeaths: You killed {DEATHS} Rats during the game... yikes.
+  ZeroDeaths: You didn't kill a single Rat! Horray for you!
   Background: {fileID: 5978308952150686719}
-  Main: {fileID: 0}
-  Buttons: []
+  Main: {fileID: 1194556211424949066}
+  Text: {fileID: 4198291533313387336}
+  Buttons:
+  - {fileID: 34343375114055332}
+  - {fileID: 3898167073031978021}
 --- !u!1 &3738550969980746026
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,7 +325,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -454,7 +460,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -618,6 +624,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
+--- !u!114 &34343375114055332 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1081834574957618818, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
+  m_PrefabInstance: {fileID: 1115047513537775654}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c5843b5008d2b24a93253672addaa64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5449837448565912181 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
@@ -728,6 +745,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
+--- !u!114 &3898167073031978021 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1081834574957618818, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}
+  m_PrefabInstance: {fileID: 4114707435995028135}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c5843b5008d2b24a93253672addaa64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &9061989132353020148 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4960934371067329107, guid: 77f7f7ff6120a674a89926d0231ea2a5, type: 3}

@@ -34,6 +34,7 @@ public class GameSystem : Singleton<GameSystem>
     [field: Header("Public")]
     public bool GameplayPaused = false;
     public bool DebugPermitted = false;
+    [HideInInspector] public uint PlayerDeathCount = 0;
 
     [field: Header("Privates")]
     [field: SerializeField] private float SceneLoadingModifier = 0.01f;
@@ -91,8 +92,11 @@ public class GameSystem : Singleton<GameSystem>
     public bool IsCurrentSceneAValidLevel() => IsTargetSceneAValidLevel(SceneManager.GetActiveScene());
     public int GetLevelCount() => Levels.Count;
 
-    // TODO: Reset all interactable / moveable objects the Player interacts with in the level they're currently in during the death transition!
-    public void PlayerDiedCallback() => Events.PlayerDied?.Invoke(Player);
+    public void PlayerDiedCallback()
+    {
+        PlayerDeathCount++;
+        Events.PlayerDied?.Invoke(Player);
+    }
 
     public void RefreshCachedExternals()
     {
@@ -202,6 +206,8 @@ public class GameSystem : Singleton<GameSystem>
     private void SceneUnloaded(Scene Scene) => Events.SceneUnloaded?.Invoke(Scene);
     private void ActiveSceneChanged(Scene Old, Scene New)
     {
+        PlayerDeathCount = 0;
+
         RefreshCachedExternals();
         PrecacheInteractions();
 
