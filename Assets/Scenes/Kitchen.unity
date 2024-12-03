@@ -248,9 +248,9 @@ MonoBehaviour:
   spawnDelay: 1
   spawnLimit: 25
   lifetime: 6
+  canKill: 0
   useKnifeAngle: 1
   axisToSpawnAlong: 1
-  clonedObjects: []
 --- !u!1001 &13784797
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13850,7 +13850,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Enabled>k__BackingField: 1
   <HideOnStartup>k__BackingField: 1
-  UI_Image: {fileID: 0}
+  UI: {fileID: 0}
   FadeTime: 3
   FadeModifier: 1
   TargetColor: {r: 0, g: 0, b: 0, a: 0}
@@ -22662,6 +22662,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6311586672009633380, guid: 402fc591e0b74e245a77ce1899927940, type: 3}
+      propertyPath: m_Size.y
+      value: 1.4238836
+      objectReference: {fileID: 0}
+    - target: {fileID: 6311586672009633380, guid: 402fc591e0b74e245a77ce1899927940, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6311586672009633380, guid: 402fc591e0b74e245a77ce1899927940, type: 3}
+      propertyPath: m_Center.y
+      value: 0.6069103
+      objectReference: {fileID: 0}
+    - target: {fileID: 6311586672009633380, guid: 402fc591e0b74e245a77ce1899927940, type: 3}
+      propertyPath: m_Center.z
+      value: -0.044864163
+      objectReference: {fileID: 0}
     - target: {fileID: 7595313889415021920, guid: 402fc591e0b74e245a77ce1899927940, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10.356632
@@ -30922,9 +30938,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1889080415}
+  - component: {fileID: 1889080417}
+  - component: {fileID: 1889080416}
   m_Layer: 0
   m_Name: Rat Trap Zone 2
-  m_TagString: Untagged
+  m_TagString: Touchable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30972,6 +30990,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1889080416
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889080414}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.6185303, y: 0.2942388, z: 1.776865}
+  m_Center: {x: 0.19073486, y: -0.3528806, z: 0.3884325}
+--- !u!114 &1889080417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889080414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb37918cbc94554eb41633c6802385f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeathType: 1
+  PrintMessages: 0
+  DeathDelayTime: 1
+  DisableControlOnDeath: 0
+  UseDebounce: 1
+  DebounceTime: 1
+  <Enabled>k__BackingField: 1
+  <HideOnStartup>k__BackingField: 0
 --- !u!1001 &1889788082
 PrefabInstance:
   m_ObjectHideFlags: 0
