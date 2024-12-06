@@ -3,9 +3,13 @@ using UnityEngine;
 public class AudioPlay : MonoBehaviour
 {
     [field: SerializeField] private AudioSource[] Sources;
-	[field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
 	
-    public Animator Animator;
+    private Animator Animator;
+
+	void Start()
+	{
+		Animator = gameObject.GetComponent<Animator>();
+	}
 
     public void PlaySteps()
     {
