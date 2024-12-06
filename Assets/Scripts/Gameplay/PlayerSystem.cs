@@ -672,7 +672,7 @@ public class PlayerSystem : MonoBehaviour
 
         rotater.transform.rotation = CharacterRotation;
     }
-
+	
     private void Update()
     {
         switch (MoveType)
@@ -729,7 +729,7 @@ public class PlayerSystem : MonoBehaviour
                                 }
 
                                 RandomIdleAnimCurrentTime = 0.0f;
-                                RandomIdleAnimIndex = Random.Range(1, CustomIdleAnimations.Length);
+                                RandomIdleAnimIndex = Random.Range(1, CustomIdleAnimations.Length + 1);
 
                                 Animator.SetFloat("RandomIdleIndex", RandomIdleAnimIndex);
                                 RandomIdleAnimIndex = 0;
