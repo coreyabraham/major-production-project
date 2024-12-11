@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 884.0215, g: 517.895, b: 383.59912, a: 1}
+  m_IndirectSpecularColor: {r: 883.7534, g: 517.7637, b: 383.55127, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -963,6 +963,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 317287234}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!95 &374776644 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7059123096655792303, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+  m_PrefabInstance: {fileID: 2844293425310399110}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &391605887
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3047,6 +3052,11 @@ Transform:
   m_Father: {fileID: 826382113}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &2083826820 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7059123095951674602, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+  m_PrefabInstance: {fileID: 2844293425310399110}
+  m_PrefabAsset: {fileID: 0}
 --- !u!2083052967 &3614355724996495
 VisualEffect:
   m_ObjectHideFlags: 0
@@ -15354,6 +15364,102 @@ PrefabInstance:
       propertyPath: m_Name
       value: _CrowLighting
       objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: speed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 374776644}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[0].Name
+      value: EnemyIsSpotted
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[1].Name
+      value: IsFlying
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[2].Name
+      value: IsLanding
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[0].CustomValueType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[1].CustomValueType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[2].CustomValueType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[0].InternalAnimType
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[1].InternalAnimType
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889165016530, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[2].InternalAnimType
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: speed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 2083826820}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[0].Name
+      value: EnemyIsSpotted
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[1].Name
+      value: IsFlying
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[2].Name
+      value: IsLanding
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[0].CustomValueType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[1].CustomValueType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[2].CustomValueType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[0].InternalAnimType
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[1].InternalAnimType
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984364889532541335, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
+      propertyPath: crowAnimations.Array.data[2].InternalAnimType
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 6363429368762070953, guid: 8ca32fceb58984440b7759db74aa86c4, type: 3}
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
@@ -15608,6 +15714,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6290413471183352636, guid: dd5803bd6d17c11458ee90f936dd3571, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 37.251
+      objectReference: {fileID: 0}
     - target: {fileID: 8420977407911143876, guid: dd5803bd6d17c11458ee90f936dd3571, type: 3}
       propertyPath: m_Name
       value: RESPAWN_Alleyway
