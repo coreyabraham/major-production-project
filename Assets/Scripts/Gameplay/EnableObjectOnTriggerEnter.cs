@@ -17,6 +17,10 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
     [field: SerializeField] bool destroyTaggedObject;
     [field: Tooltip("If the player enters this trigger, will it be treated as a death?")]
     [field: SerializeField] bool canKillPlayer;
+
+    [field: Header("Hyper Specific Bools")]
+    [field: Tooltip("Removes the tire from the alleyway once the takeaway box has been pushed over the ledge. This ensures the player cannot backtrack and therefore see that the player can climb while disguised, which shouldn't be possible.")]
+    [field: SerializeField] bool doAdditionalAlleywayThing = false;
     #endregion
 
     private void UpdateVisibilityRandomly()
@@ -56,6 +60,13 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
 
         if (other.CompareTag(tagToLookFor))
         {
+            if (doAdditionalAlleywayThing)
+            {
+                elementsToEnable[0].SetActive(true);
+                elementsToEnable[1].SetActive(false);
+                return;
+            }
+
             if (randomiseEnables) { UpdateVisibilityRandomly(); }
             else { UpdateVisibilitySpecifically(other.name); }
 
@@ -71,6 +82,7 @@ public class EnableObjectOnTriggerEnter : MonoBehaviour
 
     private void Start()
     {
-        foreach (GameObject obj in elementsToEnable) obj.SetActive(false);
+        if (!doAdditionalAlleywayThing) { foreach (GameObject obj in elementsToEnable) obj.SetActive(false); }
+        else { elementsToEnable[0].SetActive(false); }
     }
 }

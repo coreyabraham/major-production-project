@@ -32,12 +32,15 @@ public class BoxScript : MonoBehaviour
     float previousXPos;
     float marginOfError = 0.01f;
 
+    Vector3 startPos;
+
     LayerMask layerMask;
     #endregion
 
     #region Functions - Public
     public float GetGrabDistance() => grabDistanceFromPlayer / 10f;
     public bool CheckIfValidPush(Vector3 direction) => !Physics.Raycast(transform.position + Vector3.up / 4, transform.TransformDirection(direction), 0.27f, layerMask);
+    public Vector3 GetStartPos() => startPos;
     public void FreezeBox() => rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     public void UnfreezeBox()
     {
@@ -108,6 +111,8 @@ public class BoxScript : MonoBehaviour
 
         if (rightParticleSystem != null && leftParticleSystem != null) { canUseParticles = true; }
         else { Debug.LogWarning("One or both particles have not been set. They must both be set in order to use particles."); }
+
+        startPos = transform.position;
 
         layerMask = LayerMask.GetMask("BoxBoundary");
     }
