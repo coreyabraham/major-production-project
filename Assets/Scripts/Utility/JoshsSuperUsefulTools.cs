@@ -26,10 +26,17 @@ public class JoshsSuperUsefulTools : MonoBehaviour
 
 
     #region Private Functions
+    private void StopAllSounds()
+    {
+        AudioSource[] allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        foreach (AudioSource audioS in allAudioSources) { audioS.Stop(); }
+    }
+
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Minus) && enableSceneReloading) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
-        if (Input.GetKeyDown(KeyCode.Equals) && enableGameReloading) { SceneManager.LoadScene(0); }
+        if (Input.GetKeyDown(KeyCode.Minus) && enableSceneReloading) { StopAllSounds(); SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
+        if (Input.GetKeyDown(KeyCode.Equals) && enableGameReloading) { StopAllSounds(); SceneManager.LoadScene(0); }
 
         if (enableSetCycling)
         {
