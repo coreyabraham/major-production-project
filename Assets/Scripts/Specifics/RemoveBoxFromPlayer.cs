@@ -48,6 +48,8 @@ public class RemoveBoxFromPlayer : MonoBehaviour, ITouchable
 
         Player.IsHidden = false;
         hasTriggeredOnce = true;
+
+        Player.RotatableCharacter.SetActive(true);
     }
 
     public void Left(PlayerSystem Player) {  }

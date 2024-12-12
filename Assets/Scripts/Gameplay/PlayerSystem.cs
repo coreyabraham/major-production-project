@@ -93,7 +93,7 @@ public class PlayerSystem : MonoBehaviour
     [field: Tooltip("Reference to the player model's Animator that's used to animate the character.")]
     public Animator Animator;
     [field: Tooltip("The Character Model to rotate when dealing with rotations")]
-    [field: SerializeField] private GameObject RotatableCharacter;
+    public GameObject RotatableCharacter;
 
     [field: Header("Collections")]
     [field: SerializeField] private PlayerAnimation[] PlayerAnimations;

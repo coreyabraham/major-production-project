@@ -29,6 +29,7 @@ public class TakeawayBoxTrigger : MonoBehaviour, IInteractable
         if (GetComponent<BoxCollider>()) { Destroy(GetComponent<BoxCollider>()); }
         if (transform.parent.GetComponent<BoxCollider>()) { Destroy(transform.parent.GetComponent<BoxCollider>()); }
 
+        Player.RotatableCharacter.SetActive(false);
         Player.IsHidden = true;
     }
 
